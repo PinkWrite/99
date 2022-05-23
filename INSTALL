@@ -1,0 +1,19 @@
+# [PinkWrite 99](https://github.com/PinkWrite/99) install instructions
+
+## Web cloud requirements: (same as WordPress)
+- Simple LAMP stack
+  - Linux
+  - Apache web server
+  - MySQL/MariaDB database
+  - PHP
+- FTP or CLI access to a hosted web folder
+- Database and user already setup
+
+## Install Instructions:
+- Unzip the [zip file](https://github.com/PinkWrite/99/archive/refs/heads/master.zip) or `git clone` the [git repo](https://github.com/PinkWrite/99.git) into your web folder
+- Make sure you have a MySQL/MariaDB database and user setup
+- Go to your web folder: example.com/`install.php`
+- Follow the one-step instructions
+
+## Admin recovery:
+- Download and place `install.php` from the web folder to create a new admin to regain access

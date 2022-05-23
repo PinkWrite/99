@@ -1,0 +1,5 @@
+User-agent:  * # Applies to all!
+Disallow: /includes/ # Don't scan the includes directory.
+Disallow: /tinymce/ # Don't scan the tiny_mce directory.
+Disallow: /
+# Disallow: /ADMINDIRECTORYNAME/ # Don't scan the administrative directory, if it exists.

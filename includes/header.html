@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<link href="https://write.pink/99" rel="canonical">
+<link rel="shortcut icon" type="image/png" href="favicon.png"/>
+<meta name="robots" content="noindex">
+<meta name="description" content="Worldwide classified ads, work at home want-ads, suppliers needed, luxury items for sale, not location-specific">
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://write.pink/99" />
+<meta property="og:title" content="classified ads" />
+<meta property="og:image" content="https://write.pink/99/PW99-og-image.jpg" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="css/styles.css" type="text/css" />
+
+<title><?php // Use a default page title if one wasn't provided...
+if (isset($page_title)) {
+		echo $page_title;
+} else {
+		echo $siteTitle.': Classifieds ALPHA-DEV';
+}
+include ('includes/tallies.inc.php');
+?></title>
+</head>
+<body>
+<div id="wrap">
+	<?php if (isset($_SESSION['user_id'])) {echo '
+	<div id="top_menu_nav">
+		<div id="topnav">
+			<ul class="topnav">
+				<li>
+					<h1><a class="dklink" href="index.php">PinkWrite 99</a></h1>
+				</li>
+				<li class="user">';
+					set_button("Logout", "Exit from this login session", "logout.php", "navButton user");
+				echo '
+				</li>';
+					if ($_SESSION['user_is_admin'] == true) {
+						echo '
+						<li class="user">';
+							set_button("Admin Dash", "View Editor dashboard", "adminor.php", "navButton user $active_admin");
+						echo '
+						</li>
+						<li class="user">';
+							set_button("Editor Dash", "View Editor dashboard", "editor.php", "navButton user $active_editor");
+						echo '
+						</li>';
+						echo '
+						<li class="user">';
+							set_button("Observer Dash", "View Observer dashboard", "observer.php", "navButton user $active_observer");
+						echo '
+						</li>';
+						echo '
+						<li class="user">';
+							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+						echo '
+						</li>';
+					} elseif ($_SESSION['user_is_supervisor'] == true) {
+						echo '
+						<li class="user">';
+							set_button("Admin Dash", "View Editor dashboard", "adminor.php", "navButton user $active_admin");
+						echo '
+						</li>
+						<li class="user">';
+							set_button("Editor Dash", "View Editor dashboard", "editor.php", "navButton user $active_editor");
+						echo '
+						</li>';
+						echo '
+						<li class="user">';
+							set_button("Observer Dash", "View Observer dashboard", "observer.php", "navButton user $active_observer");
+						echo '
+						</li>';
+						echo '
+						<li class="user">';
+							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+						echo '
+						</li>';
+					} elseif ($_SESSION['user_is_editor'] == true) {
+						echo '
+						<li class="user">';
+							set_button("Editor Dash", "View Editor dashboard", "editor.php", "navButton user $active_editor");
+						echo '
+						</li>';
+						echo '
+						<li class="user">';
+							set_button("Observer Dash", "View Observer dashboard", "observer.php", "navButton user $active_observer");
+						echo '
+						</li>';
+							echo '
+						<li class="user">';
+							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+						echo '
+						</li>';
+					} elseif ($_SESSION['user_is_observer'] == true) {
+						echo '
+						<li class="user">';
+							set_button("Observer Dash", "View Observer dashboard", "observer.php", "navButton user $active_observer");
+						echo '
+						</li>';
+							echo '
+						<li class="user">';
+							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+						echo '
+						</li>';
+					} else {
+						echo '
+						<li class="user">';
+							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+						echo '
+						</li>';
+					}
+				echo '
+			</ul>
+		</div>
+	</div>';
+	} ?>
+
+	<div id="header" class="header">
+		<!-- TITLE -->
+		<!-- <h1>PAGE_TITLE_CAN_GO_HERE</h1> -->
+		<!-- END TITLE -->
+	</div>
+
+	<div class="page">
+
+		<div class="content">
+
+			<!-- CONTENT -->

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Word Hanon
+</title>
+<!-- CSS -->
+<style>
+/* Global styles */
+body {
+/* background-color: #e9e4dd; */
+background-color: #666;
+}
+
+h1 {
+font:24px/36px sans-serif;
+color:#fff;
+}
+
+a.h1link {
+color:#555;
+text-decoration:none;
+}
+
+/* Box styles */
+.listBox {
+border:none;
+background:#333;
+color:#ccc;
+font: 24px/36px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+border:none;
+resize:none;
+width:100%;
+outline:none;
+}
+
+.typeBox {
+background:#222;
+color:#eee;
+font-size:x-large;
+font-family: "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+border:none;
+resize:none;
+outline:none;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+width:12px;
+height:12px;
+}
+
+::-webkit-scrollbar-thumb {
+background:#444;
+border-radius:10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background:#f71771;
+}
+
+::-webkit-scrollbar-corner {
+background:#e9e4dd;
+}
+
+/* Highlight style */
+::-moz-selection {
+color:#fff;
+background:#f71771;
+}
+
+::selection {
+color:#fff;
+background:#f71771;
+}
+
+/* Keyboard chart */
+img.center {
+display:block;
+margin-left:auto;
+margin-right:auto;
+width:50%;
+}
+
+</style>
+
+</head>
+<body>
+<h1>Word Hanon <a class="h1link" href="index.html">[88]</a> <a class="h1link" href="typeScreen.html">[TYPE]</a></h1>
+<textarea class="listBox" rows="8" cols="82" placeholder="Put practice words here.."></textarea>
+<br />
+<br />
+<textarea class="typeBox" rows="4" cols="82" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Type here..."></textarea>
+<br />
+<br />
+<img class="center" src="Keyboard.png" alt="Typing Keyboard Finger Chart" />
+<br />
+<!--
+<div class="typeBox">
+
+</div>
+<br />
+<br />
+-->
+</body>
+</html>

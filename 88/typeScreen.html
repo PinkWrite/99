@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Word Hanon
+</title>
+<!-- CSS -->
+<style>
+/* Global styles */
+body {
+/* background-color: #e9e4dd; */
+background-color: #666;
+}
+
+h1 {
+font:24px/36px sans-serif;
+color:#fff;
+}
+
+a.h1link {
+color:#555;
+text-decoration:none;
+}
+
+/* Box styles */
+.readScreen {
+border:none;
+background:#333;
+color:#ccc;
+font: 24px/36px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+border:none;
+width:100%;
+outline:none;
+}
+
+.typeScreen {
+background:#222;
+color:#eee;
+font-size:x-large;
+font-family: "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+border:none;
+width:100%;
+outline:none;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+width:12px;
+height:12px;
+}
+
+::-webkit-scrollbar-thumb {
+background:#444;
+border-radius:10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background:#f71771;
+}
+
+::-webkit-scrollbar-corner {
+background:#e9e4dd;
+}
+
+/* Highlight style */
+::-moz-selection {
+color:#fff;
+background:#f71771;
+}
+
+::selection {
+color:#fff;
+background:#f71771;
+}
+
+</style>
+
+</head>
+<body>
+<h1>Type Screen <a class="h1link" href="index.html">[88]</a> <a class="h1link" href="listWordHanon.html">[CUSTOM LIST]</a></h1>
+<textarea class="readScreen" rows="8" cols="82" placeholder="Put original text here.."></textarea>
+<br />
+<br />
+<textarea class="typeScreen" rows="8" cols="82" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Type here..."></textarea>
+<br />
+</body>
+</html>

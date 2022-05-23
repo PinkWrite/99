@@ -1,0 +1,1253 @@
+/* File save CSS */
+#textArea {
+  display: block;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+body {
+  background-color: #333;
+  color: #ddd;
+}
+
+hr {
+  color: #ddd;
+}
+
+div#wrap {
+  margin: 0.5em;
+}
+
+/* Top Nav */
+div#top_menu_nav {
+  overflow: hidden;
+  top: 0;
+  height: 2em;
+  width: 100%;
+  padding: 0.2em;
+}
+/* User nav */
+ul.topnav {
+  position: relative;
+  margin 0;
+}
+div#topnav {
+	/* background-color:#202020;*/
+}
+div#topnav ul {
+	list-style: none;
+	padding:0;
+	height:100%;
+	/* background-color:#202020;*/
+	margin:0;
+	position:relative;
+}
+div#topnav ul li {
+	display:inline;
+	float:left;
+	/* background-color:#202020;*/
+	padding:10;
+}
+div#topnav ul li.user {
+  padding-left: 0.3em;
+  display:inline;
+	float:right;
+}
+/* For topnav links with non-buttons
+div#topnav ul li.selected {
+	background-color:#353535;
+}
+div#topnav ul li.selected a, div#topnav ul li.selected a:visited {
+	color:#fff;
+	background-color:#353535;
+}
+div#topnav ul li.selected a, div#topnav ul li.selected a:hover {
+  /* background-color:#f71771;
+	display:block;
+	cursor:pointer;
+}
+div#topnav ul li a, div.nav ul li a:visited {
+	float:left;
+	margin:0 5px;
+	padding:10px;
+	text-decoration:none;
+	color:#fff;
+	font-weight:normal;
+	font-size: 0.9em;
+	font-family: Arial, Helvetica, sans-serif;
+}
+div#topnav ul li a:hover {
+	background-color:#353535;
+	padding:0;
+}
+div#topnav ul li a:hover {
+	background-color:#353535;
+	display:block;
+	padding:10px;
+	cursor:pointer;
+}
+*/
+
+/* Top Nav */
+div.dash_menu_nav {
+  overflow: hidden;
+  top: 0;
+  height: 2em;
+  width: 100%;
+  padding: 0.2em;
+  margin: 0.5em 0;
+}
+/* User nav */
+ul.dashnav {
+  position: relative;
+  margin 0;
+}
+div.dashnav {
+	/* background-color:#202020;*/
+}
+div.dashnav ul {
+	list-style: none;
+	padding:0;
+	height:100%;
+	/* background-color:#202020;*/
+	margin:0;
+	position:relative;
+}
+div.dashnav ul li {
+	display:inline;
+	float:left;
+	/* background-color:#202020;*/
+	padding:10;
+}
+div.dashnav ul li.user {
+  padding-left: 0.3em;
+  display:inline;
+	float:right;
+  font:0.72em/1.44em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+/* Headers */
+#header {
+  padding: 0.1em;
+}
+
+h1, h2, h3, h4, h5, h6, label {
+color:#555;
+}
+
+h1 {
+  font:24px/36px Verdana, Arial, Helvetica, sans-serif;
+  margin-top: 0.1em;
+}
+
+h1 a.dklink {
+  font:24px/36px Verdana, Arial, Helvetica, sans-serif;
+  margin: 0.1em 0;
+}
+
+h2 {
+  font:22px/34px Verdana, Arial, Helvetica, sans-serif;
+}
+
+h3 {
+  font:20px/32px Verdana, Arial, Helvetica, sans-serif;
+}
+
+h4 {
+  font:18px/30px Verdana, Arial, Helvetica, sans-serif;
+}
+
+h5 {
+  font:16px/28px Verdana, Arial, Helvetica, sans-serif;
+}
+
+h6 {
+  font:14px/16px Verdana, Arial, Helvetica, sans-serif;
+}
+
+.sans {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.view_note {
+  color:#aaa;
+}
+
+a.listed_note {
+  color:#888;
+  font-size:1.2em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+a.listed_note:hover {
+  color:#f71771;
+}
+
+i.listed_note {
+  color:#555;
+  font-size: 0.8em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.right {
+  text-align: right;
+}
+
+.padding_8_right {
+  padding: 0px 8px 0px 0px;
+}
+
+.note_blue {
+  color: #3f6fb9;
+}
+.note_green {
+  color: #708070;
+}
+.note_orange {
+  color: #7f7a78;
+}
+
+p, div.correction {
+  color:#aaa;
+}
+
+a {
+color:#f71771;
+text-decoration:none;
+}
+
+.dk, .dk a, a.dklink {
+color:#555;
+text-decoration:none;
+}
+
+.dk, a:hover {
+color:#f71771;
+text-decoration:none;
+}
+
+.dk {
+color:#555;
+text-decoration:none;
+}
+
+.lt {
+color:#777;
+text-decoration:none;
+}
+
+.bt {
+color:#888;
+text-decoration:none;
+}
+
+.red {
+color:#cc3936;
+text-decoration:none;
+}
+
+/* Defaults */
+input, textarea {
+  background:#555;
+  color: #ccc;
+  font: 16px/36px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+  border: none;
+  border-radius: 4px;
+  padding:3px 3px 3px 8px;
+}
+
+
+/* Box styles */
+.readBox {
+border: none;
+background:#282828;
+color:#ccc;
+font: 16px/32px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+border: none;
+width:99%;
+outline:none;
+padding:3px 3px 3px 3px;
+}
+
+.writingBox {
+border: none;
+background:#222;
+color:#eee;
+font: 16px/32px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+border: none;
+width:99%;
+outline:none;
+padding:3px 3px 3px 8px;
+}
+
+#saveName {
+resize:none;
+}
+
+/* Word count */
+.wordCounter {
+color:#000;
+font: 28px/24px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+width:12px;
+height:12px;
+}
+
+::-webkit-scrollbar-thumb {
+background:#444;
+border-radius:10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background:#f71771;
+}
+
+::-webkit-scrollbar-corner {
+background:#e9e4dd;
+}
+
+/* Highlight style */
+::-moz-selection {
+color:#000;
+background:#f71771;
+}
+
+::selection {
+color:#000;
+background:#f71771;
+}
+
+/* buttons */
+.formbutton {
+  cursor: pointer;
+  background-color: #222;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.formbutton:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.darkButton {
+  cursor: pointer;
+  background-color: #222;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.darkButton:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.navButton {
+  cursor: pointer;
+  background-color: #2d2d2d;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.navButton:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.navButton.user.active {
+  background-color: #282828;
+}
+
+.navButton.user.active:hover {
+  background-color: #2d2d2d;
+}
+
+.navButton.user.activedash {
+  background-color: #222;
+}
+
+.navButton.user.activedash:hover {
+  background-color: #2d2d2d;
+}
+
+.navDarkButton {
+  cursor: pointer;
+  background-color: #2a2a2a;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.navDarkButton:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.navDarkButton.user.active {
+  background-color: #222;
+}
+
+.navDarkButton.user.active:hover {
+  background-color: #2a2a2a;
+}
+
+.newNoteButton {
+  cursor: pointer;
+  background-color: #222;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.newNoteButton:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.editNoteButton {
+  cursor: pointer;
+  background-color: #2a2a2a;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.editNoteButton:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.2em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.ln_button {
+  cursor: pointer;
+  background-color: #333;
+  color: #ccc;
+  font-size: 0.8em;
+  border: solid #ccc;
+  border-width: 2px;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.ln_button:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: solid #ccc;
+  border-width: 2px;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.dk_sub_button {
+  cursor: pointer;
+  background-color: #222;
+  color: #ccc;
+  font-size: 0.8em;
+  border: solid #222;
+  border-width: 2px;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.dk_sub_button:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: solid #f71771;
+  border-width: 2px;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.dk_button {
+  cursor: pointer;
+  background-color: #222;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.dk_button:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.lt_button {
+  cursor: pointer;
+  background-color: #444;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.lt_button:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+/* Other inputs */
+.formselect {
+  cursor: pointer;
+  background-color: #555;
+  border: none;
+  color: #ccc;
+  width: auto;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 24px 3px 8px;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  font: 16px/36px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+  -moz-appearance:none; /* Firefox */
+  -webkit-appearance:none; /* Safari and Chrome */
+  appearance:none;
+  background: url(da_16.png) no-repeat right #555;
+}
+
+span.small,
+p.small {
+  border: none;
+  padding: 0.3em 2.2em 0.3em 0.7em;
+  font:0.72em/1.44em Verdana, Arial, Helvetica, sans-serif;
+}
+
+code.small,
+pre.small {
+  border: none;
+  padding: 0.3em 2.2em 0.3em 0.7em;
+  font:0.72em/1.44em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+select.small {
+  cursor: pointer;
+  background-color: #2a2a2a;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3em 2.2em 0.3em 0.7em;
+  font:0.72em/1.44em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+input.small[type=submit],
+button.small,
+input.small[type=submit]:hover,
+button.small:hover {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3em 0.7em;
+  font:0.72em/1.44em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+.act_dkgray {
+  color: #ccc;
+  background-color: #222;
+}
+
+.act_gray:hover {
+  background-color: #f71771;
+}
+
+.act_gray {
+  color: #ccc;
+  background-color: #333;
+}
+
+.act_gray:hover {
+  background-color: #f71771;
+}
+
+.act_ltgray {
+  color: #ccc;
+  background-color: #444;
+}
+
+.act_ltgray:hover {
+  background-color: #f71771;
+}
+
+.act_red {
+  color: #ccc;
+  background-color: #731a15;
+}
+
+.act_red:hover {
+  background-color: #f71771;
+}
+
+.act_orange {
+  color: #ccc;
+  background-color: #734a20;
+}
+
+.act_orange:hover {
+  background-color: #f71771;
+}
+
+.act_green {
+  color: #ccc;
+  background-color: #51700e;
+}
+
+.act_green:hover {
+  background-color: #f71771;
+}
+
+.act_blue {
+  color: #ccc;
+  background-color: #2c3c55;
+}
+
+.act_blue:hover {
+  background-color: #f71771;
+}
+
+.act_disabled {
+  color: #ccc;
+  background-color: #3c3c3c;
+}
+
+.act_disabled:hover {
+  color: #f71771;
+}
+
+input.small:hover,
+button.small:hover {
+  background-color: #f71771;
+}
+
+input[type=checkbox] {
+  background-color: transparent;
+}
+
+input[type=text].lt_text {
+  background-color: #444;
+  color: #ccc;
+  width:30%;
+  outline:none;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+/* Search clear button */
+.search-input {
+  position: relative;
+  display: inline-block;
+}
+.search-input > input {
+  padding-right: 1.4em;
+}
+/* .search-input:hover > [data-clear-input] {
+  display: block; Hover-only styling
+} */
+.search-input > [data-clear-input] {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 50%;
+  background: #ddd;
+  color: #555;
+  width: 0.8em;
+  height: 0.8em;
+  text-align: center;
+  font-weight: bold;
+  font-size: 2em;
+  margin: 0.2em 0.3em;
+  padding: 0;
+  line-height: 0.8em;
+  cursor: pointer;
+}
+.search-input > input::-ms-clear,
+.search-input > input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* Pagination */
+div.paginate_nav_container {
+	text-align: right;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+div.paginate_nav {
+	display: inline-block;
+}
+
+a.paginate {
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.8em;
+  border: none;
+	border-radius: 8px;
+	padding: 0.8em 1em;
+  padding: 4px 8px;
+	font-size: 0.9em;
+	background-color: #222;
+	color: #777;
+}
+
+a.paginate:hover {
+  background-color: #f71771;
+  color: #fff;
+}
+
+a.paginate.disabled {
+  pointer-events: none;
+  background-color: #2f2f2f;
+	color: #555;
+}
+a.paginate.current {
+	pointer-events: none;
+  background-color: #2f2f2f;
+}
+
+/* Reset button for search */
+input[type=number] {
+  background-color: #444;
+  color: #888;
+  font-size: 0.8em;
+  border: none;
+	border-radius: 8px;
+	padding: 0.8em 1em;
+  font:18px/26px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+  /* Firefox */
+	appearance: textfield;
+	-moz-appearance:textfield;
+	margin: 0;
+}
+/* Chrome */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+	 margin: 0;
+}
+
+input[type=number].score_dk {
+  width: 3em;
+  color: #bbb;
+  background-color: #252525;
+}
+
+input[type=number].score_lt {
+  width: 3em;
+  color: #ccc;
+  background-color: #444;
+}
+
+input[type=number].outof_dk {
+  width: 2.5em;
+  color: #999;
+  background-color: #383838;
+  font-size: 0.8em;
+}
+
+form input.set_gray,
+button.set_gray {
+  cursor: pointer;
+  background-color: #222;
+  border: none;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_gray:hover,
+button.set_gray:hover {
+  cursor: pointer;
+  background-color: #f71771;
+  border: none;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+form input.set_writ_gray {
+  width: 7em;
+  cursor: pointer;
+  background-color: #222;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_gray:hover {
+  width: 7em;
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_red {
+  width: 7em;
+  cursor: pointer;
+  background-color: #731a15;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_red:hover {
+  width: 7em;
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_orange {
+  width: 7em;
+  cursor: pointer;
+  background-color: #734a20;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_orange:hover {
+  width: 7em;
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_green {
+  width: 7em;
+  cursor: pointer;
+  background-color: #51700e;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_green:hover {
+  width: 7em;
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_blue {
+  width: 7em;
+  cursor: pointer;
+  background-color: #2c3c55;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_blue:hover {
+  width: 7em;
+  cursor: pointer;
+  background-color: #f71771;
+  color: #ccc;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+form input.set_writ_disabled {
+  width: 7em;
+  cursor: not-allowed;
+  background-color: #3c3c3c;
+  color: #555;
+  font-size: 0.8em;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font:1em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
+
+button {
+  cursor: pointer;
+	background:#333 none repeat-x scroll bottom left;
+	color:#ffffff;
+	font-size: 0.8em;
+	border: none;
+	border-radius: 8px;
+	overflow: hidden;
+	padding: 0.35em 0.7em;
+	font-weight:bold;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+button:hover {
+  cursor: pointer;
+	background:#444 none repeat-x scroll bottom left;
+	color:#ffffff;
+	cursor:pointer;
+	font-size: 0.8em;
+	border: none;
+	border-radius: 8px;
+	overflow: hidden;
+	padding: 0.35em 0.7em;
+	font-weight:bold;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+/* default tables */
+table {
+	width:100%;
+	margin-bottom: 0.35em;
+}
+table.writs {
+	text-align: left;
+}
+table.notes {
+	text-align: left;
+}
+table tr th, table tr td {
+	padding: 0.35em 0.7em;
+}
+table tr th {
+  border-bottom-style:2px solid #444;
+	color:#888;
+  text-align:left;
+}
+table tr td {
+	border-bottom-style:1px solid #444;
+}
+table.plain tr td {
+	border-bottom-style: none;
+  vertical-align: middle;
+}
+table.list tr.lr {
+  background-color: #383838;
+}
+table.list tr.dr {
+  background-color: #313131;
+}
+table.list tr.hr {
+  background-color: #222;
+  font-style: italic;
+}
+
+/* Notices */
+@-webkit-keyframes fadeOut {
+  0% { opacity: 1;}
+  99% { opacity: 0.01;width: 100%; height: 100%;}
+  100% { opacity: 0;width: 0; height: 0;}
+}
+@keyframes fadeOut {
+  0% { opacity: 1;}
+  99% { opacity: 0.01;width: 100%; height: 100%;}
+  100% { opacity: 0;width: 0; height: 0;}
+}
+.noticehide {
+  -webkit-animation: fadeOut 8s;
+  animation: fadeOut 8s;
+  animation-fill-mode: forwards;
+}
+
+.noticegreen,
+p.noticegreen,
+b.noticegreen,
+i.noticegreen,
+span.noticegreen {
+  color: #448844;
+}
+
+input.error,
+textarea.error,
+input.noticered,
+textarea.noticered {
+  border: 2px solid #884444;
+}
+
+.error,
+p.error,
+b.error,
+i.error,
+span.error,
+.noticered,
+p.noticered,
+b.noticered,
+i.noticered,
+span.noticered
+ {
+  color: #884444;
+}
+
+.noticeblue,
+p.noticeblue,
+b.noticeblue,
+i.noticeblue,
+span.noticeblue {
+  color: #448844;
+}
+
+.noticeorange,
+p.noticeorange,
+b.noticeorange,
+i.noticeorange,
+span.noticeorange {
+  color: #777733;
+}
+
+/* Writ content */
+section.writcontent {
+  color: #bbb;
+  line-height: 3;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+section.writcontent,
+section.draft {
+
+}
+section.writcontent,
+section.revision {
+
+}
+section.writcontent,
+section.diff {
+
+}
+section.writcontent,
+section.remarks {
+
+}
+section.writcontent,
+section.correction {
+
+}
+section.writcontent,
+section.scoring {
+
+}
+section.writcontent,
+section.score {
+
+}
+section.writcontent,
+section.notes {
+
+}
+
+/* HTMLdiff */
+ins {
+  color: #ddd;
+  text-decoration: none;
+  background-color: #374a1e;
+}
+
+del {
+  color: #888;
+  text-decoration: line-through;
+  background-color: #3d2c30;
+}
