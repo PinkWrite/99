@@ -106,7 +106,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 	if (empty($pass_errors)) { // If everything is OK
 
 		// Update the database
-		$q = "UPDATE users SET email='$email1', name='$name', username='$username' $type_sql WHERE id='$u_id'";
+		$q = "UPDATE users SET email='$email1', name='$name', username='$username', editor='$editor' $type_sql WHERE id='$u_id'";
 		if ($r = mysqli_query ($dbc, $q)) { // If it ran OK.
 
 			// Let the user know the email has been changed
@@ -195,7 +195,7 @@ echo "<h3>Change user account info</h3>
 		$editor_type = "$rowe[0]";
 		$editor_username = "$rowe[1]";
 		$editor_name = "$rowe[2]";
-		$editor_id = $row[3];
+		$editor_id = $rowe[3];
 
 		echo '<option value="'.$editor_id.'"';
 
@@ -203,6 +203,7 @@ echo "<h3>Change user account info</h3>
 			echo ' selected';
 		}
 		echo '>'.$editor_name.' ('.$editor_type.' - <small>'.$editor_username.'</small>)</option>';
+
 	}
 	echo '</select></p>';
 

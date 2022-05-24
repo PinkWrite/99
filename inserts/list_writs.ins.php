@@ -7,13 +7,20 @@ $term_status = (isset($term_status)) ? $term_status : 'current'; // Must be set
 $sort_get = (strstr($where_am_i, '?')) ? '&' : '?' ;
 
 // Sort GET setting
+$activity_cl = 'act_ltgray';
 $creation_cl = 'act_ltgray';
 $work_cl = 'act_ltgray';
 $title_cl = 'act_ltgray';
 $status_cl = 'act_ltgray';
+$coalesce_greatest_dates = "COALESCE ( GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date), draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date )";
 if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 	$sort = preg_replace("/[^a-z]/","", $_GET['s']);
 	switch ($sort) {
+		case "activity":
+				$order_by = "$coalesce_greatest_dates DESC";
+				$activity_cl = 'act_dkgray';
+				$sort_suffix = 's=activity';
+				break;
 		case "creation":
 				$order_by = "id DESC";
 				$creation_cl = 'act_dkgray';
@@ -35,14 +42,14 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				$sort_suffix = 's=status';
 				break;
 		default:
-				$order_by = "id DESC";
-				$creation_cl = 'act_dkgray';
+				$order_by = "$coalesce_greatest_dates DESC";
+				$activity_cl = 'act_dkgray';
 				$sort_suffix = 's=creation';
 				break;
 	}
 } else {
-	$order_by = "id DESC";
-	$creation_cl = 'act_dkgray';
+	$order_by = "$coalesce_greatest_dates DESC";
+	$activity_cl = 'act_dkgray';
 	$sort_suffix = '';
 }
 
@@ -183,6 +190,8 @@ echo '
 		<td>
 		<span class="lo sans">&uarr;&darr;</span>
 		</td><td>';
+set_button("Activity", "Sort by most recent activity", "${where_am_i}${sort_get}s=activity${search_suffix}", $activity_cl);
+echo '</td><td>';
 set_button("Creation", "Sort by order of creation", "${where_am_i}${sort_get}s=creation${search_suffix}", $creation_cl);
 echo '</td><td>';
 set_button("Work", "Sort by work", "${where_am_i}${sort_get}s=work${search_suffix}", $work_cl);

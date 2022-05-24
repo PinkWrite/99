@@ -10,7 +10,7 @@ $userid = $_SESSION['user_id'];
 
 if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1)))) {
 	$v = preg_replace("/[^0-9]/","", $_GET['v']);
-	$blocks_sql = "blocks LIKE '%\"$v\"%' AND";
+	$filter_sql = "blocks LIKE '%\"$v\"%' AND";
 
 	// Retrieve the block info
 	$q = "SELECT name, code FROM blocks WHERE id='$v'";
@@ -22,8 +22,23 @@ if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('m
 	// Heading
 	echo '<h3>Writers for block: '.$block_name.' <small>('.$block_code.')</small></h3>
 	<a title="List all writers from all blocks" href="enrollment_sup.php"><button type="button" class="navButton">List from all</button></a>';
+
+} elseif ((isset($_GET['e'])) && (filter_var($_GET['e'], FILTER_VALIDATE_INT, array('min_range' => 1)))) {
+	$e = preg_replace("/[^0-9]/","", $_GET['e']);
+	$filter_sql = "editor='$e' AND";
+
+	// Retrieve the block info
+	$q = "SELECT name, email FROM users WHERE id='$e' AND (type='editor' OR type='supervisor' OR type='admin') ";
+	$r = mysqli_query($dbc, $q);
+	$row = mysqli_fetch_array($r);
+	$editor_name = "$row[0]";
+	$editor_email = "$row[1]";
+
+	// Heading
+	echo '<h3>Writers for editor: '.$editor_name.' <small>('.$editor_email.')</small></h3>
+	<a title="List all writers from all blocks" href="enrollment_sup.php"><button type="button" class="navButton">List from all</button></a>';
 } else {
-	$blocks_sql = "";
+	$filter_sql = "";
 }
 
 // Deleting POST
@@ -208,7 +223,7 @@ $itemskip = $pageitems * ($paged - 1);
 // Prepare our SQL query, but only IDs for pagination
 $sql_cols = 'id';
 $sql_where = "$SQLcolumnSearch type='writer' ORDER BY $order_by" ;
-$qp = "SELECT $sql_cols FROM users WHERE $blocks_sql $sql_where";
+$qp = "SELECT $sql_cols FROM users WHERE $filter_sql $sql_where";
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
 if (($totalrows == 0) && ((!isset($SQLcolumnSearch)) || ($SQLcolumnSearch == ''))) {echo '<p class="lt sans"><b>Nothing yet</b></p>'; if (isset($_SERVER['HTTP_REFERER'])) {$where_was_i = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL); set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");} return;}
@@ -382,7 +397,7 @@ function toggle(source) {
 // List users
 $sql_cols = 'id, name, username, status, editor';
 $sql_where = "$SQLcolumnSearch type='writer' ORDER BY $order_by LIMIT $itemskip,$pageitems" ;
-$q = "SELECT $sql_cols FROM users WHERE $blocks_sql $sql_where";
+$q = "SELECT $sql_cols FROM users WHERE $filter_sql $sql_where";
 $r = mysqli_query ($dbc, $q);
 
 // Empty?

@@ -8,6 +8,21 @@ if (!isset($_SESSION['user_id'])) {
 if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1)))) {
 	$block_id = preg_replace("/[^0-9]/","", $_GET['v']);
 	$block_sql_where = "AND id='$block_id'";
+
+	// Block info
+	$q = "SELECT name, code FROM blocks WHERE id='$block_id'";
+	$r = mysqli_query ($dbc, $q);
+	if (mysqli_num_rows($r) == 1) {
+		$row = mysqli_fetch_array($r, MYSQLI_NUM);
+		$name = "$row[0]";
+		$code = "$row[1]";
+		echo '<h3 class="lt sans">For block: '.$name.' <small>('.$code.')</small></h3>';
+
+	} else {
+		echo '<h3 class="lt sans">For Main block</h3>';
+	}
+} else {
+	echo '<h3 class="lt sans">For Main block</h3>';
 }
 
 // Okay to view this page
@@ -102,7 +117,7 @@ $pageitems = ($search_suffix == '') ? 250 : 1000; // Search results list a lot
 $itemskip = $pageitems * ($paged - 1);
 // Prepare our SQL query, but only IDs for pagination
 $sql_cols = 'id';
-$sql_where = (isset($block_id)) ? "users u WHERE EXISTS (SELECT 1 FROM blocks b WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', b.id, '\"')) AND b.id = '$userid') AND $SQLcolumnSearch AND id ORDER BY $order_by" :
+$sql_where = (isset($block_id)) ? "users u WHERE $SQLcolumnSearch EXISTS (SELECT 1 FROM blocks b WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', b.id, '\"')) AND b.id = '$userid') ORDER BY $order_by" :
                                   "users WHERE $SQLcolumnSearch editor='$userid' ORDER BY $order_by" ;
 $qp = "SELECT $sql_cols FROM $sql_where";
 $rp = mysqli_query($dbc, $qp);

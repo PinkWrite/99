@@ -54,15 +54,17 @@ include('./inserts/dash_editor.ins.php');
 echo (isset($_SESSION['act_message'])) ? $_SESSION['act_message'] : false ;
 if (isset($_SESSION['act_message'])) {unset($_SESSION['act_message']);}
 
-// Writ table
-echo '<h2 class="lt">Writs</h2>';
-$review_status = 'current';
+// $where_am_i
 $where_am_i = "editor.php";
-include('./inserts/list_editor.ins.php');
 
 // Blocks table
 echo '<h2 class="lt">Blocks</h2>';
 include('./inserts/list_blocks_editor.ins.php');
+
+// Writ table
+echo '<h2 class="lt">Writs</h2>';
+$review_status = 'current';
+include('./inserts/list_editor.ins.php');
 
 // Include the footer file to complete the template
 require('./includes/footer.html');
