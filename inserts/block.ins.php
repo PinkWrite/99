@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
 // Valid the Block ID
-if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0')) {
+if ((isset($_GET['v'])) && ((filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0'))) {
   $block_id = preg_replace("/[^0-9]/","", $_GET['v']);
 	$block_type = ($block_id == 0) ? 'main' : 'block';
 } else {

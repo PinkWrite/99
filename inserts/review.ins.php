@@ -2,14 +2,14 @@
 
 // Editing
 if (!isset($_GET['w'])) {
-	echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
+	header("Location: " . PW99_HOME);
 	exit(); // Quit the script
 }
 
 if (filter_var($_GET['w'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
 	$writ_id = preg_replace("/[^0-9]/","", $_GET['w']);
 } else {
-	echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
+	header("Location: " . PW99_HOME);
 	exit(); // Quit the script
 }
 
@@ -62,7 +62,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 		}
 		$r = mysqli_query ($dbc, $q);
 		if ($r) {
-			echo (isset($list_writer)) ? '<script type="text/javascript"> window.location = "' . "writer_editor.php?u=$list_writer" . '" </script>' : '<script type="text/javascript"> window.location = "' . "editor.php" . '" </script>';
+			(isset($list_writer)) ? header("Location: writer_editor.php?u=$list_writer") : header("Location: editor.php");
 			exit(); // Quit the script
 		} else {
 			echo "<div class=\"noticered sans\">Database error, could not be submitted.</div>";
@@ -77,7 +77,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 		}
 		$r = mysqli_query ($dbc, $q);
 		if ($r) {
-			echo (isset($list_writer)) ? '<script type="text/javascript"> window.location = "' . "writer_editor.php?u=$list_writer" . '" </script>' : '<script type="text/javascript"> window.location = "' . "editor.php" . '" </script>';
+			(isset($list_writer)) ? header("Location: writer_editor.php?u=$list_writer") : header("Location: editor.php");
 			exit(); // Quit the script
 		} else {
 			echo "<div class=\"noticered sans\">Database error, score could not be submitted.</div>";
@@ -91,7 +91,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 		}
 		$r = mysqli_query ($dbc, $q);
 		if ($r) {
-			echo (isset($list_writer)) ? '<script type="text/javascript"> window.location = "' . "writer_editor.php?u=$list_writer" . '" </script>' : '<script type="text/javascript"> window.location = "' . "editor.php" . '" </script>';
+			(isset($list_writer)) ? header("Location: writer_editor.php?u=$list_writer") : header("Location: editor.php");
 			exit(); // Quit the script
 		} else {
 			echo "<div class=\"noticered sans\">Database error, score could not be submitted.</div>";
@@ -545,7 +545,7 @@ $scoring_date = "$row[19]";
 	if ($draft_status == 'saved') {
 		echo "<hr class=\"review\" />";
 		echo "<h4>First draft: (In-progress)<br /><i class=\"dk sans\">(<b>Saved</b> $draft_save_date)</i></h4>
-					<section class='writcontent draft'>".nl2br($draft)."</section>";
+					<section class='writcontent draft'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft))."</section>";
 		// Nothing if there are no notes
 		$show_notes = ( (!empty($notes)) && ($notes != '') ) ? "<h4 class='lt'>Notes:</h4><section class='writcontent notes'>$notes</section>" : '';
 		echo $show_notes;
@@ -554,7 +554,7 @@ $scoring_date = "$row[19]";
 } elseif ($draft_status == 'submitted') {
 		echo "<hr class=\"review\" />";
 		echo "<h4>First draft: (Submitted for review)<br /><i class=\"dk sans\">(<b>Submitted</b> $draft_submit_date)</i></h4>
-					<section class='writcontent draft'>".nl2br($draft)."</section>";
+					<section class='writcontent draft'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft))."</section>";
 		echo "<hr class=\"review\" />";
 					edit_form();
 		return;
@@ -562,19 +562,19 @@ $scoring_date = "$row[19]";
 }	elseif (($draft_status == 'reviewed') && ($edits_status == 'drafting')) {
 		echo "<hr class=\"review\" />";
 		echo "<h4>First draft: (Reviewed)<br /><i class=\"dk sans\">(<b>Submitted</b> $draft_submit_date)</i></h4>
-					<section class='writcontent draft'>".nl2br($draft)."</section>";
+					<section class='writcontent draft'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft))."</section>";
 		echo "<hr class=\"review\" />
 					<h3 class=\"note_blue\">Editor revision complete!<br /><i class=\"note_blue sans\">(<b>Reviewed</b> $edits_date)</i></h3>
 					<h4>Editor revision:</h4>
-					<section class='writcontent revision' id='outputDif'></section>";
+					<section class='writcontent revision' id='diffDraftEdits'></section>";
 		// HTMLdiff
 		echo '
 					<script src="js/htmldiff.min.js"></script>
 					<script>
-					let oldHTML = `'.nl2br($draft).'`;
-					let curHTML = `'.nl2br($edits).'`;
+					let oldHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
+					let curHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
 					let difHTML = htmldiff(oldHTML, curHTML);
-					document.getElementById("outputDif").innerHTML = difHTML;
+					document.getElementById("diffDraftEdits").innerHTML = difHTML;
 					</script>
 					';
 					edit_form();
@@ -582,26 +582,26 @@ $scoring_date = "$row[19]";
 	// Final in-progress
 }	elseif (($draft_status == 'reviewed') && (($edits_status == 'viewed') || ($edits_status == 'saved'))) {
 		echo "<h4>First draft: (Reviewed)<br /><i class=\"dk sans\">(<b>Submitted</b> $draft_submit_date)</i></h4>
-					<section class='writcontent draft'>".nl2br($draft)."</section>
+					<section class='writcontent draft'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft))."</section>
 					<h4>Editor revision:<br /><i class=\"dk sans\">(<b>Submitted</b> $corrected_submit_date)</i></h4>
-					<section class='writcontent revision'>".nl2br($edits)."</section>
-					<h5>Diff:</h5>
-					<section class='writcontent diff' id='outputDif'></section>
+					<section class='writcontent revision'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits))."</section>
+					<h5>Edited diff:</h5>
+					<section class='writcontent diff' id='diffDraftEdits'></section>
 					<h5>Editor remarks:</h5>
-					<section class='writcontent remarks'>".nl2br($edit_notes)."</section>";
+					<section class='writcontent remarks'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes))."</section>";
 		echo "<hr class=\"review\" />";
 		echo "<h4>Final corrected revision: (In-Progress)<br /><i class=\"dk sans\">(<b>Saved</b> $corrected_save_date)</i></h4>
-					<section class='writcontent correction'>".nl2br($correction)."</section>";
+					<section class='writcontent correction'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction))."</section>";
 		echo "<h4>Notes:</h4>
-					<section class='writcontent notes'>".nl2br($notes)."</section>";
+					<section class='writcontent notes'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes))."</section>";
 		// HTMLdiff
 		echo '
 					<script src="js/htmldiff.min.js"></script>
 					<script>
-					let oldHTML = `'.nl2br($draft).'`;
-					let curHTML = `'.nl2br($edits).'`;
+					let oldHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
+					let curHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
 					let difHTML = htmldiff(oldHTML, curHTML);
-					document.getElementById("outputDif").innerHTML = difHTML;
+					document.getElementById("diffDraftEdits").innerHTML = difHTML;
 					</script>
 					';
 		return;
@@ -610,27 +610,31 @@ $scoring_date = "$row[19]";
 		echo '<h4>First draft: (Reviewed)<br /><i class="dk sans">(<b>Submitted</b> '.$draft_submit_date.')</i></h4>
 					<h4>Edited</h4>
 					<h5>Remarks:</h5>
-					<section class="writcontent remarks">'.nl2br($edit_notes).'</section>
-					<h5>Diff:</h5>
-					<section class="writcontent diff" id="outputDif"></section>
-					<section class="writcontent draft">'.nl2br($draft).'</section>
+					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
+					<h5>Edited diff:</h5>
+					<section class="writcontent diff" id="diffDraftEdits"></section>
+					<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 					<h5>Editor revision:<br /><i class="dk sans">(<b>Submitted</b> '.$corrected_submit_date.')</i></h5>
-					<section class="writcontent revision">'.nl2br($edits).'</section>';
-		echo '<hr class="review" />';
+					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>';
 		echo '<h4>Final corrected revision: (Submitted for scoring)<br /><i class="dk sans">(<b>Submitted</b> '.$corrected_submit_date.')</i></h4>
-					<section class="writcontent correction">'.nl2br($correction).'</section>';
+					<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
+					<h5>Scored diff:</h5>
+					<section class="writcontent diff" id="diffEditsFinal"></section>';
 		echo '<h4>Notes:</h4>
-					<section class="writcontent notes">'.nl2br($notes).'</section>';
+					<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		echo '<hr class="review" />';
 					score_form();
 		// HTMLdiff
 		echo '
 					<script src="js/htmldiff.min.js"></script>
 					<script>
-					let oldHTML = `'.nl2br($draft).'`;
-					let curHTML = `'.nl2br($edits).'`;
-					let difHTML = htmldiff(oldHTML, curHTML);
-					document.getElementById("outputDif").innerHTML = difHTML;
+					let draftHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
+					let editsHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
+					let finalHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'`;
+					let difDraftEditsHTML = htmldiff(draftHTML, editsHTML);
+					let difEditsFinalHTML = htmldiff(editsHTML, finalHTML);
+					document.getElementById("diffDraftEdits").innerHTML = difDraftEditsHTML;
+					document.getElementById("diffEditsFinal").innerHTML = difEditsFinalHTML;
 					</script>
 					';
 		return;
@@ -638,19 +642,20 @@ $scoring_date = "$row[19]";
 } elseif (($draft_status == 'reviewed') && ($edits_status == 'scored')) {
 		echo '<h3 class="lt">Score: '.$score.'<small class="dk">/'.$outof.'</small></h3>
 					<h4>First draft:<br /><i class="dk sans">(<b>Submitted</b> '.$draft_submit_date.')</i></h4>
-					<section class="writcontent draft">'.nl2br($draft).'</section>
+					<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 					<h4>Edited</h4>
 					<h5>Remarks:</h5>
-					<section class="writcontent remarks">'.nl2br($edit_notes).'</section>
-					<h5>Diff:</h5>
-					<section class="writcontent diff" id="outputDif"></section>
+					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
+					<h5>Edited diff:</h5>
+					<section class="writcontent diff" id="diffDraftEdits"></section>
 					<h5>Editor revision:<br /><i class=\"dk sans\">(<b>Submitted</b> '.$corrected_submit_date.')</i></h5>
-					<section class="writcontent revision">'.nl2br($edits).'</section>';
-		echo '<hr class="review" />';
+					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>';
 		echo '<h4>Final corrected revision:</h4>
-					<section class="writcontent correction">'.nl2br($correction).'</section>';
+					<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
+					<h5>Scored diff:</h5>
+					<section class="writcontent diff" id="diffEditsFinal"></section>';
 		echo '<h4>Notes:</h4>
-					<section class="writcontent notes">'.nl2br($notes).'</section>';
+					<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		echo '<hr class="review" />
 					<h3 class="note_blue">Score complete!<br /><i class="note_blue sans">(<b>Scored</b> '.$scoring_date.')</i></h3>';
 					score_form();
@@ -658,10 +663,13 @@ $scoring_date = "$row[19]";
 		echo '
 					<script src="js/htmldiff.min.js"></script>
 					<script>
-					let oldHTML = `'.nl2br($draft).'`;
-					let curHTML = `'.nl2br($edits).'`;
-					let difHTML = htmldiff(oldHTML, curHTML);
-					document.getElementById("outputDif").innerHTML = difHTML;
+					let draftHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
+					let editsHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
+					let finalHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'`;
+					let difDraftEditsHTML = htmldiff(draftHTML, editsHTML);
+					let difEditsFinalHTML = htmldiff(editsHTML, finalHTML);
+					document.getElementById("diffDraftEdits").innerHTML = difDraftEditsHTML;
+					document.getElementById("diffEditsFinal").innerHTML = difEditsFinalHTML;
 					</script>
 					';
 		return;

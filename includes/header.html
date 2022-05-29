@@ -31,7 +31,7 @@ include ('includes/tallies.inc.php');
 		<div id="topnav">
 			<ul class="topnav">
 				<li>
-					<h1><a class="dklink" href="index.php">PinkWrite 99</a></h1>
+					<h1><a class="dklink" href="'.PW99_HOME.'">PinkWrite 99</a></h1>
 				</li>
 				<li class="user">';
 					set_button("Logout", "Exit from this login session", "logout.php", "navButton user");
@@ -54,7 +54,7 @@ include ('includes/tallies.inc.php');
 						</li>';
 						echo '
 						<li class="user">';
-							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+							set_button("My Dash", "View my home dashboard", PW99_HOME, "navButton user $active_dash");
 						echo '
 						</li>';
 					} elseif ($_SESSION['user_is_supervisor'] == true) {
@@ -74,7 +74,7 @@ include ('includes/tallies.inc.php');
 						</li>';
 						echo '
 						<li class="user">';
-							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+							set_button("My Dash", "View my home dashboard", PW99_HOME, "navButton user $active_dash");
 						echo '
 						</li>';
 					} elseif ($_SESSION['user_is_editor'] == true) {
@@ -90,7 +90,7 @@ include ('includes/tallies.inc.php');
 						</li>';
 							echo '
 						<li class="user">';
-							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+							set_button("My Dash", "View my home dashboard", PW99_HOME, "navButton user $active_dash");
 						echo '
 						</li>';
 					} elseif ($_SESSION['user_is_observer'] == true) {
@@ -101,13 +101,13 @@ include ('includes/tallies.inc.php');
 						</li>';
 							echo '
 						<li class="user">';
-							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+							set_button("My Dash", "View my home dashboard", PW99_HOME, "navButton user $active_dash");
 						echo '
 						</li>';
 					} else {
 						echo '
 						<li class="user">';
-							set_button("My Dash", "View my home dashboard", "index.php", "navButton user $active_dash");
+							set_button("My Dash", "View my home dashboard", PW99_HOME, "navButton user $active_dash");
 						echo '
 						</li>';
 					}

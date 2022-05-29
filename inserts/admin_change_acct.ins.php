@@ -22,36 +22,36 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 	// For storing errors
 	$pass_errors = array();
 
-	// Check for a username
-	if (isset($_POST['username'])) {
-		if (preg_match('/^[A-Za-z0-9]{6,32}$/i', $_POST['username'])) {
-			$username = mysqli_real_escape_string($dbc, $_POST['username']);
-		} else {
-			$username = "";
-			$pass_errors['username'] = 'Please enter a username!';
-		}
-	} else {
-		$pass_errors['username'] = 'Please enter a username!';
-	}
-
 	// Check for a name
 	if ( (isset($_POST['name'])) && ($_POST['name'] != '') ) {
-		if (preg_match('/^[A-Z \'.-]{1,80}$/i', $_POST['name'])) {
-			$name = mysqli_real_escape_string($dbc, $_POST['name']);
+		if (preg_match('/[A-Za-z0-9 \'.-]{1,80}$/i', $_POST['name'])) {
+			$name = mysqli_real_escape_string($dbc, preg_replace("/[^A-Za-z0-9 \'.-]/","", $_POST['name']));
 		} else {
 			$name = "";
-			$pass_errors['name'] = 'Please enter a username, 6-32 characters!';
+			$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
 		}
 	} else {
-		$pass_errors['name'] = 'Please enter a username, 6-32 characters!';
+		$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
+	}
+
+	// Check for a username
+	if ( (isset($_POST['username'])) && ($_POST['username'] != '') ) {
+		if (preg_match('/[A-Za-z0-9]{6,32}$/i', $_POST['username'])) {
+			$username = mysqli_real_escape_string($dbc, strtolower(preg_replace("/[^A-Za-z0-9]/","", $_POST['username'])));
+		} else {
+			$username = "";
+			$pass_errors['username'] = 'Please enter a valid username, letters and numbers only, 6-32 characters!';
+		}
+	} else {
+		$pass_errors['username'] = 'Please enter a valid username, letters and numbers only, 6-32 characters!';
 	}
 
 	// Check for an email and match against the confirmed email
-	if ( ($_POST['email1'] != '') || ($_POST['email2'] != '') ) {
+	if ( (isset($_POST['email1'])) && (isset($_POST['email2'])) && ($_POST['email1'] != '') && ($_POST['email2'] != '') ) {
 		if (filter_var($_POST['email1'], FILTER_VALIDATE_EMAIL)) {
 			if ($_POST['email1'] == $_POST['email2']) {
-				$email1 = mysqli_real_escape_string($dbc, $_POST['email1']);
-				$email2 = mysqli_real_escape_string($dbc, $_POST['email1']);
+				$email1 = mysqli_real_escape_string($dbc, filter_var($_POST['email1'], FILTER_VALIDATE_EMAIL));
+				$email2 = mysqli_real_escape_string($dbc, filter_var($_POST['email2'], FILTER_VALIDATE_EMAIL));
 			} else {
 				$pass_errors['email2'] = 'Your email addresses did not match!';
 			}
@@ -103,7 +103,8 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 		exit(); // Quit the script
 	}
 
-	if (empty($pass_errors)) { // If everything is OK
+	// If everything is OK...
+	if (empty($pass_errors)) {
 
 		// Update the database
 		$q = "UPDATE users SET email='$email1', name='$name', username='$username', editor='$editor' $type_sql WHERE id='$u_id'";
@@ -175,7 +176,7 @@ echo "<h3>Change user account info</h3>
 	echo "<p><label class =\"sans\" for=\"email1\">Email</label><br /><br />";
 	create_form_input('email1__o', 'email', $pass_errors, $email1);
 	echo "</p>
-	<p><label class =\"sans\" for=\"email2\">Double-Check Email</label><br /><br />";
+	<p><label class =\"sans\" for=\"email2\">Double-check email</label><br /><br />";
 	create_form_input('email2__o', 'email', $pass_errors, $email2);
 	echo "</p>";
 

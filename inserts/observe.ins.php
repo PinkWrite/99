@@ -76,32 +76,37 @@ if (isset($_GET['w'])) {
 	<h4>Score:</h4>
 	<section class="writcontent score" id="edits">'.$score.'<small class="dk">/'.$outof.'</small></section>
 	<h4>Scoring remarks:</h4>
-	<section class="writcontent remarks" id="edits">'.nl2br($scoring).'</section>
+	<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $scoring)).'</section>
 	<h4>Draft: '.$draft_status.'</h4>
-	<section class="writcontent draft" id="draft">'.nl2br($draft).'</section>
+	<section class="writcontent draft" id="draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 	<hr />
 	<h4>Edited</h4>
 	<h5>Remarks:</h5>
-	<section class="writcontent remarks" id="edits">'.nl2br($edit_notes).'</section>
-	<h5>Diff:</h5>
-	<section class="writcontent diff" id="outputDif"></section>
+	<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
+	<h5>Edited diff:</h5>
+	<section class="writcontent diff" id="diffDraftEdits"></section>
 	<h5>Editor revision:</h5>
-	<section class="writcontent revision" id="edits">'.nl2br($edits).'</section>
+	<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
 	<h4>Writer correction: '.$edits_status.'</h4>
-	<section class="writcontent correction" id="edits">'.nl2br($correction).'</section>
-	<h4>Editor scoring:</h4>
-	<section class="writcontent scoring" id="edits">'.nl2br($correction).'</section>
+	<section class="writcontent correction" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
+	<h5>Scored diff:</h5>
+	<section class="writcontent diff" id="diffEditsFinal"></section>
+	<h4>Scoring remarks: <small><i>(same as above, for reference)</i></small></h4>
+	<section class="writcontent scoring" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $scoring)).'</section>
 	<h4>Notes:</h4>
-	<section class="writcontent notes" id="edits">'.nl2br($notes).'</section>
+	<section class="writcontent notes" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>
 	';
 
 	// HTMLdiff
 	echo '
 	<script src="js/htmldiff.min.js"></script>
 	<script>
-	let oldHTML = `'.nl2br($draft).'`;
-	let curHTML = `'.nl2br($edits).'`;
-	let difHTML = htmldiff(oldHTML, curHTML);
-	document.getElementById("outputDif").innerHTML = difHTML;
+	let draftHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
+	let editsHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
+	let finalHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'`;
+	let difDraftEditsHTML = htmldiff(draftHTML, editsHTML);
+	let difEditsFinalHTML = htmldiff(editsHTML, finalHTML);
+	document.getElementById("diffDraftEdits").innerHTML = difDraftEditsHTML;
+	document.getElementById("diffEditsFinal").innerHTML = difEditsFinalHTML;
 	</script>
 	';

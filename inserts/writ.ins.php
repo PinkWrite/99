@@ -61,43 +61,48 @@ if (isset($_GET['w'])) {
 	// Message if the correction was submitted
 	if ($draft_status == 'submitted') {
 		echo "<p class=\"sans noticegreen\">The draft for \"$title\" for \"$work\" has been submitted and is waiting for review.</p>";
-		set_switch("New Writ +", "Start writing something new", "writ.php", "new_writ", $writer_id, "set_gray");
+		set_switch("New writ +", "Start writing something new", "writ.php", "new_writ", $writer_id, "set_gray");
 		echo '<br>';
-		set_switch("Return to your Dashboard", "My Dashboard", "home", "no_post_name", "no_post_value", "navDarkButton user");
+		set_switch("Return to your Dashboard", "My Dashboard", PW99_HOME, "no_post_name", "no_post_value", "navDarkButton user");
 		return; // Quit the script
 	} elseif ($edits_status == 'submitted') {
 		echo "<p class=\"sans noticegreen\">The corrected revision \"$title\" for \"$work\" has been submitted and is waiting to be scored.</p>";
-		set_switch("New Writ +", "Start writing something new", "writ.php", "new_writ", $writer_id, "set_gray");
+		set_switch("New writ +", "Start writing something new", "writ.php", "new_writ", $writer_id, "set_gray");
 		echo '<br>';
-		set_switch("Return to your Dashboard", "My Dashboard", "home", "no_post_name", "no_post_value", "navDarkButton user");
+		set_switch("Return to your Dashboard", "My Dashboard", PW99_HOME, "no_post_name", "no_post_value", "navDarkButton user");
 		return; // Quit the script
 	} elseif ( ($draft_status == 'reviewed') && ($edits_status == 'scored') ) {
 		echo '<p class="sans">Block: '.$block_listing.'</p>
 		<h3 class="lt">Work: '.$work.'<br />Title: '.$title.'</h3>
 		<h4 class="lt">Score: '.$score.'<small class="dk">/'.$outof.'</small></h4>
 		<h4>Final scoring remarks:</h4>
-		<section class="writcontent remarks">'.nl2br($scoring).'</section>
+		<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $scoring)).'</section>
 		<h4>First draft:</h4>
-		<section class="writcontent draft">'.nl2br($draft).'</section>
+		<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 		<h4>Edited</h4>
 		<h5>Remarks:</h5>
-		<section class="writcontent remarks" id="edits">'.nl2br($edit_notes).'</section>
-		<h5>Diff:</h5>
-		<section class="writcontent diff" id="outputDif"></section>
+		<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
+		<h5>Edited diff:</h5>
+		<section class="writcontent diff" id="diffDraftEdits"></section>
 		<h5>Editor revision:</h5>
-		<section class="writcontent revision" id="edits">'.nl2br($edits).'</section>
+		<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
 		<h4>Final corrected revision:</h4>
-		<section class="writcontent correction">'.nl2br($correction).'</section>
+		<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
+		<h5>Scored diff:</h5>
+		<section class="writcontent diff" id="diffEditsFinal"></section>
 		<h4>Notes:</h4>
-		<section class="writcontent notes">'.nl2br($notes).'</section>';
+		<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		// HTMLdiff
 		echo '
 		<script src="js/htmldiff.min.js"></script>
 		<script>
-		let oldHTML = `'.nl2br($draft).'`;
-		let curHTML = `'.nl2br($edits).'`;
-		let difHTML = htmldiff(oldHTML, curHTML);
-		document.getElementById("outputDif").innerHTML = difHTML;
+		let draftHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
+		let editsHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
+		let finalHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'`;
+		let difDraftEditsHTML = htmldiff(draftHTML, editsHTML);
+		let difEditsFinalHTML = htmldiff(editsHTML, finalHTML);
+		document.getElementById("diffDraftEdits").innerHTML = difDraftEditsHTML;
+		document.getElementById("diffEditsFinal").innerHTML = difEditsFinalHTML;
 		</script>
 		';
 		return; // Quit the script
@@ -253,7 +258,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 } // End $_POST forms
 
 // Created for specific block?
-if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0')) {
+if ((isset($_GET['v'])) && ((filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0'))) {
 	$block_id = preg_replace("/[^0-9]/","", $_GET['v']);
 }
 
@@ -470,7 +475,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	.$inputwritid;
 
 	// Block
-	if ( (!isset($writ_id)) || ($edits_status == 'drafting') ||  ( ($_SESSION['user_is_editor'] == true) || ($_SESSION['user_is_supervisor'] == true) || ($_SESSION['user_is_admin'] == true) ) ) {
+	if ( (!isset($writ_id)) || ($edits_status == 'drafting') || ( ($_SESSION['user_is_editor'] == true) || ($_SESSION['user_is_supervisor'] == true) || ($_SESSION['user_is_admin'] == true) ) ) {
 		echo '<p><label class="sans" for="block">Block:</label>
 		<select class="formselect small" name="block" id="block" onchange="onNavWarn();" onkeyup="onNavWarn();">
 			<option value="0" hidden>Choose...</option>
@@ -508,15 +513,15 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	// Main fields
 	echo '<h3 class="lt">Work: '.$work.'<br />Title: '.$title.'</h3>
 	<h4>Draft:</h4>
-	<section class="writcontent draft" id="draft">'.nl2br($draft).'</section>
+	<section class="writcontent draft" id="draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 	<hr />
 	<h4>Edited</h4>
 	<h5>Remarks:</h5>
-	<section class="writcontent remarks" id="edits">'.nl2br($edit_notes).'</section>
-	<h5>Diff:</h5>
-	<section class="writcontent diff" id="outputDif"></section>
+	<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
+	<h5>Edited diff:</h5>
+	<section class="writcontent diff" id="diffDraftEdits"></section>
 	<h5>Editor revision:</h5>
-	<section class="writcontent revision" id="edits">'.nl2br($edits).'</section>
+	<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
 	<br />
 	<button type="button" title="Save (Ctrl + S)" class="lt_button" onclick="ajaxFormData(\'editform\', \'writ.ajax.php\', \'ajax_changes\'); offNavWarn();">Save</button>
 	&nbsp;<span id="wordCount" class="wordCounter" ></span>
@@ -604,10 +609,10 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	echo '
 	<script src="js/htmldiff.min.js"></script>
 	<script>
-	let oldHTML = `'.nl2br($draft).'`;
-	let curHTML = `'.nl2br($edits).'`;
-	let difHTML = htmldiff(oldHTML, curHTML);
-	document.getElementById("outputDif").innerHTML = difHTML;
+	let draftHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
+	let editsHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
+	let difDraftEditsHTML = htmldiff(draftHTML, editsHTML);
+	document.getElementById("diffDraftEdits").innerHTML = difDraftEditsHTML;
 	</script>
 	';
 

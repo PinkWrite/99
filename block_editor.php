@@ -45,7 +45,7 @@ if (isset($_SESSION['user_id'])) {
 	exit(); // Quit the script
 }
 
-if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0')) {
+if ((isset($_GET['v'])) && ((filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0'))) {
 	$v = preg_replace("/[^0-9]/","", $_GET['v']);
 } else {
 	header("Location: editor.php");

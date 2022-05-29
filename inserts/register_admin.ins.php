@@ -14,42 +14,62 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 	}
 
 	// Check for a name
-	if (preg_match ('/^[A-Z \'.-]{1,80}$/i', $_POST['name'])) {
-		$name = mysqli_real_escape_string ($dbc, $_POST['name']);
+	if ( (isset($_POST['name'])) && ($_POST['name'] != '') ) {
+		if (preg_match('/[A-Za-z0-9 \'.-]{1,80}$/i', $_POST['name'])) {
+			$name = mysqli_real_escape_string($dbc, preg_replace("/[^A-Za-z0-9 \'.-]/","", $_POST['name']));
+		} else {
+			$name = "";
+			$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
+		}
 	} else {
-		$reg_errors['name'] = 'Please enter your name, only letters and hyphens, 80 characters max!';
+		$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
 	}
 
 	// Check for a username
-	if (preg_match ('/^[A-Z0-9]{6,32}$/i', $_POST['username'])) {
-		$username = mysqli_real_escape_string ($dbc, $_POST['username']);
+	if ( (isset($_POST['username'])) && ($_POST['username'] != '') ) {
+		if (preg_match('/[A-Za-z0-9]{6,32}$/i', $_POST['username'])) {
+			$username = mysqli_real_escape_string($dbc, strtolower(preg_replace("/[^A-Za-z0-9]/","", $_POST['username'])));
+		} else {
+			$username = "";
+			$pass_errors['username'] = 'Please enter a valid username!';
+		}
 	} else {
-		$reg_errors['username'] = 'Please enter a valid username, 6-32 characters!';
+		$pass_errors['username'] = 'Please enter a valid username!';
 	}
 
 	// Check for an email and match against the confirmed email
-	if (filter_var($_POST['email1'], FILTER_VALIDATE_EMAIL)) {
-		if ($_POST['email1'] == $_POST['email2']) {
-			$email = mysqli_real_escape_string ($dbc, $_POST['email1']);
+	if ( (isset($_POST['email1'])) && (isset($_POST['email2'])) && ($_POST['email1'] != '') && ($_POST['email2'] != '') ) {
+		if (filter_var($_POST['email1'], FILTER_VALIDATE_EMAIL)) {
+			if ($_POST['email1'] == $_POST['email2']) {
+				$email1 = mysqli_real_escape_string($dbc, filter_var($_POST['email1'], FILTER_VALIDATE_EMAIL));
+				$email2 = mysqli_real_escape_string($dbc, filter_var($_POST['email2'], FILTER_VALIDATE_EMAIL));
+			} else {
+				$pass_errors['email2'] = 'Your email addresses did not match!';
+			}
 		} else {
-			$reg_errors['email2'] = 'Your email addresses did not match!';
+			$pass_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
 		}
 	} else {
-		$reg_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
+		$pass_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
 	}
 
 	// Check for a password and match against the confirmed password
-	if (preg_match ('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z!@#$%+-]{6,32}$/', $_POST['pass1']) ) {
-		if ($_POST['pass1'] == $_POST['pass2']) {
-			$password = mysqli_real_escape_string ($dbc, $_POST['pass1']);
+	if ( (isset($_POST['pass1'])) && (isset($_POST['pass2'])) && ($_POST['pass1'] != '') && ($_POST['pass2'] != '') ) {
+		if (preg_match ('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z!@#$%&*+-]{6,32}$/', $_POST['pass1']) ) {
+			if ($_POST['pass1'] == $_POST['pass2']) {
+				$password = mysqli_real_escape_string ($dbc, $_POST['pass1']);
+			} else {
+				$reg_errors['pass2'] = 'Your passwords did not match!';
+			}
 		} else {
-			$reg_errors['pass2'] = 'Your passwords did not match!';
+			$reg_errors['pass1'] = 'Please enter a valid password!';
 		}
 	} else {
 		$reg_errors['pass1'] = 'Please enter a valid password!';
 	}
 
-	if (empty($reg_errors)) { // If everything's OK...
+	// If everything's OK...
+	if (empty($reg_errors)) {
 
 		// Make sure the email address and username are available
 		$q = "SELECT email, username FROM users WHERE email='$email' OR username='$username'";
@@ -184,11 +204,11 @@ echo "
 		<p><label class=\"sans\" for=\"email1\"><b>Email</b></label><br /><br />";
 		create_form_input('email1', 'email', $reg_errors, '');
 		echo "</p>
-		<p><label class=\"sans\" for=\"email2\"><b>Double-Check Email</b></label><br /><br />";
+		<p><label class=\"sans\" for=\"email2\"><b>Double-check email</b></label><br /><br />";
 		create_form_input('email2', 'email', $reg_errors, '');
 		echo "</p>
 
-		<p><label class=\"sans\" for=\"pass1\"><b>Password</b><br /><small class =\"sans\">6-32 characters, one lowercase letter, one uppercase letter, one number, special characters allowed: +-!@#$%</small></label><br /><br />";
+		<p><label class=\"sans\" for=\"pass1\"><b>Password</b><br /><small class =\"sans\">6-32 characters, one lowercase letter, one uppercase letter, one number, special characters allowed: ! @ # $ % ! & * + -</small></label><br /><br />";
 		create_form_input('pass1', 'password', $reg_errors, '');
 		echo "</p>
 		<p><label class=\"sans\" for=\"pass2\"><b>Confirm Password</b></label><br /><br />";

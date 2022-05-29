@@ -15,14 +15,18 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 } elseif ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (!isset($_POST['opened_by'])) ) {
 
 	// Check for a password and match against the confirmed password
-	if (preg_match ('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z!@#$%+-]{6,32}$/', $_POST['pass1']) ) {
-		if ($_POST['pass1'] == $_POST['pass2']) {
-			$p = mysqli_real_escape_string ($dbc, $_POST['pass1']);
+	if ( (isset($_POST['pass1'])) && (isset($_POST['pass2'])) && ($_POST['pass1'] != '') && ($_POST['pass2'] != '') ) {
+		if (preg_match ('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z!@#$%&*+-]{6,32}$/', $_POST['pass1']) ) {
+			if ($_POST['pass1'] == $_POST['pass2']) {
+				$password = mysqli_real_escape_string ($dbc, $_POST['pass1']);
+			} else {
+				$reg_errors['pass2'] = 'Your passwords did not match!';
+			}
 		} else {
-			$pass_errors['pass2'] = 'Your password did not match the confirmed password!';
+			$reg_errors['pass1'] = 'Please enter a valid password!';
 		}
 	} else {
-		$pass_errors['pass1'] = 'Please enter a valid password!';
+		$reg_errors['pass1'] = 'Please enter a valid password!';
 	}
 
 	// Check for a user id
@@ -103,7 +107,7 @@ echo "<h3>Change User Password for: $name <small>($username - $email)</small></h
 <form action=\"$rformaction\" method=\"post\" accept-charset=\"utf-8\">
 <input type=\"hidden\" name=\"user_id\" value=\"$u_id\">";
 
-	echo "<p><label class =\"sans\" for=\"pass1\">New Password<br /><small class =\"sans\">6-32 characters, one lowercase letter, one uppercase letter, one number, special characters allowed: +-!@#$%</small></label><br /><br />";
+	echo "<p><label class =\"sans\" for=\"pass1\">New Password<br /><small class =\"sans\">6-32 characters, one lowercase letter, one uppercase letter, one number, special characters allowed: ! @ # $ % ! & * + -</small></label><br /><br />";
 	create_form_input('pass1', 'password', $pass_errors, '');
 	echo "</p>
 	<p><label class =\"sans\" for=\"pass2\">Confirm New Password</label><br /><br />";
