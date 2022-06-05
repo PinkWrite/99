@@ -29,7 +29,7 @@ if (mysqli_num_rows($rw) == 0) {
 }
 
 // Block name
-echo '<h3>Writs by: '.$writer_name.' <small>('.$writer_email.')</small></h3>';
+echo '<h3 class="lt sans">Writs by: '.$writer_name.' <small>('.$writer_email.')</small></h3>';
 
 // Writ table
 $term_status = 'current';

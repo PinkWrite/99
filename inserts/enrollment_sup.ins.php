@@ -20,7 +20,7 @@ if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('m
 	$block_code = "$row[1]";
 
 	// Heading
-	echo '<h3>Writers for block: '.$block_name.' <small>('.$block_code.')</small></h3>
+	echo '<h3 class="lt sans">Writers for block: '.$block_name.' <small>('.$block_code.')</small></h3>
 	<a title="List all writers from all blocks" href="enrollment_sup.php"><button type="button" class="navButton">List from all</button></a>';
 
 } elseif ((isset($_GET['e'])) && (filter_var($_GET['e'], FILTER_VALIDATE_INT, array('min_range' => 1)))) {
@@ -35,7 +35,7 @@ if ((isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('m
 	$editor_email = "$row[1]";
 
 	// Heading
-	echo '<h3>Writers for editor: '.$editor_name.' <small>('.$editor_email.')</small></h3>
+	echo '<h3 class="lt sans">Writers for editor: '.$editor_name.' <small>('.$editor_email.')</small></h3>
 	<a title="List all writers from all blocks" href="enrollment_sup.php"><button type="button" class="navButton">List from all</button></a>';
 } else {
 	$filter_sql = "";
@@ -77,7 +77,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST')
 	}
 	if ((isset($has_del_user)) && ($has_del_user == true)) {
 		// Echo the final delete form and message
-		echo '<h3>Confirm Deleting Users!</h3>';
+		echo '<h3 class="lt sans">Confirm Deleting Users!</h3>';
 		echo '<p class="sans">You are about to delete and purge all writs &amp; notes for the following users:<br><br>';
 		echo $confirm_delete_display_items;
 		echo '</p>';

@@ -84,7 +84,7 @@ if ($block_type == 'main') {
 	}
 
 	// Block name
-	echo '<h3>'.$block_name.' <small>('.$block_code.') <i>'.$editor_name.'</i></small></h3>';
+	echo '<h3 class="lt sans">'.$block_name.' <small>('.$block_code.') <i>'.$editor_name.'</i></small></h3>';
 
 	// New generic Writ for Main Block
 	set_switch("New $block_code writ +", "Start a writ for '.$block_name.'", "writ.php?v=$block_id", "new_writ", $writer_id, "set_gray");
