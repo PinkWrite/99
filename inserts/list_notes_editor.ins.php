@@ -124,7 +124,7 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				break;
 		case "block":
 				$sql_order_formula = "editor_set_block";
-				$order_by = "b.name DESC";
+				$order_by = "b.name, n.editor_set_block=0 DESC";
 				$block_cl = 'act_dkgray';
 				$sort_suffix = 's=block';
 				break;
