@@ -11,7 +11,7 @@ if (isset($_GET['w'])) {
 }
 
 	// Writ information
-	$q = "SELECT writer_id, block, work, title, notes, draft, draft_status, edits, edit_notes, correction, edits_status, scoring, score, outof FROM writs WHERE id='$writ_id'";
+	$q = "SELECT writer_id, block, work, title, notes, draft, draft_wordcount, draft_status, edits, edits_wordcount, edit_notes, correction, correction_wordcount, edits_status, scoring, score, outof, draft_submit_date, corrected_submit_date FROM writs WHERE id='$writ_id'";
 	$r = mysqli_query ($dbc, $q);
 	$row = mysqli_fetch_array($r);
 	$writer_id = "$row[0]";
@@ -20,14 +20,19 @@ if (isset($_GET['w'])) {
 	$title = "$row[3]";
 	$notes = "$row[4]";
 	$draft = "$row[5]";
-	$draft_status = "$row[6]";
-	$edits = "$row[7]";
-	$edit_notes = "$row[8]";
-	$correction = "$row[9]";
-	$edits_status = "$row[10]";
-	$scoring = "$row[11]";
-	$score = "$row[12]";
-	$outof = "$row[13]";
+	$draft_wordcount = "$row[6]";
+	$draft_status = "$row[7]";
+	$edits = "$row[8]";
+	$edits_wordcount = "$row[9]";
+	$edit_notes = "$row[10]";
+	$correction = "$row[11]";
+	$correction_wordcount = "$row[12]";
+	$edits_status = "$row[13]";
+	$scoring = "$row[14]";
+	$score = "$row[15]";
+	$outof = "$row[16]";
+	$draft_submit_date = "$row[17]";
+	$corrected_submit_date = "$row[18]";
 
 	// Block
 	if ($block_id == 0) {
@@ -77,7 +82,8 @@ if (isset($_GET['w'])) {
 	<section class="writcontent score" id="edits">'.$score.'<small class="dk">/'.$outof.'</small></section>
 	<h4>Scoring remarks:</h4>
 	<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $scoring)).'</section>
-	<h4>Draft: '.$draft_status.'</h4>
+	<h4>Draft: <i class="dk sans">'.$draft_status.' '.$draft_submit_date.'</i></h4>
+	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>
 	<section class="writcontent draft" id="draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 	<hr />
 	<h4>Edited</h4>
@@ -86,8 +92,10 @@ if (isset($_GET['w'])) {
 	<h5>Edited diff:</h5>
 	<section class="writcontent diff" id="diffDraftEdits"></section>
 	<h5>Editor revision:</h5>
+	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
 	<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
-	<h4>Writer correction: '.$edits_status.'</h4>
+	<h4>Writer correction: <i class="dk sans">'.$edits_status.' '.$draft_submit_date.'</i></h4>
+	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
 	<section class="writcontent correction" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
 	<h5>Scored diff:</h5>
 	<section class="writcontent diff" id="diffEditsFinal"></section>

@@ -8,19 +8,110 @@ if (!isset($_SESSION['user_id'])) {
 // Okay to view this page
 $userid = $_SESSION['user_id'];
 
+// What are we looking at?
+if (isset($_GET['w'])) {
+	if (filter_var($_GET['w'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$editor_set_writer_id = preg_replace("/[^0-9]/","", $_GET['w']);
+
+		// Heading
+		$q = "SELECT name, email FROM users WHERE id='$editor_set_writer_id'";
+		$r = mysqli_query ($dbc, $q);
+		$row = mysqli_fetch_array($r, MYSQLI_NUM);
+		$w_name = "$row[0]";
+		$w_email = "$row[1]";
+		echo '<h2 class="sans dk">Editor notes for writer: '.$w_name.' <small>'.$w_email.'</small></h2>';
+
+	}
+} elseif (isset($_GET['b'])) {
+	if (filter_var($_GET['b'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$editor_set_block = preg_replace("/[^0-9]/","", $_GET['b']);
+
+		// Heading
+		$q = "SELECT name, code FROM blocks WHERE id='$editor_set_block'";
+		$r = mysqli_query ($dbc, $q);
+		$row = mysqli_fetch_array($r, MYSQLI_NUM);
+		$b_name = "$row[0]";
+		$b_code = "$row[1]";
+		echo '<h2 class="sans dk">Editor notes for block: '.$b_name.' <small>'.$b_code.'</small></h2>';
+
+	}
+} elseif (isset($_GET['m'])) {
+	if (filter_var($_GET['m'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		// Editors can only view their own Main block
+		if (($usr_type == "Admin") || ($usr_type == "Supervisor")) {
+			$editor_main_block = preg_replace("/[^0-9]/","", $_GET['m']);
+
+			// Heading
+			$q = "SELECT name, email FROM users WHERE id='$editor_main_block'";
+			$r = mysqli_query ($dbc, $q);
+			$row = mysqli_fetch_array($r, MYSQLI_NUM);
+			$e_name = "$row[0]";
+			$e_email = "$row[1]";
+			echo '<h2 class="sans dk">Editor notes for editor Main block: '.$e_name.' <small>'.$e_email.'</small></h2>';
+
+		} elseif ($usr_type == "Editor") {
+			$editor_main_block = ($userid == preg_replace("/[^0-9]/","", $_GET['m'])) ? preg_replace("/[^0-9]/","", $_GET['m']) : false;
+			if ($editor_main_block == false) { unset($editor_main_block); }
+			echo '<h2 class="sans dk">My Main block editor notes</h2>';
+		}
+	}
+
+// Special for Supervisors to view All editor notes
+} elseif (isset($_GET['v'])) {
+	if (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		// Editors can only view their own Main block
+		if (($usr_type == "Admin") || ($usr_type == "Supervisor")) {
+			$editor_all_notes = preg_replace("/[^0-9]/","", $_GET['v']);
+			// Heading
+			$q = "SELECT name, email FROM users WHERE id='$editor_all_notes'";
+			$r = mysqli_query ($dbc, $q);
+			$row = mysqli_fetch_array($r, MYSQLI_NUM);
+			$e_name = "$row[0]";
+			$e_email = "$row[1]";
+			echo '<h2 class="sans dk">All editor notes for editor: '.$e_name.' <small>'.$e_email.'</small></h2>';
+
+		} else {
+			$editor_all_notes = $userid;
+			echo '<h2 class="sans dk">All my editor notes</h2>';
+		}
+	}
+
+// Default: all editor notes
+} elseif (($usr_type == "Editor") || ($usr_type == "Admin") || ($usr_type == "Supervisor")) {
+	$editor_all_notes = $userid;
+	echo '<h2 class="sans dk">All my editor notes</h2>';
+}
+
+// Editor limit
+if (($usr_type == "Admin") || ($usr_type == "Supervisor")) {
+	$editor_limit = '';
+} elseif ($usr_type == "Editor") {
+	$editor_limit = "AND n.editor_id='$userid'";
+} else {
+	echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
+}
+
 // New
-set_switch("New note +", "Start a new note", "note.php", "new_note", $userid, "newNoteButton");
+set_switch("New editor note +", "Start a new note", "note_editor.php", "new_note", $userid, "newNoteButton");
 echo '<br>';
 
 // Sorting options
 $sort_get = (strstr($where_am_i, '?')) ? '&' : '?' ;
 
 // Sort GET setting
+$activity_cl = 'act_ltgray';
 $creation_cl = 'act_ltgray';
 $heading_cl = 'act_ltgray';
+$block_cl = 'act_ltgray';
+$writer_cl = 'act_ltgray';
 if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 	$sort = preg_replace("/[^a-z]/","", $_GET['s']);
 	switch ($sort) {
+		case "activity":
+				$order_by = "save_date DESC";
+				$activity_cl = 'act_dkgray';
+				$sort_suffix = 's=activity';
+				break;
 		case "creation":
 				$order_by = "id DESC";
 				$creation_cl = 'act_dkgray';
@@ -31,6 +122,18 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				$heading_cl = 'act_dkgray';
 				$sort_suffix = 's=heading';
 				break;
+		case "block":
+				$sql_order_formula = "editor_set_block";
+				$order_by = "b.name DESC";
+				$block_cl = 'act_dkgray';
+				$sort_suffix = 's=block';
+				break;
+		case "writer":
+				$sql_order_formula = "editor_set_writer_id";
+				$order_by = "u.name DESC";
+				$writer_cl = 'act_dkgray';
+				$sort_suffix = 's=writer';
+				break;
 		default:
 				$order_by = "id DESC";
 				$creation_cl = 'act_dkgray';
@@ -38,8 +141,8 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				break;
 	}
 } else {
-	$order_by = "body ASC";
-	$heading_cl = 'act_dkgray';
+	$order_by = "save_date DESC";
+	$activity_cl = 'act_dkgray';
 	$sort_suffix = '';
 }
 
@@ -100,9 +203,30 @@ if (isset($_GET['r'])) {
 $pageitems = ($search_suffix == '') ? 250 : 1000; // Search results list a lot
 $itemskip = $pageitems * ($paged - 1);
 // Prepare our SQL query, but only IDs for pagination
-$sql_cols = 'id';
-$sql_where = "$SQLcolumnSearch writer_id='$userid' ORDER BY $order_by" ;
-$qp = "SELECT $sql_cols FROM notes WHERE $sql_where";
+$sql_cols = 'n.id';
+if (isset($editor_set_block)) {
+	$sql_who = "n.editor_set_block='$editor_set_block' $editor_limit";
+} elseif (isset($editor_set_writer_id)) {
+  $sql_who = "n.editor_set_writer_id='$editor_set_writer_id' $editor_limit";
+} elseif (isset($editor_main_block)) { // Editor's Main block
+  $sql_who = "n.editor_id='$editor_main_block' AND editor_set_writer_id='0' AND editor_set_block='0' $editor_limit";
+} elseif (isset($editor_all_notes)) {
+	$sql_who = "n.editor_id='$editor_all_notes' $editor_limit";
+}
+if ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_writer_id')) {
+
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$qp = "SELECT $sql_cols FROM notes AS n JOIN users AS u WHERE $sql_where";
+
+} elseif ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_block')) {
+
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$qp = "SELECT $sql_cols FROM notes AS n JOIN blocks AS b WHERE $sql_where";
+
+} else {
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$qp = "SELECT $sql_cols FROM notes AS n WHERE $sql_where";
+}
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
 if (($totalrows == 0) && ((!isset($SQLcolumnSearch)) || ($SQLcolumnSearch == ''))) {echo '<p class="lt sans"><b>Nothing yet</b></p>'; if (isset($_SERVER['HTTP_REFERER'])) {$where_was_i = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL); set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");} return;}
@@ -178,9 +302,15 @@ echo '
 		<td>
 		<span class="lo sans">&uarr;&darr;</span>
 		</td><td>';
+set_button("Activity", "Sort by most recent activity", "${where_am_i}${sort_get}s=activity${search_suffix}", $activity_cl);
+echo '</td><td>';
 set_button("Creation", "Sort by order of creation", "${where_am_i}${sort_get}s=creation${search_suffix}", $creation_cl);
 echo '</td><td>';
 set_button("Heading", "Sort by heading", "${where_am_i}${sort_get}s=heading${search_suffix}", $heading_cl);
+echo '</td><td>';
+set_button("Block", "Sort by block", "${where_am_i}${sort_get}s=block${search_suffix}", $block_cl);
+echo '</td><td>';
+set_button("Writer", "Sort by writer", "${where_am_i}${sort_get}s=writer${search_suffix}", $writer_cl);
 echo '</td>';
 // Search form inputs
 echo '<td>
@@ -224,9 +354,23 @@ input.addEventListener('keyup',function(){
 <?php
 
 // List notes
-$sql_cols = 'id, body, pinned, save_date';
-$sql_where = "$SQLcolumnSearch writer_id='$userid' ORDER BY $order_by" ;
-$q = "SELECT $sql_cols FROM notes WHERE $sql_where LIMIT $itemskip,$pageitems";
+$sql_cols = 'n.id, n.body, n.pinned, n.save_date, n.editor_set_block, n.editor_set_writer_id';
+if ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_writer_id')) {
+
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$q = "SELECT $sql_cols FROM notes AS n JOIN users AS u WHERE $sql_where";
+
+} elseif ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_block')) {
+
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$q = "SELECT $sql_cols FROM notes AS n JOIN blocks AS b WHERE $sql_where";
+
+} else {
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$q = "SELECT $sql_cols FROM notes AS n WHERE $sql_where";
+}
+
+$q .= " LIMIT $itemskip,$pageitems";
 $r = mysqli_query ($dbc, $q);
 
 // Empty?
@@ -247,26 +391,56 @@ if (mysqli_num_rows($r) == 0) {
 		$body = "$row[1]";
 		$pinned = "$row[2]";
 		$save_date = "$row[3]";
+		$editor_set_block = "$row[4]";
+		$editor_set_writer_id = "$row[5]";
 		$title = strtok($body, "\n"); // Get just the first line
 
 		echo '<tr class="'.$cc.'">';
 		echo "<td><a class=\"listed_note\" href=\"note.php?v=$note_id\">$title</a><br /><i class=\"listed_note\">$save_date</i></td>";
-		echo '<td><div style="display: inline; float:right;">';
-		set_switch("Read", "Read this note", "note.php?v=$note_id", "no_post_value", "no_post_value", "act_blue editNoteButton");
-		echo '</div>
-			</td>
-			<td><div style="display: inline; float:right;">';
-		set_switch("Edit", "Edit this note", "note.php?v=$note_id", "opened_by", $userid, "editNoteButton");
-		echo '</div>
-			</td>
-			<td><div style="display: inline; float:right;">';
-		if ($pinned == false) {
-			set_switch("Pin", "Pin at the top of your Dashboard", "note.act.php", "pin", $note_id, "editNoteButton");
-		} elseif ($pinned == true) {
-			set_switch("Pinned", "Unpin from Dashboard", "note.act.php", "unpin", $note_id, "act_green editNoteButton");
+
+		// Writer note
+		if ($editor_set_writer_id > 0) {
+			$q = "SELECT name, email FROM users WHERE id='$editor_set_writer_id'";
+			$r = mysqli_query ($dbc, $q);
+			$row = mysqli_fetch_array($r, MYSQLI_NUM);
+			$w_name = "$row[0]";
+			$w_email = "$row[1]";
+			echo "<td>Writer: $w_name <small>$w_email</small></td>";
+		// Block note
+		} elseif ($editor_set_block > 0) {
+			$q = "SELECT name, code FROM blocks WHERE id='$editor_set_block'";
+			$r = mysqli_query ($dbc, $q);
+			$row = mysqli_fetch_array($r, MYSQLI_NUM);
+			$b_name = "$row[0]";
+			$b_code = "$row[1]";
+			echo "<td>Block: $b_name <small>$b_code</small></td>";
+		// Main block note
+		} else {
+			if ((($usr_type == "Admin") || ($usr_type == "Supervisor")) && (isset($editor_main_block))) {
+				$q = "SELECT name, email FROM users WHERE id='$editor_main_block'";
+				$r = mysqli_query ($dbc, $q);
+				$row = mysqli_fetch_array($r, MYSQLI_NUM);
+				$e_name = "$row[0]";
+				$e_email = "$row[1]";
+				echo "<td>Block: $e_name <small>$e_email</small></td>";
+
+			} elseif (($usr_type == "Editor") || ($usr_type == "Admin") || ($usr_type == "Supervisor")) {
+				echo "<td>Block: Main</td>";
+			}
 		}
+
+		echo '<td><div style="display: inline; float:right;">';
+		set_switch("Read", "Read this note", "note_editor.php?v=$note_id", "no_post_value", "no_post_value", "act_blue editNoteButton");
 		echo '</div>
 			</td>
+			<td><div style="display: inline; float:right;">';
+		set_switch("Edit", "Edit this note", "note_editor.php?v=$note_id", "opened_by", $userid, "editNoteButton");
+		echo '</div>
+			</td>
+			<td><div style="display: inline; float:right;">';
+			set_switch("Delete", "Delete this note", "delete_note.php", "deleted_note", $note_id, "editNoteButton");
+		echo '</div>
+		  </td>
 		</tr>';
 
 		// Rotate our row color class

@@ -249,7 +249,7 @@ $editor_id = $userid;
 // Start the table
 echo '
 <table class="list sans lt"><tbody>
-<tr><th>Name</th></th><th>Code</th><th>Editor</th><th>Writs</th><th>Roll</th></tr>';
+<tr><th>Name</th></th><th>Code</th><th>Editor</th><th>Writs</th><th>Roll</th><th>New note</th></tr>';
 
 // Don't show the Main block in search results
 if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
@@ -266,8 +266,13 @@ if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
 	get_switch("Roll", "List writers in Main block", "enrollment_editor.php", "", "", "editNoteButton");
 	echo '
 		</td>
+		<td>';
+	get_switch("Editor notes", "List editor notes for this block", "notes_editor.php", "m", $userid, "editNoteButton");
+	echo '
+		</td>
 		</tr>';
 }
+
 
 // List blocks
 $sql_cols = 'id, editor_id, name, code';
@@ -303,6 +308,10 @@ if (mysqli_num_rows($r) > 0) {
 			</td>
 			<td>';
 		get_switch("Roll", "List writers in block $code", "enrollment_editor.php", "v", $block_id, "editNoteButton");
+		echo '
+			</td>
+			<td>';
+		get_switch("Editor notes", "List editor notes for this block", "notes_editor.php", "b", $block_id, "editNoteButton");
 		echo '
 			</td>
 			</tr>';

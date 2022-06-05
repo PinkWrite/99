@@ -8,44 +8,61 @@ if (!isset($_SESSION['user_id'])) {
 // Okay to view this page
 $userid = $_SESSION['user_id'];
 
-// Original query
-// $qb = "SELECT id, editor_id, name, code FROM blocks WHERE status='open' AND id='$b_id'";
-// Full concatenate SQL query
-// $qb = "SELECT id, editor_id, name, code
-// FROM blocks b
-// WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', b.id, '\"')) AND u.id = '$userid')
-// AND status='open'";
+// Which notes?
+if (isset($_GET['w'])) {
+	if (filter_var($_GET['w'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$editor_set_writer_id = preg_replace("/[^0-9]/","", $_GET['w']);
+
+		// Heading
+		$q = "SELECT name, email FROM users WHERE id='$editor_set_writer_id'";
+		$r = mysqli_query ($dbc, $q);
+		$row = mysqli_fetch_array($r, MYSQLI_NUM);
+		$w_name = "$row[0]";
+		$w_email = "$row[1]";
+		echo '<h2 class="sans dk">Editor notes for writer: '.$w_name.' <small>'.$w_email.'</small></h2>';
+
+	}
+} elseif (isset($_GET['b'])) {
+	if (filter_var($_GET['b'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$editor_set_block = preg_replace("/[^0-9]/","", $_GET['b']);
+
+		// Heading
+		$q = "SELECT name, code FROM blocks WHERE id='$editor_set_block'";
+		$r = mysqli_query ($dbc, $q);
+		$row = mysqli_fetch_array($r, MYSQLI_NUM);
+		$b_name = "$row[0]";
+		$b_code = "$row[1]";
+		echo '<h2 class="sans dk">Editor notes for block: '.$b_name.' <small>'.$b_code.'</small></h2>';
+
+	}
+} else {
+	echo '<h2 class="sans dk">Editor notes for Main block</h2>';
+}
 
 // Sorting options
 $sort_get = (strstr($where_am_i, '?')) ? '&' : '?' ;
 
 // Sort GET setting
+$activity_cl = 'act_ltgray';
 $creation_cl = 'act_ltgray';
-$name_cl = 'act_ltgray';
-$code_cl = 'act_ltgray';
-$status_cl = 'act_ltgray';
+$heading_cl = 'act_ltgray';
 if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 	$sort = preg_replace("/[^a-z]/","", $_GET['s']);
 	switch ($sort) {
+		case "activity":
+				$order_by = "save_date DESC";
+				$activity_cl = 'act_dkgray';
+				$sort_suffix = 's=activity';
+				break;
 		case "creation":
 				$order_by = "id DESC";
 				$creation_cl = 'act_dkgray';
 				$sort_suffix = 's=creation';
 				break;
-		case "name":
-				$order_by = "name ASC";
-				$name_cl = 'act_dkgray';
-				$sort_suffix = 's=name';
-				break;
-		case "code":
-				$order_by = "code ASC";
-				$code_cl = 'act_dkgray';
-				$sort_suffix = 's=code';
-				break;
-		case "status":
-				$order_by = "draft_status='submitted' DESC, edits_status='submitted' DESC, draft_status='reviewed' DESC, edits_status='drafting' DESC, edits_status='scored' DESC, draft_status='saved' DESC, id DESC";
-				$status_cl = 'act_dkgray';
-				$sort_suffix = 's=status';
+		case "heading":
+				$order_by = "body ASC";
+				$heading_cl = 'act_dkgray';
+				$sort_suffix = 's=heading';
 				break;
 		default:
 				$order_by = "id DESC";
@@ -54,8 +71,8 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				break;
 	}
 } else {
-	$order_by = "id DESC";
-	$creation_cl = 'act_dkgray';
+	$order_by = "save_date DESC";
+	$activity_cl = 'act_dkgray';
 	$sort_suffix = '';
 }
 
@@ -89,7 +106,8 @@ if (isset($_GET['r'])) {
 		exit(); // Quit the script
 	}
 	// Search SQL query string
-	$SQLcolumnSearch = "( id LIKE '0'";
+	$SQLcolumnSearch = "AND ";
+	$SQLcolumnSearch .= "( id LIKE '0'";
 	// Add each search word
 	if(strpos($search_query, " ") !== false) {
 			$searchwordS = array();
@@ -97,12 +115,12 @@ if (isset($_GET['r'])) {
 
 			foreach($searchwordS as $searchword){
 					$searchword = mysqli_real_escape_string($dbc, $searchword);
-					$SQLcolumnSearch = $SQLcolumnSearch." OR LOWER(name) LIKE LOWER('%$searchword%') OR LOWER(code) LIKE LOWER('%$searchword%')";
+					$SQLcolumnSearch = $SQLcolumnSearch." OR LOWER(body) LIKE LOWER('%$searchword%')";
 			}
 	} else {
 		$searchword = $search_query;
 		$searchword = mysqli_real_escape_string($dbc, $searchword);
-		$SQLcolumnSearch = $SQLcolumnSearch." OR LOWER(name) LIKE LOWER('%$searchword%') OR LOWER(code) LIKE LOWER('%$searchword%')";
+		$SQLcolumnSearch = $SQLcolumnSearch." OR LOWER(body) LIKE LOWER('%$searchword%')";
 	}
 	// Finish the SQL serch query with order or operations
 	$SQLcolumnSearch = $SQLcolumnSearch." ) AND";
@@ -117,9 +135,19 @@ $pageitems = ($search_suffix == '') ? 250 : 1000; // Search results list a lot
 $itemskip = $pageitems * ($paged - 1);
 // Prepare our SQL query, but only IDs for pagination
 $sql_cols = 'id';
-$concat_where_statement = "blocks b WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', b.id, '\"')) AND u.id = '$userid')";
-$sql_where = "status='open' ORDER BY $order_by";
-$qp = "SELECT $sql_cols FROM $concat_where_statement AND $SQLcolumnSearch $sql_where";
+if (isset($editor_set_block)) {
+	$sql_where = "editor_set_block='$editor_set_block'";
+} elseif (isset($editor_set_writer_id)) {
+  $sql_where = "editor_set_writer_id='$userid'";
+} else { // Writer's Main block
+	$q = "SELECT editor FROM users WHERE id='$userid'";
+	$r = mysqli_query ($dbc, $q);
+	$row = mysqli_fetch_array($r, MYSQLI_NUM);
+	$u_editor = "$row[0]";
+	$sql_where = "editor_id='$u_editor' AND editor_set_writer_id='0' AND editor_set_block='0'";
+}
+$sql_where .= " $SQLcolumnSearch ORDER BY $order_by";
+$qp = "SELECT $sql_cols FROM notes WHERE $sql_where";
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
 if (($totalrows == 0) && ((!isset($SQLcolumnSearch)) || ($SQLcolumnSearch == ''))) {echo '<p class="lt sans"><b>Nothing yet</b></p>'; if (isset($_SERVER['HTTP_REFERER'])) {$where_was_i = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL); set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");} return;}
@@ -195,11 +223,11 @@ echo '
 		<td>
 		<span class="lo sans">&uarr;&darr;</span>
 		</td><td>';
+set_button("Activity", "Sort by most recent activity", "${where_am_i}${sort_get}s=activity${search_suffix}", $activity_cl);
+echo '</td><td>';
 set_button("Creation", "Sort by order of creation", "${where_am_i}${sort_get}s=creation${search_suffix}", $creation_cl);
 echo '</td><td>';
-set_button("Name", "Sort by name", "${where_am_i}${sort_get}s=name${search_suffix}", $name_cl);
-echo '</td><td>';
-set_button("Code", "Sort by code", "${where_am_i}${sort_get}s=code${search_suffix}", $code_cl);
+set_button("Heading", "Sort by heading", "${where_am_i}${sort_get}s=heading${search_suffix}", $heading_cl);
 echo '</td>';
 // Search form inputs
 echo '<td>
@@ -242,93 +270,44 @@ input.addEventListener('keyup',function(){
 </script>
 <?php
 
-// Main block
-$qe = "SELECT editor FROM users WHERE id='$userid'";
-$re = mysqli_query ($dbc, $qe);
-$rowe = mysqli_fetch_array($re);
-$editor_id = "$rowe[0]";
-// Get the Editor name
-$qe = "SELECT name FROM users WHERE id='$editor_id'";
-$re = mysqli_query ($dbc, $qe);
-$rowe = mysqli_fetch_array($re);
-$main_editor_name = "$rowe[0]";
+// List notes
+$sql_cols = 'id, body, save_date';
+$sql_where = "$SQLcolumnSearch editor_id='$userid' ORDER BY $order_by" ;
+$q = "SELECT $sql_cols FROM notes WHERE $sql_where LIMIT $itemskip,$pageitems";
+$r = mysqli_query ($dbc, $q);
 
-// Because there is always a Main block, we don't need an "Empty?" check for (mysqli_num_rows($r) == 0)
+// Empty?
+if (mysqli_num_rows($r) == 0) {
+	echo '<p class="lt sans">No notes</p>';
+} else {
 
-// Start the table
-echo '
-<table class="list sans lt"><tbody>';
+	// Start our row color class
+	$cc = 'lr';
 
-// Don't show the Main block in search results
-if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
-	// Main Block
-	echo '<tr>
-		<td><a class="listed_note" href="block_main.php?v=0"><b>Main</b></a></td>
-		<td></td>
-		<td><span class="sans bt">'.$main_editor_name.'</span></td>
-		<td><div style="display: inline; float:right;">';
-	set_switch("Browse &rarr;", "Browse my writs for this block", "block.php?v=0", "opened_by", "no_value", "editNoteButton");
-	echo '</div></td>
-		<td><div style="display: inline; float:right;">';
-	set_button("Editor notes &rarr;", "List editor notes for Main block", "notes_view.php", "editNoteButton");
-	echo '</div>
-		</td>
-		<td><div style="display: inline; float:right;">';
-	set_switch("New writ +", "Start a general task for this block", "writ.php?v=0", "opened_by", "no_value", "editNoteButton");
-	echo '</div>
-		</td>
-		</tr>';
-}
+	// Start the table
+	echo '
+	<table class="list lt notes sans"><tbody>';
 
-// Start our row color class
-$cc = 'lr';
-// List enrolled blocks
-$has_blocks = false;
-//foreach ($u_blocks_array as $b_id) {
-//	$qb = "SELECT id, editor_id, name, code FROM blocks WHERE status='open' AND id='$b_id'";
-$sql_cols = 'id, editor_id, name, code';
-$qb = "SELECT $sql_cols FROM $concat_where_statement AND $SQLcolumnSearch $sql_where LIMIT $itemskip,$pageitems";
-$rb = mysqli_query ($dbc, $qb);
+	// Iterate each entry
+	while ($row = mysqli_fetch_array($r)) {
+		$note_id = "$row[0]";
+		$body = "$row[1]";
+		$save_date = "$row[2]";
+		$title = strtok($body, "\n"); // Get just the first line
 
-while ($rowb = mysqli_fetch_array($rb)) {
-	$block_id = "$rowb[0]";
-	$editor_id = "$rowb[1]";
-	$block_name = "$rowb[2]";
-	$block_code = "$rowb[3]";
-
-	// Get the Editor name
-	$qe = "SELECT name FROM users WHERE id='$editor_id'";
-	$re = mysqli_query ($dbc, $qe);
-	$rowe = mysqli_fetch_array($re);
-	$editor_name = "$rowe[0]";
-
-	echo '<tr class="'.$cc.'">
-		<td><a class="listed_note" href="block.php?v='.$block_id.'"><b>'.$block_name.'</b></a></td>
-		<td><a class="listed_note" href="block.php?v='.$block_id.'">'.$block_code.'</a></td>
-		<td><span class="sans bt">'.$editor_name.'</span></td>
-		<td><div style="display: inline; float:right;">';
-	get_switch("Browse &rarr;", "Browse my writs for this block", "block.php", "v", $block_id, "editNoteButton");
-	echo '</div></td>
-		<td><div style="display: inline; float:right;">';
-	get_switch("Editor notes &rarr;", "List editor notes for this block", "notes_view.php", "b", "$block_id", "editNoteButton");
-	echo '</div></td>
-		<td><div style="display: inline; float:right;">';
-	set_switch("New writ +", "Start a general writ for this block", "writ.php?v=$block_id", "opened_by", $userid, "editNoteButton");
-	echo '</div>
-		</td>
+		echo '<tr class="'.$cc.'">';
+		echo "<td><a class=\"listed_note\" href=\"note.php?v=$note_id\">$title</a><br /><i class=\"listed_note\">$save_date</i></td>";
+		echo '<td><div style="display: inline; float:right;">';
+		get_switch("Read", "Read this note", "note_editor.php", "v", "$note_id", "act_blue editNoteButton");
+		echo '</div>
+			</td>
 		</tr>';
 
-	// Rotate our row color class
-	$cc = ($cc == 'lr') ? 'dr' : 'lr';
-	// We have at least one row
-	$has_blocks = true;
-} // End loop
-if (mysqli_num_rows($rb) == 0) {
-	echo '<tr><td colspan="4"><span class="lt sans">No other enrolled blocks</sans></td></tr>';
+		// Rotate our row color class
+		$cc = ($cc == 'lr') ? 'dr' : 'lr';
+	}
+	echo '</tbody></table>';
 }
-
-echo '</tbody></table>';
-
 
 // Pagination row
 if ($totalpages > 1) {

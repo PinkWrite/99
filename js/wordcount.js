@@ -3,6 +3,7 @@ counter = function() {
 
     if (value.length == 0) {
         $('#wordCount').html(0);
+        $('#wordCountInput').val(0);
         return;
     }
 
@@ -10,10 +11,11 @@ counter = function() {
     var wordCount = value.trim().replace(/\u2013|\u2014/g, ' ').replace(regex, ' ').split(' ').length;
 
     $('#wordCount').html(wordCount);
+    $('#wordCountInput').val(wordCount);
 };
 
 $(document).ready(function() {
-    $('#count').click(counter);
+//    $('#count').click(counter); // Delete if still works
     $('#writingArea').change(counter);
     $('#writingArea').keydown(counter);
     $('#writingArea').keypress(counter);

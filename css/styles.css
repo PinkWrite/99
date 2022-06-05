@@ -292,6 +292,10 @@ resize:none;
 color:#000;
 font: 28px/24px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
 }
+.wordCountDisplay {
+color:#ccc;
+font: 16px/32px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+}
 
 /* Scrollbar styles */
 ::-webkit-scrollbar {

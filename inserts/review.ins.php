@@ -24,6 +24,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : NULL;
 	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : NULL;
 	$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : NULL;
+	$edits_wordcount = (isset($_POST['edits_wordcount'])) ? filter_var($_POST['edits_wordcount'], FILTER_VALIDATE_INT) : 0;
 	$edit_notes = (isset($_POST['edit_notes'])) ? strip_tags(htmlspecialchars($_POST['edit_notes'])) : NULL;
 	$edits_status = (isset($_POST['edits_status'])) ? strip_tags(htmlspecialchars($_POST['edits_status'])) : NULL;
 	//$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : NULL;
@@ -44,6 +45,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 	$sql_notes = mysqli_real_escape_string($dbc, $notes);
 	$sql_work = mysqli_real_escape_string($dbc, $work);
 	$sql_edits = mysqli_real_escape_string($dbc, $edits);
+	$sql_edits_wordcount = mysqli_real_escape_string($dbc, $edits_wordcount);
 	$sql_edit_notes = mysqli_real_escape_string($dbc, $edit_notes);
 	//$sql_correction = mysqli_real_escape_string($dbc, $correction);
 	$sql_scoring = mysqli_real_escape_string($dbc, $scoring);
@@ -56,9 +58,9 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 	// Submit edits
 	if (isset($_POST['submit_edits'])) {
 		if ( ($score == '') || ($score == NULL) ) {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', scoring='$sql_scoring', score=NULL, outof='$sql_outof', edits='$sql_edits', edit_notes='$sql_edit_notes', draft_status='reviewed', edits_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', scoring='$sql_scoring', score=NULL, outof='$sql_outof', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', draft_status='reviewed', edits_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
 		} else {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', scoring='$sql_scoring', score='$sql_score', outof='$sql_outof', edits='$sql_edits', edit_notes='$sql_edit_notes', draft_status='reviewed', edits_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', scoring='$sql_scoring', score='$sql_score', outof='$sql_outof', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', draft_status='reviewed', edits_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
 		}
 		$r = mysqli_query ($dbc, $q);
 		if ($r) {
@@ -85,9 +87,9 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 		// Submit score NOW
 	} elseif (isset($_POST['submit_scoring_now'])) {
 		if ( ($score == '') || ($score == NULL) ) {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score=NULL, outof='$sql_outof', correction='NO NEED', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score=NULL, outof='$sql_outof', correction='NO NEED', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
 		} else {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score='$sql_score', outof='$sql_outof', correction='NO NEED', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score='$sql_score', outof='$sql_outof', correction='NO NEED', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
 		}
 		$r = mysqli_query ($dbc, $q);
 		if ($r) {
@@ -100,9 +102,9 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 	// Save edits
 	} elseif (isset($_POST['save_edit'])) {
 		if ( ($score == '') || ($score == NULL) ) {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score=NULL, outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score=NULL, outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
 		} else {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score='$sql_score', outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score='$sql_score', outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
 		}
 
 		$r = mysqli_query ($dbc, $q);
@@ -148,7 +150,7 @@ function showSubmit(showID) {
 // Editor revision for correction form
 function edit_form() {
 	// Make our variables work
-	global $dbc, $userid, $writ_id, $block_id, $writer_id, $work, $title, $notes, $draft, $draft_status, $correction, $edits, $edit_notes, $edits_status, $scoring, $score, $outof, $draft_save_date, $draft_submit_date, $edits_date, $corrected_save_date, $corrected_submit_date, $scoring_date, $name, $email, $block_listing, $rformaction;
+	global $dbc, $userid, $writ_id, $block_id, $u_blocks_array, $writer_id, $work, $title, $notes, $draft, $draft_status, $correction, $edits, $edit_notes, $edits_status, $scoring, $score, $outof, $draft_save_date, $draft_submit_date, $edits_date, $corrected_save_date, $corrected_submit_date, $scoring_date, $name, $email, $block_listing, $rformaction;
 
 	// Create the form
 	echo '
@@ -162,7 +164,7 @@ function edit_form() {
 	<input type="hidden" name="save_edit" value="Save" id="save_edit" class="lt_button" /><br />
 
 	<h2>Editor revision:</h2>
-	<textarea name="edits" id="edits" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" placeholder="Draft edit contents...">';
+	<textarea name="edits" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" placeholder="Draft edit contents...">';
 
 	// Editor revision value
 	if (isset($edits)) {
@@ -170,6 +172,7 @@ function edit_form() {
 	}
 
 	echo '</textarea>
+	<input type="hidden" name="edits_wordcount" id="wordCountInput" value="0">
 	<h3>Editor remarks:</h3>
 	<textarea name="edit_notes" id="edit_notes" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="3" cols="82" placeholder="Draft edit contents...">';
 
@@ -244,8 +247,7 @@ function edit_form() {
 	echo ' placeholder="NO WORK LABEL" />';
 
 	// Block
-	echo '<br /><br />
-	<label class="sans" for="block">Block:</label>
+	echo '<p><label class="sans" for="block">Block:</label>
 	<select class="formselect small" name="block" id="block" onchange="onNavWarn();" onkeyup="onNavWarn();">
 		<option value="0" hidden>Choose...</option>
 		<option value="0"';
@@ -255,22 +257,26 @@ function edit_form() {
 		}
 		echo '>Main</option>';
 
-		// List available blocks
-		$qb = "SELECT id, name, code FROM blocks WHERE status='open' AND editor_id='$userid'";
+	// List available blocks
+	foreach ($u_blocks_array as $b_id) {
+		// [""] could end up being the value, so see if this item is empty
+		if (!filter_var($b_id, FILTER_VALIDATE_INT, array('min_range' => 1))) { continue; }
+
+		$qb = "SELECT id, name, code FROM blocks WHERE status='open' AND id='$b_id'";
 		$rb = mysqli_query ($dbc, $qb);
+		$rowb = mysqli_fetch_array($rb);
+		$block_id_form = "$rowb[0]";
+		$block_name_form = "$rowb[1]";
+		$block_code_form = "$rowb[2]";
 
-		while ($rowb = mysqli_fetch_array($rb)) {
-			$block_id_form = "$rowb[0]";
-			$block_name_form = "$rowb[1]";
-			$block_code_form = "$rowb[2]";
-			echo '<option value="'.$block_id_form.'"';
+		echo '<option value="'.$block_id_form.'"';
 
-			if ( (isset($block_id)) && ($block_id == $block_id_form) ) {
-				echo ' selected';
-			}
-			echo '>'.$block_name_form.' (<small>'.$block_code_form.'</small>)</option>';
+		if ( (isset($block_id)) && ($block_id == $block_id_form) ) {
+			echo ' selected';
 		}
-	echo '</select><br /><br />';
+		echo '>'.$block_name_form.' (<small>'.$block_code_form.'</small>)</option>';
+	}
+	echo '</select></label></p>';
 
 	// Finish the form
 	echo '
@@ -333,7 +339,7 @@ function edit_form() {
 // Scoring form
  function score_form() {
 	 // Make our variables work
-		global $dbc, $userid, $writ_id, $block_id, $writer_id, $work, $title, $notes, $draft, $draft_status, $correction, $edits, $edit_notes, $edits_status, $scoring, $score, $outof, $draft_save_date, $draft_submit_date, $edits_date, $corrected_save_date, $corrected_submit_date, $scoring_date, $name, $email, $block_listing, $rformaction;
+		global $dbc, $userid, $writ_id, $block_id, $u_blocks_array, $writer_id, $work, $title, $notes, $draft, $draft_status, $correction, $edits, $edit_notes, $edits_status, $scoring, $score, $outof, $draft_save_date, $draft_submit_date, $edits_date, $corrected_save_date, $corrected_submit_date, $scoring_date, $name, $email, $block_listing, $rformaction;
 
 		// Create the form
 	echo '
@@ -348,7 +354,7 @@ function edit_form() {
 	<div id="ajax_changes" style="display: inline;"></div><br />
 	<input type="hidden" name="save_scoring" value="Save" id="save_scoring" class="lt_button" /><br />
 
-	<textarea name="scoring" id="scoring" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="3" cols="82" placeholder="Final scoring comments...">';
+	<textarea name="scoring" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="3" cols="82" placeholder="Final scoring comments...">';
 
 	// Scoring value
 	if (isset($scoring)) {
@@ -404,8 +410,7 @@ function edit_form() {
 	echo ' placeholder="NO WORK LABEL" />';
 
 	// Block
-	echo '<br /><br />
-	<label class="sans" for="block">Block:</label>
+	echo '<p><label class="sans" for="block">Block:</label>
 	<select class="formselect small" name="block" id="block" onchange="onNavWarn();" onkeyup="onNavWarn();">
 		<option value="0" hidden>Choose...</option>
 		<option value="0"';
@@ -415,22 +420,26 @@ function edit_form() {
 		}
 		echo '>Main</option>';
 
-		// List available blocks
-		$qb = "SELECT id, name, code FROM blocks WHERE status='open' AND editor_id='$userid'";
+	// List available blocks
+	foreach ($u_blocks_array as $b_id) {
+		// [""] could end up being the value, so see if this item is empty
+		if (!filter_var($b_id, FILTER_VALIDATE_INT, array('min_range' => 1))) { continue; }
+
+		$qb = "SELECT id, name, code FROM blocks WHERE status='open' AND id='$b_id'";
 		$rb = mysqli_query ($dbc, $qb);
+		$rowb = mysqli_fetch_array($rb);
+		$block_id_form = "$rowb[0]";
+		$block_name_form = "$rowb[1]";
+		$block_code_form = "$rowb[2]";
 
-		while ($rowb = mysqli_fetch_array($rb)) {
-			$block_id_form = "$rowb[0]";
-			$block_name_form = "$rowb[1]";
-			$block_code_form = "$rowb[2]";
-			echo '<option value="'.$block_id_form.'"';
+		echo '<option value="'.$block_id_form.'"';
 
-			if ( (isset($block_id)) && ($block_id == $block_id_form) ) {
-				echo ' selected';
-			}
-			echo '>'.$block_name_form.' (<small>'.$block_code_form.'</small>)</option>';
+		if ( (isset($block_id)) && ($block_id == $block_id_form) ) {
+			echo ' selected';
 		}
-	echo '</select><br /><br />';
+		echo '>'.$block_name_form.' (<small>'.$block_code_form.'</small>)</option>';
+	}
+	echo '</select></label></p>';
 
 	// Finish the form
 	echo '
@@ -492,7 +501,7 @@ function edit_form() {
 } // Score form function
 
 // Work information
-$q = "SELECT writer_id, block, work, title, notes, draft, draft_status, correction, edits, edit_notes, edits_status, scoring, score, outof, draft_save_date, draft_submit_date, edits_date, corrected_save_date, corrected_submit_date, scoring_date FROM writs WHERE id='$writ_id'";
+$q = "SELECT writer_id, block, work, title, notes, draft, draft_wordcount, draft_status, correction, correction_wordcount, edits, edit_notes, edits_status, scoring, score, outof, draft_save_date, draft_submit_date, edits_date, corrected_save_date, corrected_submit_date, scoring_date FROM writs WHERE id='$writ_id'";
 $r = mysqli_query ($dbc, $q);
 $row = mysqli_fetch_array($r, MYSQLI_NUM);
 $writer_id = "$row[0]";
@@ -501,20 +510,22 @@ $work = "$row[2]";
 $title = "$row[3]";
 $notes = "$row[4]";
 $draft = "$row[5]";
-$draft_status = "$row[6]";
-$correction = "$row[7]";
-$edits = "$row[8]";
-$edit_notes = "$row[9]";
-$edits_status = "$row[10]";
-$scoring = "$row[11]";
-$score = "$row[12]";
-$outof = "$row[13]";
-$draft_save_date = "$row[14]";
-$draft_submit_date = "$row[15]";
-$edits_date = "$row[16]";
-$corrected_save_date = "$row[17]";
-$corrected_submit_date = "$row[18]";
-$scoring_date = "$row[19]";
+$draft_wordcount = "$row[6]";
+$draft_status = "$row[7]";
+$correction = "$row[8]";
+$correction_wordcount = "$row[9]";
+$edits = "$row[10]";
+$edit_notes = "$row[11]";
+$edits_status = "$row[12]";
+$scoring = "$row[13]";
+$score = "$row[14]";
+$outof = "$row[15]";
+$draft_save_date = "$row[16]";
+$draft_submit_date = "$row[17]";
+$edits_date = "$row[18]";
+$corrected_save_date = "$row[19]";
+$corrected_submit_date = "$row[20]";
+$scoring_date = "$row[21]";
 
 // Current status
 
@@ -531,11 +542,12 @@ $scoring_date = "$row[19]";
 	}
 
 	// Writer information
-	$q = "SELECT name, email FROM users WHERE id='$writer_id'";
+	$q = "SELECT name, email, blocks FROM users WHERE id='$writer_id'";
 	$r = mysqli_query ($dbc, $q);
 	$row = mysqli_fetch_array($r, MYSQLI_NUM);
 	$name = "$row[0]";
 	$email = "$row[1]";
+	$u_blocks_array = json_decode($row[2], true);
 	echo "<p class=\"lt sans\">Writer: $name ($email)<br />Block: $block_listing</p>";
 
 	// Work & Title
@@ -554,6 +566,7 @@ $scoring_date = "$row[19]";
 } elseif ($draft_status == 'submitted') {
 		echo "<hr class=\"review\" />";
 		echo "<h4>First draft: (Submitted for review)<br /><i class=\"dk sans\">(<b>Submitted</b> $draft_submit_date)</i></h4>
+					<p class=\"sans lt\">Word count: <span class=\"wordCountDisplay\">$draft_wordcount</span></p>
 					<section class='writcontent draft'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft))."</section>";
 		echo "<hr class=\"review\" />";
 					edit_form();
@@ -562,6 +575,7 @@ $scoring_date = "$row[19]";
 }	elseif (($draft_status == 'reviewed') && ($edits_status == 'drafting')) {
 		echo "<hr class=\"review\" />";
 		echo "<h4>First draft: (Reviewed)<br /><i class=\"dk sans\">(<b>Submitted</b> $draft_submit_date)</i></h4>
+					<p class=\"sans lt\">Word count: <span class=\"wordCountDisplay\">$draft_wordcount</span></p>
 					<section class='writcontent draft'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft))."</section>";
 		echo "<hr class=\"review\" />
 					<h3 class=\"note_blue\">Editor revision complete!<br /><i class=\"note_blue sans\">(<b>Reviewed</b> $edits_date)</i></h3>
@@ -583,7 +597,8 @@ $scoring_date = "$row[19]";
 }	elseif (($draft_status == 'reviewed') && (($edits_status == 'viewed') || ($edits_status == 'saved'))) {
 		echo "<h4>First draft: (Reviewed)<br /><i class=\"dk sans\">(<b>Submitted</b> $draft_submit_date)</i></h4>
 					<section class='writcontent draft'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft))."</section>
-					<h4>Editor revision:<br /><i class=\"dk sans\">(<b>Submitted</b> $corrected_submit_date)</i></h4>
+					<h4>Editor revision:<br /><i class=\"dk sans\">(<b>Reviewed</b> $edits_date)</i></h4>
+					<p class=\"sans lt\">Word count: <span class=\"wordCountDisplay\">$edits_wordcount</span></p>
 					<section class='writcontent revision'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits))."</section>
 					<h5>Edited diff:</h5>
 					<section class='writcontent diff' id='diffDraftEdits'></section>
@@ -591,6 +606,7 @@ $scoring_date = "$row[19]";
 					<section class='writcontent remarks'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes))."</section>";
 		echo "<hr class=\"review\" />";
 		echo "<h4>Final corrected revision: (In-Progress)<br /><i class=\"dk sans\">(<b>Saved</b> $corrected_save_date)</i></h4>
+					<p class=\"sans lt\">Word count: <span class=\"wordCountDisplay\">$correction_wordcount</span></p>
 					<section class='writcontent correction'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction))."</section>";
 		echo "<h4>Notes:</h4>
 					<section class='writcontent notes'>".nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes))."</section>";

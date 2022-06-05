@@ -11,7 +11,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['deleted_note'])) 
 	$note_id = preg_replace("/[^0-9]/","", $_POST['deleted_note']);
 
 	// Get the post info
-	$q = "SELECT writer_id, body, save_date FROM notes WHERE id='$note_id'";
+	$q = "SELECT writer_id, editor_id, body, save_date FROM notes WHERE id='$note_id'";
 	$r = mysqli_query ($dbc, $q);
 	if (mysqli_num_rows($r) == 0) {
 		echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
@@ -19,11 +19,12 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['deleted_note'])) 
 	}
 	$row = mysqli_fetch_array($r);
 	$writer_id = "$row[0]";
-	$body = "$row[1]";
-	$save_date = "$row[2]";
+	$editor_id = "$row[1]";
+	$body = "$row[2]";
+	$save_date = "$row[3]";
 	$title = strtok($body, "\n"); // Get just the first line
 	// Should we be here?
-	if ($userid != $writer_id) {
+	if (($userid != $writer_id) && ($userid != $editor_id)) {
 		echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
 		exit(); // Quit the script
 	}

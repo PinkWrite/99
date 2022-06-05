@@ -87,7 +87,7 @@ if ($block_type == 'main') {
 	echo '<h3 class="lt sans">'.$block_name.' <small>('.$block_code.') <i>'.$editor_name.'</i></small></h3>';
 
 	// New generic Writ for Main Block
-	set_switch("New $block_code writ +", "Start a writ for '.$block_name.'", "writ.php?v=$block_id", "new_writ", $writer_id, "set_gray");
+	set_switch("New $block_code writ +", "Start a writ for '.$block_name.'", "writ.php?v=$block_id", "new_writ", $userid, "set_gray");
 
 	// Tasks query
 	$qt = "SELECT id, name, code FROM tasks WHERE block='$block_id'";

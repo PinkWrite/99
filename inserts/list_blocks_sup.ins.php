@@ -252,7 +252,7 @@ if (mysqli_num_rows($r) == 0) {
 	// Start the table
 	echo '
 	<table class="list sans lt"><tbody>
-	<tr><th>Name</th></th><th>Code</th><th>Editor</th><th>Writs</th><th>Roll</th><th>Edit</th></tr>';
+	<tr><th>Name</th></th><th>Code</th><th>Editor</th><th>Writs</th><th>Roll</th><th>Notes</th><th>Edit</th></tr>';
 
 	// Start our row color class
 	$cc = 'lr';
@@ -281,6 +281,10 @@ if (mysqli_num_rows($r) == 0) {
 			</td>
 			<td>';
 		get_switch("Roll", "Manage writers in this block", "enrollment_sup.php", "v", $block_id, "editNoteButton");
+		echo '
+			</td>
+			<td>';
+		get_switch("Notes", "List editor notes for this block", "notes_editor.php", "b", $block_id, "editNoteButton");
 		echo '
 			</td>
 			<td>';

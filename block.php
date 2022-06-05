@@ -8,6 +8,15 @@ require_once('./includes/form_functions.inc.php');
 
 
 // Include the header
+$active_writs = '';
+$active_blocks = 'active';
+$active_notes = '';
+$active_locker = '';
+$active_admin = '';
+$active_editor = '';
+$active_observer = '';
+$active_dash = 'active';
+$page_title = "Blocks :: $siteTitle";
 $page_title = "$siteTitle";
 include('./includes/header.html');
 
@@ -47,9 +56,15 @@ if (isset($_SESSION['user_id'])) {
 	exit(); // Quit the script
 }
 
-// Content
-include('./inserts/block.ins.php');
+// Editor notes for this block
+if ((isset($_GET['v'])) && ((filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0'))) {
+  $editor_set_block = preg_replace("/[^0-9]/","", $_GET['v']);
+	include('inserts/list_notes_editor_10.ins.php');
+}
 
+// Content
+$where_am_i = "blocks.php";
+include('./inserts/block.ins.php');
 
 // Include the footer file to complete the template
 require('./includes/footer.html');

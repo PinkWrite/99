@@ -26,10 +26,12 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) && (
 	$block_id = (isset($_POST['block'])) ? filter_var($_POST['block'], FILTER_VALIDATE_INT, array('min_range' => 1)) : NULL;
 	$title = (isset($_POST['title'])) ? strip_tags(htmlspecialchars(substr($_POST['title'],0,122))) : NULL;
 	$draft = (isset($_POST['draft'])) ? strip_tags(htmlspecialchars($_POST['draft'])) : NULL;
+	$draft_wordcount = (isset($_POST['draft_wordcount'])) ? filter_var($_POST['draft_wordcount'], FILTER_VALIDATE_INT) : 0;
 	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : NULL;
 	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : NULL;
 	//$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : NULL;
 	$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : NULL;
+	$correction_wordcount = (isset($_POST['correction_wordcount'])) ? filter_var($_POST['correction_wordcount'], FILTER_VALIDATE_INT) : 0;
 
 	// Trim extra space
 	$title = trim(preg_replace('/\s+/', ' ', $title));
@@ -42,14 +44,16 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) && (
 	$sql_block_id = mysqli_real_escape_string($dbc, $block_id);
 	$sql_title = mysqli_real_escape_string($dbc, $title);
 	$sql_draft = mysqli_real_escape_string($dbc, $draft);
+	$sql_draft_wordcount = mysqli_real_escape_string($dbc, $draft_wordcount);
 	$sql_notes = mysqli_real_escape_string($dbc, $notes);
 	$sql_work = mysqli_real_escape_string($dbc, $work);
-	$sql_edits = mysqli_real_escape_string($dbc, $edits);
+	//$sql_edits = mysqli_real_escape_string($dbc, $edits);
 	$sql_correction = mysqli_real_escape_string($dbc, $correction);
+	$sql_correction_wordcount = mysqli_real_escape_string($dbc, $correction_wordcount);
 
 	// Saving a draft
 	if (isset($_POST['save_draft'])) {
-		$q = "UPDATE writs SET title='$sql_title', block='$sql_block_id', work='$sql_work', notes='$sql_notes', draft='$sql_draft', draft_status='saved', draft_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
+		$q = "UPDATE writs SET title='$sql_title', block='$sql_block_id', work='$sql_work', notes='$sql_notes', draft='$sql_draft', draft_wordcount='$sql_draft_wordcount', draft_status='saved', draft_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
 		$r = mysqli_query ($dbc, $q);
 		if ($r) {
 			echo '<span class="noticegreen noticehide sans">Saved</span>';
@@ -61,7 +65,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) && (
 		// Saving a correction
 	} elseif (isset($_POST['save_correction'])) {
 			// Continued edit
-			$q = "UPDATE writs SET block='$sql_block_id', notes='$sql_notes', correction='$sql_correction', edits_status='saved', corrected_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', notes='$sql_notes', correction='$sql_correction', correction_wordcount='$sql_correction_wordcount', edits_status='saved', corrected_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
 			$r = mysqli_query ($dbc, $q);
 			if ($r) {
 				echo '<span class="noticegreen noticehide sans">Saved</span>';

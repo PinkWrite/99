@@ -44,6 +44,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id
 	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : NULL;
 	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : NULL;
 	$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : NULL;
+	$edits_wordcount = (isset($_POST['edits_wordcount'])) ? filter_var($_POST['edits_wordcount'], FILTER_VALIDATE_INT) : 0;
 	$edit_notes = (isset($_POST['edit_notes'])) ? strip_tags(htmlspecialchars($_POST['edit_notes'])) : NULL;
 	$edits_status = (isset($_POST['edits_status'])) ? strip_tags(htmlspecialchars($_POST['edits_status'])) : NULL;
 	//$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : NULL;
@@ -64,6 +65,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id
 	$sql_notes = mysqli_real_escape_string($dbc, $notes);
 	$sql_work = mysqli_real_escape_string($dbc, $work);
 	$sql_edits = mysqli_real_escape_string($dbc, $edits);
+	$sql_edits_wordcount = mysqli_real_escape_string($dbc, $edits_wordcount);
 	$sql_edit_notes = mysqli_real_escape_string($dbc, $edit_notes);
 	//$sql_correction = mysqli_real_escape_string($dbc, $correction);
 	$sql_scoring = mysqli_real_escape_string($dbc, $scoring);
@@ -73,9 +75,9 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id
 		// Save edits
 		if (isset($_POST['save_edit'])) {
 			if ( ($score == '') || ($score == NULL) ) {
-				$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score=NULL, outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
+				$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score=NULL, outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
 			} else {
-				$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score='$sql_score', outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
+				$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$sql_scoring', score='$sql_score', outof='$sql_outof' WHERE writer_id='$writer_id' AND id='$writ_id'";
 			}
 			$r = mysqli_query ($dbc, $q);
 			if ($r) {

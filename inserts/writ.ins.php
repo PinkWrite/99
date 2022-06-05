@@ -13,7 +13,7 @@ if (isset($_GET['w'])) {
 	set_switch("New writ +", "Start writing something new", "writ.php", "new_writ", $userid, "newNoteButton");
 
 	// Writ information
-	$q = "SELECT writer_id, block, work, title, notes, draft, draft_status, edits, edit_notes, correction, edits_status, scoring, score, outof FROM writs WHERE id='$writ_id'";
+	$q = "SELECT writer_id, block, work, title, notes, draft, draft_wordcount, draft_status, edits, edits_wordcount, edit_notes, correction, correction_wordcount, edits_status, edits_date, scoring, score, outof FROM writs WHERE id='$writ_id'";
 	$r = mysqli_query ($dbc, $q);
 	$row = mysqli_fetch_array($r, MYSQLI_NUM);
 	$writer_id = "$row[0]";
@@ -22,14 +22,18 @@ if (isset($_GET['w'])) {
 	$title = "$row[3]";
 	$notes = "$row[4]";
 	$draft = "$row[5]";
-	$draft_status = "$row[6]";
-	$edits = "$row[7]";
-	$edit_notes = "$row[8]";
-	$correction = "$row[9]";
-	$edits_status = "$row[10]";
-	$scoring = "$row[11]";
-	$score = "$row[12]";
-	$outof = "$row[13]";
+	$draft_wordcount = "$row[6]";
+	$draft_status = "$row[7]";
+	$edits = "$row[8]";
+	$edits_wordcount = "$row[9]";
+	$edit_notes = "$row[10]";
+	$correction = "$row[11]";
+	$correction_wordcount = "$row[12]";
+	$edits_status = "$row[13]";
+	$edits_date = "$row[14]";
+	$scoring = "$row[15]";
+	$score = "$row[16]";
+	$outof = "$row[17]";
 
 	// BLock
 	if ($block_id != 0) {
@@ -78,15 +82,18 @@ if (isset($_GET['w'])) {
 		<h4>Final scoring remarks:</h4>
 		<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $scoring)).'</section>
 		<h4>First draft:</h4>
+		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>
 		<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 		<h4>Edited</h4>
 		<h5>Remarks:</h5>
 		<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
 		<h5>Edited diff:</h5>
 		<section class="writcontent diff" id="diffDraftEdits"></section>
-		<h5>Editor revision:</h5>
+		<h5>Editor revision:<br /><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></h5>
+		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
 		<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
 		<h4>Final corrected revision:</h4>
+		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
 		<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
 		<h5>Scored diff:</h5>
 		<section class="writcontent diff" id="diffEditsFinal"></section>
@@ -138,10 +145,12 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 	$block_id = (isset($_POST['block'])) ? preg_replace("/[^0-9]/","", $_POST['block']) : NULL;
 	$title = (isset($_POST['title'])) ? strip_tags(htmlspecialchars(substr($_POST['title'],0,122))) : NULL;
 	$draft = (isset($_POST['draft'])) ? strip_tags(htmlspecialchars($_POST['draft'])) : NULL;
+	$draft_wordcount = (isset($_POST['draft_wordcount'])) ? filter_var($_POST['draft_wordcount'], FILTER_VALIDATE_INT) : 0;
 	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : NULL;
 	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : NULL;
 	//$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : NULL;
 	$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : NULL;
+	$correction_wordcount = (isset($_POST['correction_wordcount'])) ? filter_var($_POST['correction_wordcount'], FILTER_VALIDATE_INT) : 0;
 
 	// Trim extra space
 	$title = trim(preg_replace('/\s+/', ' ', $title));
@@ -154,10 +163,12 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 	$sql_block_id = mysqli_real_escape_string($dbc, $block_id);
 	$sql_title = mysqli_real_escape_string($dbc, $title);
 	$sql_draft = mysqli_real_escape_string($dbc, $draft);
+	$sql_draft_wordcount = mysqli_real_escape_string($dbc, $draft_wordcount);
 	$sql_notes = mysqli_real_escape_string($dbc, $notes);
 	$sql_work = mysqli_real_escape_string($dbc, $work);
 	//$sql_edits = mysqli_real_escape_string($dbc, $edits);
 	$sql_correction = mysqli_real_escape_string($dbc, $correction);
+	$sql_correction_wordcount = mysqli_real_escape_string($dbc, $correction_wordcount);
 
 	// BLock
 	if ($block_id != 0) {
@@ -176,7 +187,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 
 		// New draft submission
 		if (!isset($writ_id))	{
-			$q = "INSERT INTO writs (writer_id, block, level, work, title, notes, draft, draft_status, draft_submit_date) VALUES ('$userid', '$sql_block_id', '$level', '$sql_work', '$sql_title', '$sql_notes', '$sql_draft', 'submitted', NOW())";
+			$q = "INSERT INTO writs (writer_id, block, level, work, title, notes, draft, draft_wordcount, draft_status, draft_submit_date) VALUES ('$userid', '$sql_block_id', '$level', '$sql_work', '$sql_title', '$sql_notes', '$sql_draft', '$sql_draft_wordcount', 'submitted', NOW())";
 			$r = mysqli_query ($dbc, $q);
 			if (mysqli_affected_rows($dbc) == 1) {
 				$writ_id = $dbc->insert_id;
@@ -188,7 +199,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 
 		// Saved draft submission
 		} elseif (isset($writ_id)) {
-				$q = "UPDATE writs SET title='$sql_title', block='$sql_block_id', work='$sql_work', notes='$sql_notes', draft='$sql_draft', draft_status='submitted', draft_submit_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
+				$q = "UPDATE writs SET title='$sql_title', block='$sql_block_id', work='$sql_work', notes='$sql_notes', draft='$sql_draft', draft_wordcount='$sql_draft_wordcount', draft_status='submitted', draft_submit_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
 				$r = mysqli_query ($dbc, $q);
 				if ($r) {
 					echo '<script type="text/javascript"> window.location = "' . "writ.php?w=$writ_id" . '" </script>';
@@ -203,7 +214,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 
 			// New draft
 			if (!isset($writ_id))	{
-				$q = "INSERT INTO writs (writer_id, block, level, work, title, notes, draft, draft_status) VALUES ('$userid', '$sql_block_id', '$level', '$sql_work', '$sql_title', '$sql_notes', '$sql_draft', 'saved')";
+				$q = "INSERT INTO writs (writer_id, block, level, work, title, notes, draft, draft_wordcount, draft_status) VALUES ('$userid', '$sql_block_id', '$level', '$sql_work', '$sql_title', '$sql_notes', '$sql_draft', '$sql_draft_wordcount', 'saved')";
 				$r = mysqli_query ($dbc, $q);
 				if (mysqli_affected_rows($dbc) == 1) {
 					// Get the last id INSERTed, similar to SCOPE_IDENTITY() but with MySQLi
@@ -216,7 +227,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 
 			// Continued draft
 			} elseif (isset($writ_id)) {
-				$q = "UPDATE writs SET title='$sql_title', block='$sql_block_id', work='$sql_work', notes='$sql_notes', draft='$sql_draft', draft_status='saved', draft_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
+				$q = "UPDATE writs SET title='$sql_title', block='$sql_block_id', work='$sql_work', notes='$sql_notes', draft='$sql_draft', draft_wordcount='$sql_draft_wordcount', draft_status='saved', draft_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
 				$r = mysqli_query ($dbc, $q);
 				if ($r) {
 					echo '<script type="text/javascript"> window.location = "' . "writ.php?w=$writ_id" . '" </script>';
@@ -232,7 +243,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 		if (isset($_POST['submit_correction'])) {
 
 			// Saved edit submission
-				$q = "UPDATE writs SET block='$sql_block_id', notes='$sql_notes', correction='$sql_correction', edits_status='submitted', corrected_submit_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
+				$q = "UPDATE writs SET block='$sql_block_id', notes='$sql_notes', correction='$sql_correction', correction_wordcount='$sql_correction_wordcount', edits_status='submitted', corrected_submit_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
 				$r = mysqli_query ($dbc, $q);
 				if ($r) {
 					echo '<script type="text/javascript"> window.location = "' . "writ.php?w=$writ_id" . '" </script>';
@@ -245,7 +256,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 		} elseif (isset($_POST['save_correction'])) {
 
 			// Continued edit
-			$q = "UPDATE writs SET block='$sql_block_id', notes='$sql_notes', correction='$sql_correction', edits_status='saved', corrected_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', notes='$sql_notes', correction='$sql_correction', correction_wordcount='$sql_correction_wordcount', edits_status='saved', corrected_save_date=NOW() WHERE writer_id='$userid' AND id='$writ_id'";
 			$r = mysqli_query ($dbc, $q);
 			if ($r) {
 				echo '<script type="text/javascript"> window.location = "' . "writ.php?w=$writ_id" . '" </script>';
@@ -368,7 +379,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 		<br />';
 	}
 	echo '
-	<textarea name="draft" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Draft contents...">';
+	<textarea name="draft" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Draft contents...">';
 
 	// Draft value
 	if (isset($draft)) {
@@ -376,6 +387,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	}
 
 	echo '</textarea>
+	<input type="hidden" name="draft_wordcount" id="wordCountInput" value="0">
 	<br />
 	<br />
 	<textarea name="notes" class="readBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="2" cols="82" placeholder="Notes...">';
@@ -513,6 +525,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	// Main fields
 	echo '<h3 class="lt">Work: '.$work.'<br />Title: '.$title.'</h3>
 	<h4>Draft:</h4>
+	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span>
 	<section class="writcontent draft" id="draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
 	<hr />
 	<h4>Edited</h4>
@@ -520,14 +533,15 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
 	<h5>Edited diff:</h5>
 	<section class="writcontent diff" id="diffDraftEdits"></section>
-	<h5>Editor revision:</h5>
+	<h5>Editor revision:<br /><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></h5>
+	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span>
 	<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
 	<br />
 	<button type="button" title="Save (Ctrl + S)" class="lt_button" onclick="ajaxFormData(\'editform\', \'writ.ajax.php\', \'ajax_changes\'); offNavWarn();">Save</button>
 	&nbsp;<span id="wordCount" class="wordCounter" ></span>
 	<div id="ajax_changes" style="display: inline;"></div><br />
 	<input type="hidden" name="save_correction" value="Save" id="save_correction" class="lt_button" /><br />
-	<textarea name="correction" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Edited contents...">';
+	<textarea name="correction" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Edited contents...">';
 
 	// Draft value
 	if (isset($correction)) {
@@ -535,6 +549,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	}
 
 	echo '</textarea>
+	<input type="hidden" name="correction_wordcount" id="wordCountInput" value="0">
 	<br />
 	<br />
 	<textarea name="notes" class="readBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="2" cols="82" placeholder="Notes...">';

@@ -55,15 +55,19 @@ if (isset($_SESSION['user_id'])) {
 	exit(); // Quit the script
 }
 
-echo '<br>';
-set_button("Editor notes &rarr;", "View all notes from your editor and blocks", "notes_view.php", "editNoteButton");
-
 // Heading
-echo '<h2 class="lt">My Notes</h2>';
+if ((!isset($_GET['w'])) || (!filter_var($_GET['w'], FILTER_VALIDATE_INT)) ) {
+	get_switch("For my eyes only &rarr;", "List editor notes only for me", "notes_view.php", "w", "$userid", "editNoteButton");
+	echo '<br>';
+	$editor_set_writer_id = preg_replace("/[^0-9]/","", $_GET['w']);
+	$where_am_i = "notes_view.php?w=$editor_set_writer_id";
+} else {
+	$where_am_i = "notes_view.php";
+}
 
 // Note table
-$where_am_i = "notes.php";
-include('inserts/list_notes.ins.php');
+$editor_set_writer_id = $userid;
+include('inserts/list_notes_editor_view.ins.php');
 
 // Include the footer file to complete the template
 require('./includes/footer.html');

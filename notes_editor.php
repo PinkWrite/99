@@ -8,15 +8,16 @@ require_once('./includes/form_functions.inc.php');
 
 
 // Include the header file
+$active_notes = 'active';
 $active_writs = '';
 $active_blocks = '';
-$active_notes = 'active';
+$active_roll = '';
 $active_locker = '';
 $active_admin = '';
-$active_editor = '';
+$active_editor = 'activedash';
 $active_observer = '';
-$active_dash = 'active';
-$page_title = "Notes :: $siteTitle";
+$active_dash = '';
+$page_title = "Editor :: $siteTitle";
 include('./includes/header.html');
 
 // Logged in or not?
@@ -44,26 +45,47 @@ if (isset($_SESSION['user_id'])) {
 		exit(); // Quit the script
 	} elseif ($_SESSION['user_is_writer'] == true) {
 	 $usr_type = "Writer";
+ 		header("Location: " . PW99_HOME);
+ 		exit(); // Quit the script
 	}
 
 	// Dashboard
-	$dashgreeting = "Dash for $u_name";
-	include('./inserts/dash.ins.php');
+	$dashgreeting = "Editor Notes for $u_name";
+	include('./inserts/dash_editor.ins.php');
 
 } else {
 	header("Location: " . PW99_HOME);
 	exit(); // Quit the script
 }
 
-echo '<br>';
-set_button("Editor notes &rarr;", "View all notes from your editor and blocks", "notes_view.php", "editNoteButton");
-
 // Heading
-echo '<h2 class="lt">My Notes</h2>';
+echo '<h2 class="lt">Editor Notes</h2>';
 
 // Note table
-$where_am_i = "notes.php";
-include('inserts/list_notes.ins.php');
+if (isset($_GET['w'])) {
+	if (filter_var($_GET['w'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$writer_id = preg_replace("/[^0-9]/","", $_GET['w']);
+		$where_am_i = "notes_editor.php?w=$writer_id";
+	}
+} elseif (isset($_GET['b'])) {
+	if (filter_var($_GET['b'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$block = preg_replace("/[^0-9]/","", $_GET['b']);
+		$where_am_i = "notes_editor.php?b=$block";
+	}
+} elseif (isset($_GET['m'])) {
+	if (filter_var($_GET['m'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$editor_main_block = (preg_replace("/[^0-9]/","", $_GET['m']));
+		$where_am_i = "notes_editor.php?m=$editor_main_block";
+	}
+} elseif (isset($_GET['v'])) {
+	if (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$editor_all_notes = (preg_replace("/[^0-9]/","", $_GET['v']));
+		$where_am_i = "notes_editor.php?v=$editor_all_notes";
+	}
+} else {
+	$where_am_i = "notes_editor.php";
+}
+include('inserts/list_notes_editor.ins.php');
 
 // Include the footer file to complete the template
 require('./includes/footer.html');
