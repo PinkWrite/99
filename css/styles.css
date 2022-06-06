@@ -14,7 +14,11 @@ body {
 }
 
 hr {
-  color: #ddd;
+  color: #888;
+}
+
+hr.review {
+  color: #777;
 }
 
 div#wrap {
@@ -136,6 +140,10 @@ div.dashnav ul li.user {
 
 h1, h2, h3, h4, h5, h6, label {
 color:#555;
+}
+
+h1.review, h2.review, h3.review, h4.review, h5.review, h6.review, label.review {
+color:#888;
 }
 
 h1 {
@@ -293,7 +301,7 @@ color:#000;
 font: 28px/24px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
 }
 .wordCountDisplay {
-color:#ccc;
+color:#777;
 font: 16px/32px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
 }
 

@@ -79,25 +79,26 @@ if (isset($_GET['w'])) {
 		echo '<p class="sans">Block: '.$block_listing.'</p>
 		<h3 class="lt">Work: '.$work.'<br />Title: '.$title.'</h3>
 		<h4 class="lt">Score: '.$score.'<small class="dk">/'.$outof.'</small></h4>
-		<h4>Final scoring remarks:</h4>
+		<h4 class="review">Final scoring remarks:</h4>
 		<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $scoring)).'</section>
-		<h4>First draft:</h4>
-		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>
+		<h4 class="review">First draft:</h4>
 		<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
-		<h4>Edited</h4>
-		<h5>Remarks:</h5>
+		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>
+		<hr class="review" />
+		<h4 class="review">Editor remarks:</h4>
 		<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
-		<h5>Edited diff:</h5>
+		<h4 class="review">Edited diff:</h4>
 		<section class="writcontent diff" id="diffDraftEdits"></section>
-		<h5>Editor revision:<br /><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></h5>
-		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
+		<h4 class="review">Editor revision: <small><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></small></h4>
 		<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
-		<h4>Final corrected revision:</h4>
-		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
+		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
+		<hr class="review" />
+		<h4 class="review">Final corrected revision:</h4>
 		<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
-		<h5>Scored diff:</h5>
+		<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
+		<h4 class="review">Scored diff:</h4>
 		<section class="writcontent diff" id="diffEditsFinal"></section>
-		<h4>Notes:</h4>
+		<h4 class="review">Notes:</h4>
 		<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		// HTMLdiff
 		echo '
@@ -524,18 +525,17 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 
 	// Main fields
 	echo '<h3 class="lt">Work: '.$work.'<br />Title: '.$title.'</h3>
-	<h4>Draft:</h4>
-	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span>
+	<h4 class="review">Draft:</h4>
 	<section class="writcontent draft" id="draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
-	<hr />
-	<h4>Edited</h4>
-	<h5>Remarks:</h5>
+	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span>
+	<hr class="review" />
+	<h4 class="review">Editor remarks:</h4>
 	<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
-	<h5>Edited diff:</h5>
+	<h4 class="review">Edited diff:</h4>
 	<section class="writcontent diff" id="diffDraftEdits"></section>
-	<h5>Editor revision:<br /><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></h5>
-	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span>
+	<h4 class="review">Editor revision: <small><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></small></h4>
 	<section class="writcontent revision" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
+	<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span>
 	<br />
 	<button type="button" title="Save (Ctrl + S)" class="lt_button" onclick="ajaxFormData(\'editform\', \'writ.ajax.php\', \'ajax_changes\'); offNavWarn();">Save</button>
 	&nbsp;<span id="wordCount" class="wordCounter" ></span>
