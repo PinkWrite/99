@@ -11,6 +11,7 @@ require_once('./includes/form_functions.inc.php');
 $active_writs = 'active';
 $active_blocks = '';
 $active_notes = '';
+$active_binder = '';
 $active_locker = '';
 $active_admin = '';
 $active_editor = '';

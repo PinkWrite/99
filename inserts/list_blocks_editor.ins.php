@@ -37,11 +37,6 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				$code_cl = 'act_dkgray';
 				$sort_suffix = 's=code';
 				break;
-		case "status":
-				$order_by = "draft_status='submitted' DESC, edits_status='submitted' DESC, draft_status='reviewed' DESC, edits_status='drafting' DESC, edits_status='scored' DESC, draft_status='saved' DESC, id DESC";
-				$status_cl = 'act_dkgray';
-				$sort_suffix = 's=status';
-				break;
 		default:
 				$order_by = "id DESC";
 				$creation_cl = 'act_dkgray';
@@ -249,7 +244,7 @@ $editor_id = $userid;
 // Start the table
 echo '
 <table class="list sans lt"><tbody>
-<tr><th>Name</th></th><th>Code</th><th>Editor</th><th>Writs</th><th>Roll</th><th>New note</th></tr>';
+<tr><th>Name</th></th><th>Code</th><th>Editor</th><th><div style="display: inline; float:right;">Writs</div></th><th><div style="display: inline; float:right;">Roll</div></th><th><div style="display: inline; float:right;">Editor notes</div></th></tr>';
 
 // Don't show the Main block in search results
 if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
@@ -258,17 +253,17 @@ if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
 		<td><a class="listed_note" href="block_editor.php?v=0"><b>Main</b></a></td>
 		<td></td>
 		<td>'.$editor_name.'</td>
-		<td>';
+		<td><div style="display: inline; float:right;">';
 	get_switch("Writs", "List writs in your main Block", "block_editor.php", "v", "0", "editNoteButton");
 	echo '</div>
 		</td>
-		<td>';
+		<td><div style="display: inline; float:right;">';
 	get_switch("Roll", "List writers in Main block", "enrollment_editor.php", "", "", "editNoteButton");
-	echo '
+	echo '</div>
 		</td>
-		<td>';
-	get_switch("Editor notes", "List editor notes for this block", "notes_editor.php", "m", $userid, "editNoteButton");
-	echo '
+		<td><div style="display: inline; float:right;">';
+	get_switch("Block notes", "List editor notes for this block", "notes_editor.php", "m", $userid, "editNoteButton");
+	echo '</div>
 		</td>
 		</tr>';
 }
@@ -302,17 +297,17 @@ if (mysqli_num_rows($r) > 0) {
 			<td><a class="listed_note" href="block_editor.php?v='.$block_id.'"><b>'.$name.'</b></a></td>
 			<td><a class="listed_note" href="block_editor.php?v='.$block_id.'">'.$code.'</a></td>
 			<td>'.$editor_name.'</td>
-			<td>';
-		get_switch("Writs", "List writs in block $code", "block_editor.php", "v", $block_id, "editNoteButton");
-		echo '
+			<td><div style="display: inline; float:right;">';
+		get_switch("Writs", "List writs in your main Block", "block_editor.php", "v", "0", "editNoteButton");
+		echo '</div>
 			</td>
-			<td>';
-		get_switch("Roll", "List writers in block $code", "enrollment_editor.php", "v", $block_id, "editNoteButton");
-		echo '
+			<td><div style="display: inline; float:right;">';
+		get_switch("Roll", "List writers in Main block", "enrollment_editor.php", "", "", "editNoteButton");
+		echo '</div>
 			</td>
-			<td>';
-		get_switch("Editor notes", "List editor notes for this block", "notes_editor.php", "b", $block_id, "editNoteButton");
-		echo '
+			<td><div style="display: inline; float:right;">';
+		get_switch("Block notes", "List editor notes for this block", "notes_editor.php", "m", $userid, "editNoteButton");
+		echo '</div>
 			</td>
 			</tr>';
 

@@ -81,7 +81,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 		if ($rows == 0) { // No dups!
 
 			// Add the user to the database
-			$q = "INSERT INTO users (type, username, email, pass, name, status, blocks, observing, groups) VALUES ('$type', '$username', '$email', '"  .  password_hash($password, PASSWORD_BCRYPT) .  "', '$name', 'active', 'null', 'null', 'null')";
+			$q = "INSERT INTO users (type, username, email, pass, name, status, blocks, observing, groups) VALUES ('$type', '$username', '$email1', '"  .  password_hash($password, PASSWORD_BCRYPT) .  "', '$name', 'active', 'null', 'null', 'null')";
 			$r = mysqli_query ($dbc, $q);
 
 			if (mysqli_affected_rows($dbc) == 1) { // If it ran OK
@@ -111,7 +111,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 				*/
 
 				// Display a thanks message
-				echo '<h2>Success!</h2><p class="sans">User "'.$name.'" has been registered.</p>';
+				echo '<h2>Success!</h2><p class="sans note_green">User "'.$name.'" has been registered.</p>';
 
 				// Unset the variables
 				unset ($type);

@@ -43,6 +43,7 @@ if (isset($_SESSION['user_id'])) {
 	$active_writs = '';
 	$active_blocks = '';
 	$active_notes = '';
+	$active_binder = '';
 	$active_locker = '';
 	$active_admin = '';
 	$active_editor = '';
@@ -72,7 +73,7 @@ include('inserts/list_notes_editor_10.ins.php');
 unset($editor_set_writer_id);
 include('inserts/list_notes_editor_10.ins.php');
 echo '<br>';
-set_button("All editor notes", "View all notes from your editor and blocks", "notes_view.php", "editNoteButton");
+set_button("All editor notes", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
 
 // We need space
 echo '<br><br>';

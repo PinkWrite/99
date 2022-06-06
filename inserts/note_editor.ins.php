@@ -51,7 +51,6 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['new_note'])) && (
 			echo '<script type="text/javascript"> window.location = "' . "note_editor.php?v=$note_id" . '" </script>';
 			exit();
 		} else {
-			echo $q;
 			echo '<span class="noticered sans">Database error, could not be saved.</span>';
 		}
 

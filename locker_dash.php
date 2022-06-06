@@ -39,6 +39,7 @@ if (isset($_SESSION['user_id'])) {
 	$active_blocks = '';
 	$active_notes = '';
 	$active_locker = 'active';
+	$active_binder = '';
 	$active_admin = '';
 	$active_editor = '';
  	$active_observer = '';

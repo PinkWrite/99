@@ -11,6 +11,7 @@ require_once('./includes/form_functions.inc.php');
 $active_writs = '';
 $active_blocks = '';
 $active_notes = 'active';
+$active_binder = '';
 $active_locker = '';
 $active_admin = '';
 $active_editor = '';
@@ -56,7 +57,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 echo '<br>';
-set_button("Editor notes &rarr;", "View all notes from your editor and blocks", "notes_view.php", "editNoteButton");
+set_button("Editor notes &rarr;", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
 
 // Heading
 echo '<h2 class="lt">My Notes</h2>';

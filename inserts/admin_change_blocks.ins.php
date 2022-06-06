@@ -29,6 +29,12 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 
 // Process a form POST
 if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['submit_button'])) && (isset($_POST['v'])) && ($_POST['v'] == $u_id) ) {
+	// Check for $where_was_i
+	if ((isset($_POST['where_was_i'])) && (filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL))) {
+		$where_was_i = filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL);
+		unset($_POST['where_was_i']);
+	}
+
 	// Clear the POST so we can iterate through it
 	unset($_POST['opened_by']);
 	unset($_POST['submit_button']);
@@ -51,8 +57,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['submit_button']))
 		echo '<p class="noticegreen sans">Blocks saved.</p>';
 
 		// Check for $where_was_i
-		if ((isset($_POST['where_was_i'])) && (filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL))) {
-			$where_was_i = filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL);
+		if (isset($where_was_i)) {
 			set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");
 		}
 

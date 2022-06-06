@@ -1,5 +1,7 @@
 <?php
 
+// This is for a writer only
+
 // Logged in or not?
 if (!isset($_SESSION['user_id'])) {
 	return;
@@ -12,6 +14,21 @@ $userid = $_SESSION['user_id'];
 if (isset($_GET['w'])) {
 	if (filter_var($_GET['w'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
 		$editor_set_writer_id = preg_replace("/[^0-9]/","", $_GET['w']);
+
+		// Make sure we should be here
+		if ($usr_type == "Writer") {
+			if ($editor_set_writer_id != $userid) {
+				unset($editor_set_writer_id);
+				echo '<h2 class="sans dk">Editor notes <small>(all)</small></h2>';
+			}
+		} elseif ($usr_type == "Observer") {
+			$q = "SELECT id FROM users WHERE JSON_CONTAINS(observing, CONCAT('\"', $editor_set_writer_id, '\"')) AND id='$userid'";
+			$r = mysqli_query ($dbc, $q);
+			if (mysqli_num_rows($r) == 0) {
+				unset($editor_set_writer_id);
+				echo '<h2 class="sans dk">Editor notes <small>(all)</small></h2>';
+			}
+		}
 
 		// Heading
 		$q = "SELECT name, email FROM users WHERE id='$editor_set_writer_id'";
@@ -26,6 +43,23 @@ if (isset($_GET['w'])) {
 	if (filter_var($_GET['b'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
 		$editor_set_block = preg_replace("/[^0-9]/","", $_GET['b']);
 
+		// Make sure we should be here
+		if ($usr_type == "Writer") {
+			$q = "SELECT id FROM users WHERE JSON_CONTAINS(blocks, CONCAT('\"', $editor_set_block, '\"')) AND id='$userid'";
+			$r = mysqli_query ($dbc, $q);
+			if (mysqli_num_rows($r) == 0) {
+				unset($editor_set_block);
+				echo '<h2 class="sans dk">Editor notes <small>(all)</small></h2>';
+			}
+		// } elseif ($usr_type == "Observer") {
+		// 	$q = "JSON_HELP";
+		// 	$r = mysqli_query ($dbc, $q);
+		// 	if (mysqli_num_rows($r) == 0) {
+		// 		unset($editor_set_writer_id);
+		// 		echo '<h2 class="sans dk">Editor notes <small>(all)</small></h2>';
+		// 	}
+		}
+
 		// Heading
 		$q = "SELECT name, code FROM blocks WHERE id='$editor_set_block'";
 		$r = mysqli_query ($dbc, $q);
@@ -36,7 +70,7 @@ if (isset($_GET['w'])) {
 
 	}
 } else {
-	echo '<h2 class="sans dk">Editor notes for Main block</h2>';
+	echo '<h2 class="sans dk">Editor notes <small>(all)</small></h2>';
 }
 
 // Sorting options
@@ -139,13 +173,17 @@ if (isset($editor_set_block)) {
 	$sql_where = "editor_set_block='$editor_set_block'";
 } elseif (isset($editor_set_writer_id)) {
   $sql_where = "editor_set_writer_id='$userid'";
-} else { // Writer's Main block
-	$q = "SELECT editor FROM users WHERE id='$userid'";
-	$r = mysqli_query ($dbc, $q);
-	$row = mysqli_fetch_array($r, MYSQLI_NUM);
-	$u_editor = "$row[0]";
-	$sql_where = "editor_id='$u_editor' AND editor_set_writer_id='0' AND editor_set_block='0'";
-}
+}	elseif ((isset($by_main_block)) && ($by_main_block == true)) { // Writer's Main block
+ 	$q = "SELECT editor FROM users WHERE id='$userid'";
+ 	$r = mysqli_query ($dbc, $q);
+ 	$row = mysqli_fetch_array($r, MYSQLI_NUM);
+ 	$u_editor = "$row[0]";
+ 	$sql_where = "editor_id='$u_editor' AND editor_set_writer_id='0' AND editor_set_block='0'";
+ } else {
+	 // All notes from all non-Main blocks
+	 //JSON_HELP
+	 $sql_where = "EXISTS (SELECT 1 FROM users u JOIN blocks b WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', b.id, '\"')) AND u.id = '$userid')";
+ }
 $sql_where .= " $SQLcolumnSearch ORDER BY $order_by";
 $qp = "SELECT $sql_cols FROM notes WHERE $sql_where";
 $rp = mysqli_query($dbc, $qp);
@@ -271,7 +309,7 @@ input.addEventListener('keyup',function(){
 <?php
 
 // List notes
-$sql_cols = 'id, body, save_date';
+$sql_cols = 'id, body, save_date, editor_set_writer_id, editor_set_block';
 $sql_where = "$SQLcolumnSearch editor_id='$userid' ORDER BY $order_by" ;
 $q = "SELECT $sql_cols FROM notes WHERE $sql_where LIMIT $itemskip,$pageitems";
 $r = mysqli_query ($dbc, $q);
@@ -293,12 +331,36 @@ if (mysqli_num_rows($r) == 0) {
 		$note_id = "$row[0]";
 		$body = "$row[1]";
 		$save_date = "$row[2]";
+		$editor_set_writer_id = "$row[3]";
+		$editor_set_block = "$row[4]";
 		$title = strtok($body, "\n"); // Get just the first line
 
 		echo '<tr class="'.$cc.'">';
-		echo "<td><a class=\"listed_note\" href=\"note.php?v=$note_id\">$title</a><br /><i class=\"listed_note\">$save_date</i></td>";
+		echo "<td><a class=\"listed_note\" href=\"note_view.php?v=$note_id\">$title</a><br /><i class=\"listed_note\">$save_date</i></td>";
+
+		// Writer note
+		if ($editor_set_writer_id > 0) {
+			$qwn = "SELECT name, email FROM users WHERE id='$editor_set_writer_id'";
+			$rwn = mysqli_query ($dbc, $qwn);
+			$rowwn = mysqli_fetch_array($rwn, MYSQLI_NUM);
+			$w_name = "$rowwn[0]";
+			$w_email = "$rowwn[1]";
+			echo "<td>Writer: $w_name <small>$w_email</small></td>";
+		// Block note
+		} elseif ($editor_set_block > 0) {
+			$qbn = "SELECT name, code FROM blocks WHERE id='$editor_set_block'";
+			$rbn = mysqli_query ($dbc, $qbn);
+			$rowbn = mysqli_fetch_array($rbn, MYSQLI_NUM);
+			$b_name = "$rowbn[0]";
+			$b_code = "$rowbn[1]";
+			echo "<td>Block: $b_name <small>$b_code</small></td>";
+		// Main block note
+		} else {
+			echo "<td>Block: Main</td>";
+		}
+
 		echo '<td><div style="display: inline; float:right;">';
-		get_switch("Read", "Read this note", "note_editor.php", "v", "$note_id", "act_blue editNoteButton");
+		get_switch("Read", "Read this note", "note_view.php", "v", "$note_id", "act_blue editNoteButton");
 		echo '</div>
 			</td>
 		</tr>';

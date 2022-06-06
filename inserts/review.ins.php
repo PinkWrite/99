@@ -633,9 +633,12 @@ $scoring_date = "$row[21]";
 					<h5>Editor revision:<br /><i class="dk sans">(<b>Submitted</b> '.$corrected_submit_date.')</i></h5>
 					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>';
 		echo '<h4>Final corrected revision: (Submitted for scoring)<br /><i class="dk sans">(<b>Submitted</b> '.$corrected_submit_date.')</i></h4>
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
 					<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
 					<h5>Scored diff:</h5>
-					<section class="writcontent diff" id="diffEditsFinal"></section>';
+					<section class="writcontent diff" id="diffEditsFinal"></section>
+					<h5>Remarks: (again)</h5>
+					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>';
 		echo '<h4>Notes:</h4>
 					<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		echo '<hr class="review" />';
@@ -667,9 +670,12 @@ $scoring_date = "$row[21]";
 					<h5>Editor revision:<br /><i class=\"dk sans\">(<b>Submitted</b> '.$corrected_submit_date.')</i></h5>
 					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>';
 		echo '<h4>Final corrected revision:</h4>
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
 					<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
 					<h5>Scored diff:</h5>
-					<section class="writcontent diff" id="diffEditsFinal"></section>';
+					<section class="writcontent diff" id="diffEditsFinal"></section>
+					<h5>Remarks: (again)</h5>
+					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>';
 		echo '<h4>Notes:</h4>
 					<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		echo '<hr class="review" />

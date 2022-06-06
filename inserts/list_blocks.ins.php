@@ -267,7 +267,7 @@ if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
 		<td></td>
 		<td><span class="sans bt">'.$main_editor_name.'</span></td>
 		<td><div style="display: inline; float:right;">';
-	set_switch("Browse &rarr;", "Browse my writs for this block", "block.php?v=0", "opened_by", "no_value", "editNoteButton");
+	set_switch("Writs &rarr;", "List my writs for this block", "block.php?v=0", "opened_by", "no_value", "editNoteButton");
 	echo '</div></td>
 		<td><div style="display: inline; float:right;">';
 	set_button("Editor notes &rarr;", "List editor notes for Main block", "notes_view.php", "editNoteButton");
@@ -307,7 +307,7 @@ while ($rowb = mysqli_fetch_array($rb)) {
 		<td><a class="listed_note" href="block.php?v='.$block_id.'">'.$block_code.'</a></td>
 		<td><span class="sans bt">'.$editor_name.'</span></td>
 		<td><div style="display: inline; float:right;">';
-	get_switch("Browse &rarr;", "Browse my writs for this block", "block.php", "v", $block_id, "editNoteButton");
+	get_switch("Writs &rarr;", "List my writs for this block", "block.php", "v", $block_id, "editNoteButton");
 	echo '</div></td>
 		<td><div style="display: inline; float:right;">';
 	get_switch("Editor notes &rarr;", "List editor notes for this block", "notes_view.php", "b", "$block_id", "editNoteButton");

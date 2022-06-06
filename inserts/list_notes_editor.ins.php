@@ -104,21 +104,22 @@ $creation_cl = 'act_ltgray';
 $heading_cl = 'act_ltgray';
 $block_cl = 'act_ltgray';
 $writer_cl = 'act_ltgray';
+$editor_cl = 'act_ltgray';
 if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 	$sort = preg_replace("/[^a-z]/","", $_GET['s']);
 	switch ($sort) {
 		case "activity":
-				$order_by = "save_date DESC";
+				$order_by = "n.save_date DESC";
 				$activity_cl = 'act_dkgray';
 				$sort_suffix = 's=activity';
 				break;
 		case "creation":
-				$order_by = "id DESC";
+				$order_by = "n.id DESC";
 				$creation_cl = 'act_dkgray';
 				$sort_suffix = 's=creation';
 				break;
 		case "heading":
-				$order_by = "body ASC";
+				$order_by = "n.body ASC";
 				$heading_cl = 'act_dkgray';
 				$sort_suffix = 's=heading';
 				break;
@@ -134,14 +135,20 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				$writer_cl = 'act_dkgray';
 				$sort_suffix = 's=writer';
 				break;
+		case "editor":
+				$sql_order_formula = "editor_id";
+				$order_by = "u.name ASC";
+				$editor_cl = 'act_dkgray';
+				$sort_suffix = 's=editor';
+				break;
 		default:
-				$order_by = "id DESC";
+				$order_by = "n.save_date DESC";
 				$creation_cl = 'act_dkgray';
 				$sort_suffix = 's=creation';
 				break;
 	}
 } else {
-	$order_by = "save_date DESC";
+	$order_by = "n.save_date DESC";
 	$activity_cl = 'act_dkgray';
 	$sort_suffix = '';
 }
@@ -214,18 +221,20 @@ if (isset($editor_set_block)) {
 	$sql_who = "n.editor_id='$editor_all_notes' $editor_limit";
 }
 if ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_writer_id')) {
-
 	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
-	$qp = "SELECT $sql_cols FROM notes AS n JOIN users AS u WHERE $sql_where";
+	$qp = "SELECT $sql_cols FROM notes n JOIN users u ON n.editor_set_writer_id = u.id WHERE $sql_where";
 
 } elseif ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_block')) {
-
 	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
-	$qp = "SELECT $sql_cols FROM notes AS n JOIN blocks AS b WHERE $sql_where";
+	$qp = "SELECT $sql_cols FROM notes n JOIN blocks b ON n.editor_set_block = b.id WHERE $sql_where";
+
+} elseif ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_id')) {
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$qp = "SELECT $sql_cols FROM notes n JOIN users u ON n.editor_id = u.id WHERE n.editor_set_writer_id='0' AND n.editor_set_block='0' AND $sql_where";
 
 } else {
 	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
-	$qp = "SELECT $sql_cols FROM notes AS n WHERE $sql_where";
+	$qp = "SELECT $sql_cols FROM notes n WHERE $sql_where";
 }
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
@@ -307,10 +316,12 @@ echo '</td><td>';
 set_button("Creation", "Sort by order of creation", "${where_am_i}${sort_get}s=creation${search_suffix}", $creation_cl);
 echo '</td><td>';
 set_button("Heading", "Sort by heading", "${where_am_i}${sort_get}s=heading${search_suffix}", $heading_cl);
+echo '</td><td><span class="lo sans">&#x15CA;</span></td><td>';
+set_button("Blocks", "Sort by block", "${where_am_i}${sort_get}s=block${search_suffix}", $block_cl);
 echo '</td><td>';
-set_button("Block", "Sort by block", "${where_am_i}${sort_get}s=block${search_suffix}", $block_cl);
+set_button("Writers", "Sort by writer", "${where_am_i}${sort_get}s=writer${search_suffix}", $writer_cl);
 echo '</td><td>';
-set_button("Writer", "Sort by writer", "${where_am_i}${sort_get}s=writer${search_suffix}", $writer_cl);
+set_button("Editor Main", "Sort by editor Main blocks", "${where_am_i}${sort_get}s=editor${search_suffix}", $editor_cl);
 echo '</td>';
 // Search form inputs
 echo '<td>
@@ -354,23 +365,24 @@ input.addEventListener('keyup',function(){
 <?php
 
 // List notes
-$sql_cols = 'n.id, n.body, n.pinned, n.save_date, n.editor_set_block, n.editor_set_writer_id';
+$sql_cols = 'n.id, n.body, n.save_date, n.editor_set_block, n.editor_set_writer_id';
 if ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_writer_id')) {
-
 	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
-	$q = "SELECT $sql_cols FROM notes AS n JOIN users AS u WHERE $sql_where";
+	$q = "SELECT $sql_cols FROM notes n JOIN users u ON n.editor_set_writer_id = u.id WHERE $sql_where";
 
 } elseif ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_set_block')) {
-
 	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
-	$q = "SELECT $sql_cols FROM notes AS n JOIN blocks AS b WHERE $sql_where";
+	$q = "SELECT $sql_cols FROM notes n JOIN blocks b ON n.editor_set_block = b.id WHERE $sql_where";
+
+} elseif ((isset($sql_order_formula)) && ($sql_order_formula == 'editor_id')) {
+	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
+	$q = "SELECT $sql_cols FROM notes n JOIN users u ON n.editor_id = u.id WHERE n.editor_set_writer_id='0' AND n.editor_set_block='0' AND $sql_where";
 
 } else {
 	$sql_where = "$SQLcolumnSearch $sql_who ORDER BY $order_by" ;
-	$q = "SELECT $sql_cols FROM notes AS n WHERE $sql_where";
+	$q = "SELECT $sql_cols FROM notes n WHERE $sql_where";
 }
-
-$q .= " LIMIT $itemskip,$pageitems";
+//$q .= " LIMIT $itemskip,$pageitems";
 $r = mysqli_query ($dbc, $q);
 
 // Empty?
@@ -389,39 +401,38 @@ if (mysqli_num_rows($r) == 0) {
 	while ($row = mysqli_fetch_array($r)) {
 		$note_id = "$row[0]";
 		$body = "$row[1]";
-		$pinned = "$row[2]";
-		$save_date = "$row[3]";
-		$editor_set_block = "$row[4]";
-		$editor_set_writer_id = "$row[5]";
+		$save_date = "$row[2]";
+		$editor_set_block = "$row[3]";
+		$editor_set_writer_id = "$row[4]";
 		$title = strtok($body, "\n"); // Get just the first line
 
 		echo '<tr class="'.$cc.'">';
-		echo "<td><a class=\"listed_note\" href=\"note.php?v=$note_id\">$title</a><br /><i class=\"listed_note\">$save_date</i></td>";
+		echo "<td><a class=\"listed_note\" href=\"note_editor.php?v=$note_id\">$title</a><br /><i class=\"listed_note\">$save_date</i></td>";
 
 		// Writer note
 		if ($editor_set_writer_id > 0) {
-			$q = "SELECT name, email FROM users WHERE id='$editor_set_writer_id'";
-			$r = mysqli_query ($dbc, $q);
-			$row = mysqli_fetch_array($r, MYSQLI_NUM);
-			$w_name = "$row[0]";
-			$w_email = "$row[1]";
+			$qwn = "SELECT name, email FROM users WHERE id='$editor_set_writer_id'";
+			$rwn = mysqli_query ($dbc, $qwn);
+			$rowwn = mysqli_fetch_array($rwn, MYSQLI_NUM);
+			$w_name = "$rowwn[0]";
+			$w_email = "$rowwn[1]";
 			echo "<td>Writer: $w_name <small>$w_email</small></td>";
 		// Block note
 		} elseif ($editor_set_block > 0) {
-			$q = "SELECT name, code FROM blocks WHERE id='$editor_set_block'";
-			$r = mysqli_query ($dbc, $q);
-			$row = mysqli_fetch_array($r, MYSQLI_NUM);
-			$b_name = "$row[0]";
-			$b_code = "$row[1]";
+			$qbn = "SELECT name, code FROM blocks WHERE id='$editor_set_block'";
+			$rbn = mysqli_query ($dbc, $qbn);
+			$rowbn = mysqli_fetch_array($rbn, MYSQLI_NUM);
+			$b_name = "$rowbn[0]";
+			$b_code = "$rowbn[1]";
 			echo "<td>Block: $b_name <small>$b_code</small></td>";
 		// Main block note
 		} else {
 			if ((($usr_type == "Admin") || ($usr_type == "Supervisor")) && (isset($editor_main_block))) {
-				$q = "SELECT name, email FROM users WHERE id='$editor_main_block'";
-				$r = mysqli_query ($dbc, $q);
-				$row = mysqli_fetch_array($r, MYSQLI_NUM);
-				$e_name = "$row[0]";
-				$e_email = "$row[1]";
+				$qmb = "SELECT name, email FROM users WHERE id='$editor_main_block'";
+				$rmb = mysqli_query ($dbc, $qmb);
+				$rowmb = mysqli_fetch_array($rmb, MYSQLI_NUM);
+				$e_name = "$rowmb[0]";
+				$e_email = "$rowmb[1]";
 				echo "<td>Block: $e_name <small>$e_email</small></td>";
 
 			} elseif (($usr_type == "Editor") || ($usr_type == "Admin") || ($usr_type == "Supervisor")) {
@@ -438,7 +449,7 @@ if (mysqli_num_rows($r) == 0) {
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:right;">';
-			set_switch("Delete", "Delete this note", "delete_note.php", "deleted_note", $note_id, "editNoteButton");
+		set_switch("Delete", "Delete this note", "delete_note.php", "deleted_note", $note_id, "editNoteButton");
 		echo '</div>
 		  </td>
 		</tr>';

@@ -9,16 +9,15 @@ require_once('./includes/form_functions.inc.php');
 
 // Include the header
 $active_writs = '';
-$active_blocks = 'active';
+$active_blocks = '';
 $active_notes = '';
-$active_binder = '';
+$active_binder = 'active';
 $active_locker = '';
 $active_admin = '';
 $active_editor = '';
 $active_observer = '';
 $active_dash = 'active';
-$page_title = "Blocks :: $siteTitle";
-$page_title = "$siteTitle";
+$page_title = "Notes :: $siteTitle";
 include('./includes/header.html');
 
 // Logged in or not?
@@ -35,37 +34,17 @@ if (isset($_SESSION['user_id'])) {
 	$u_level = "$row[4]";
 	$u_editor = "$row[5]";
 
-	if ($_SESSION['user_is_admin'] == true) {
-		$usr_type = "Admin";
-	} elseif ($_SESSION['user_is_supervisor'] == true) {
-		$usr_type = "Supervisor";
-	} elseif ($_SESSION['user_is_editor'] == true) {
-		$usr_type = "Editor";
-	} elseif ($_SESSION['user_is_observer'] == true) {
-		header("Location: observer.php");
-  	exit(); // Quit the script
-	} elseif ($_SESSION['user_is_writer'] == true) {
-	 $usr_type = "Writer";
-	}
-
-	// Dashboard
-	$dashgreeting = "Block with $u_name";
-	include('./inserts/dash.ins.php');
-
 } else {
 	header("Location: " . PW99_HOME);
 	exit(); // Quit the script
 }
 
-// Editor notes for this block
-if ((isset($_GET['v'])) && ((filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0'))) {
-  $editor_set_block = preg_replace("/[^0-9]/","", $_GET['v']);
-	include('inserts/list_notes_editor_10.ins.php');
-}
+// Dashboard
+$dashgreeting = "Editor note for $u_name";
+include('./inserts/dash.ins.php');
 
 // Content
-$where_am_i = "blocks.php";
-include('./inserts/block.ins.php');
+include('./inserts/note_view.ins.php');
 
 // Include the footer file to complete the template
 require('./includes/footer.html');
