@@ -22,4 +22,5 @@ $(document).ready(function() {
     $('#writingArea').keyup(counter);
     $('#writingArea').blur(counter);
     $('#writingArea').focus(counter);
+    $(document).ready(counter); // If has words, but no changes
 });
