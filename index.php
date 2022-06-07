@@ -68,9 +68,7 @@ if (isset($_SESSION['user_id'])) {
 include('inserts/list_pins.ins.php');
 
 // Editor Notes
-$editor_set_writer_id = $userid;
-include('inserts/list_notes_editor_10.ins.php');
-unset($editor_set_writer_id);
+$limit_rows = 5;
 include('inserts/list_notes_editor_10.ins.php');
 echo '<br>';
 set_button("All editor notes", "View all notes from your editor and blocks", "binder.php", "editNoteButton");

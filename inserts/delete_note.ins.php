@@ -5,6 +5,15 @@ if (!isset($_SESSION['user_id'])) {
 	return;
 }
 
+// $where_was_i ?
+if ((isset($_POST['where_was_i'])) && (filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL))) {
+	$where_was_i = filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL);
+} elseif (isset($_SERVER['HTTP_REFERER'])) {
+	$where_was_i = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL);
+} else {
+	$where_was_i = 'no';
+}
+
 // Okay to view this page
 $userid = $_SESSION['user_id'];
 if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['deleted_note'])) && (filter_var($_POST['deleted_note'], FILTER_VALIDATE_INT, array('min_range' => 1))) ) {
@@ -32,8 +41,10 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['deleted_note'])) 
 	// Delete varification form
 	echo '<h2 class="lt">Delete: <i>"'.$title.'" (last saved '.$save_date.')</i></h2>
 	<p class="sans">Are you sure you want to delete this?</p>
-	<form id="editform" class="userform" action="delete_note.php" method="post" accept-charset="utf-8">
-	<input type="hidden" name="yes_delete_note" value="'.$note_id.'" />
+	<form id="editform" class="userform" action="delete_note.php" method="post" accept-charset="utf-8">';
+	// $where_was_i ?
+	echo (isset($where_was_i)) ? '<input type="hidden" name="where_was_i" value="'.$where_was_i.'">' : false ;
+	echo '<input type="hidden" name="yes_delete_note" value="'.$note_id.'" />
 	<input type="checkbox" required />
 	<input type="submit" name="delete_note" value="Yes, delete!" id="delete_note" class="dk_button" />
 	</form>
@@ -48,13 +59,16 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['deleted_note'])) 
 		echo '<h2 class="lt">Deleted!</h2>
 		<p class="noticeorange sans">The note has been permanently deleted.</p>';
 
-		// Check for $where_was_i
-		set_button("&larr; Back to Notes", "Return to the Notes page", "notes.php", "newNoteButton");
-
 	} else {
 		echo "Database error!";
 	}
 } else {
 	echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
 	exit(); // Quit the script
+}
+
+// Check for $where_was_i
+if ((isset($_POST['where_was_i'])) && (filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL))) {
+	$where_was_i = filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL);
+	set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");
 }

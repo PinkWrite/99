@@ -262,7 +262,7 @@ if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
 	echo '</div>
 		</td>
 		<td><div style="display: inline; float:right;">';
-	get_switch("Block notes", "List editor notes for this block", "notes_editor.php", "m", $userid, "editNoteButton");
+	get_switch("Block notes", "List editor notes for this block", "binder_editor.php", "m", $userid, "editNoteButton");
 	echo '</div>
 		</td>
 		</tr>';
@@ -306,7 +306,7 @@ if (mysqli_num_rows($r) > 0) {
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:right;">';
-		get_switch("Block notes", "List editor notes for this block", "notes_editor.php", "m", $userid, "editNoteButton");
+		get_switch("Block notes", "List editor notes for this block", "binder_editor.php", "m", $userid, "editNoteButton");
 		echo '</div>
 			</td>
 			</tr>';

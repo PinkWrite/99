@@ -6,7 +6,6 @@ require('./pw99-config.php');
 // A settings page requires form functions
 require_once('./includes/form_functions.inc.php');
 
-
 // Include the header file
 $active_writs = '';
 $active_blocks = '';
@@ -57,16 +56,27 @@ if (isset($_SESSION['user_id'])) {
 
 // Heading
 if ((isset($_GET['w'])) && (filter_var($_GET['w'], FILTER_VALIDATE_INT)) ) {
-	set_button("Editor notes for my blocks &rarr;", "List editor notes for my Main block", "binder.php", "editNoteButton");
-	echo '<br>';
+	// Before setting an ID
+	// Snippet of notes from blocks, incl Main
+	$limit_rows = 5;
+	$has_editor_notes = true; // So we don't get a header message
+	echo '<h4>Editor notes for me</h4>';
+	include('inserts/list_notes_editor_10.ins.php');
+
+	// Now set ID so it doesn't interfere with what's happening above
 	$editor_set_writer_id = preg_replace("/[^0-9]/","", $_GET['w']);
 	$where_am_i = "binder.php?w=$editor_set_writer_id";
 } else {
-	get_switch("Editor notes for my eyes only &rarr;", "List editor notes only for me", "binder.php", "w", "$userid", "editNoteButton");
 	$where_am_i = "binder.php";
-}
 
-// Note table
+	// Snippet of notes only for user
+	$limit_rows = 5;
+	$editor_set_writer_id = $userid;
+	$has_editor_notes = true; // So we don't get a header message
+	echo '<h4>Editor notes for me</h4>';
+	include('inserts/list_notes_editor_10.ins.php');
+}
+// Binder table
 include('inserts/list_notes_editor_view.ins.php');
 
 // Include the footer file to complete the template

@@ -8,8 +8,8 @@ require_once('./includes/form_functions.inc.php');
 
 
 // Include the header
-$active_notes = '';
-$active_writs = '';
+$active_binder = '';
+$active_writs = 'active';
 $active_blocks = '';
 $active_roll = '';
 $active_locker = '';

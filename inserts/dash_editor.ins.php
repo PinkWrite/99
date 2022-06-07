@@ -23,7 +23,7 @@ echo '
 			echo '
 			</li>
 			<li class="user">';
-				set_button("Notes", "List editor notes", "notes_editor.php", "navDarkButton user $active_notes");
+				set_button("Binder", "List editor notes", "binder_editor.php", "navDarkButton user $active_binder");
 			echo '
 			</li>
 			<li class="user">';

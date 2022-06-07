@@ -66,16 +66,16 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['deleted_writ'])) 
 		echo '<h2 class="lt">Deleted!</h2>
 		<p class="noticeorange sans">The writ has been permanently deleted.</p>';
 
-		// Check for $where_was_i
-		if ((isset($_POST['where_was_i'])) && (filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL))) {
-			$where_was_i = filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL);
-			set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");
-		}
-
 	} else {
 		echo "Database error!";
 	}
 } else {
 	echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
 	exit(); // Quit the script
+}
+
+// Check for $where_was_i
+if ((isset($_POST['where_was_i'])) && (filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL))) {
+	$where_was_i = filter_var($_POST['where_was_i'], FILTER_VALIDATE_URL);
+	set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");
 }

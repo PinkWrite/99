@@ -277,7 +277,7 @@ font: 16px/32px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono"
 border: none;
 width:99%;
 outline:none;
-padding:3px 3px 3px 3px;
+padding:3px 3px 3px 8px;
 }
 
 .writingBox {

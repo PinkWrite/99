@@ -8,6 +8,7 @@ require_once('./includes/form_functions.inc.php');
 
 
 // Include the header
+$active_binder = '';
 $active_writs = '';
 $active_blocks = '';
 $active_notes = '';
@@ -15,7 +16,7 @@ $active_locker = '';
 $active_admin = '';
 $active_editor = '';
 $active_observer = '';
-$active_dash = 'active';
+$active_dash = '';
 $page_title = "Notes :: $siteTitle";
 include('./includes/header.html');
 
@@ -51,8 +52,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Dashboard
-$dashgreeting = "Delete note for $u_name?";
-include('./inserts/dash.ins.php');
+// NONE for delete note
 
 // Delete form
 include('inserts/delete_note.ins.php');
