@@ -73,3 +73,5 @@ You are also welcome to help rollout the product roadmap. SysAdmins and ITs for 
   - Assignable to blocks, editors, levels
   - Can receive assigned tasks & tests
   - Can share common notes
+  
+For detailed and current to-do list, see [99-dev/TODO.md](https://github.com/PinkWrite/99-dev/blob/main/TODO.md)

@@ -7,16 +7,15 @@ require('./pw99-config.php');
 require_once('./includes/form_functions.inc.php');
 
 // Include the header file
-$active_writs = '';
-$active_blocks = '';
-$active_notes = '';
+$active_obsvwrits = '';
+$active_observees = '';
 $active_binder = 'active';
 $active_locker = '';
 $active_admin = '';
 $active_editor = '';
-$active_observer = '';
-$active_dash = 'active';
-$page_title = "Binder :: $siteTitle";
+$active_observer = 'active';
+$active_dash = '';
+$page_title = "Observees :: $siteTitle";
 include('./includes/header.html');
 
 // Logged in or not?
@@ -47,7 +46,7 @@ if (isset($_SESSION['user_id'])) {
 
 	// Dashboard
 	$dashgreeting = "Binder for $u_name";
-	include('./inserts/dash.ins.php');
+  include('./inserts/dash_observer.ins.php');
 
 } else {
 	header("Location: " . PW99_HOME);
@@ -56,27 +55,14 @@ if (isset($_SESSION['user_id'])) {
 
 // Heading
 if ((isset($_GET['w'])) && (filter_var($_GET['w'], FILTER_VALIDATE_INT)) ) {
-	// Before setting an ID
-	// Snippet of notes from blocks, incl Main
-	$limit_rows = 5;
-	$has_editor_notes = true; // So we don't get a header message
-	echo '<h4>Editor notes for me</h4>';
-	include('inserts/list_notes_editor_10.ins.php');
-
-	// Now set ID so it doesn't interfere with what's happening above
 	$editor_set_writer_id = preg_replace("/[^0-9]/","", $_GET['w']);
-	$where_am_i = "binder.php?w=$editor_set_writer_id";
+	$where_am_i = "binder_observer.php?w=$editor_set_writer_id";
 } else {
-	$where_am_i = "binder.php";
-
-	// Snippet of notes only for user
-	$limit_rows = 5;
-	$editor_set_writer_id = $userid;
-	$has_editor_notes = true; // So we don't get a header message
-	echo '<h4>Editor notes for me</h4>';
-	include('inserts/list_notes_editor_10.ins.php');
+	$where_am_i = "binder_observer.php";
 }
+
 // Binder table
+$observing = $userid;
 include('inserts/list_notes_editor_view.ins.php');
 
 // Include the footer file to complete the template

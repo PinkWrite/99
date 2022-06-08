@@ -11,6 +11,10 @@
 				echo '
 				</li>
 				<li class="user">';
+					set_button("Binder", "List editor notes", "binder_observer.php", "navDarkButton user $active_binder");
+				echo '
+				</li>
+				<li class="user">';
 					set_button("Observees", "View all observed writers", "enrollment_observer.php", "navDarkButton user $active_observees");
 				echo '
 				</li>

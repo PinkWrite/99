@@ -5,6 +5,7 @@
 // $editor_set_block = GET b
 // $by_main_block = GET m
 // $by_user_all = GET u
+// $observing = userid (for binder_observer.php)
 
 // Logged in or not?
 if (!isset($_SESSION['user_id'])) {
@@ -129,7 +130,11 @@ if (isset($_GET['w'])) {
 		}
   }
 
-// No GET
+// Observer
+} elseif ( (isset($observing)) && ($observing == $userid) && (($usr_type == "Observer") || ($usr_type == "Editor") || ($usr_type == "Supervisor") || ($usr_type == "Admin")) ) {
+	echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+
+// No GET & no settings
 } else {
 	$by_user = $userid;
 	echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
@@ -242,28 +247,74 @@ $pageitems = ($search_suffix == '') ? 250 : 1000; // Search results list a lot
 $itemskip = $pageitems * ($paged - 1);
 // Prepare our SQL query, but only IDs for pagination
 $sql_cols = 'n.id';
+$from = 'notes n';
 if (isset($editor_set_block)) {
-	$sql_where = "n.editor_set_block='$editor_set_block'";
+	$sql_where = "WHERE n.editor_set_block='$editor_set_block'";
 } elseif (isset($editor_set_writer_id)) {
-  $sql_where = "n.editor_set_writer_id='$editor_set_writer_id'";
+  $sql_where = "WHERE n.editor_set_writer_id='$editor_set_writer_id'";
 }	elseif (isset($by_main_block)) { // Writer's Main block
  	$q = "SELECT editor FROM users WHERE id='$by_main_block'";
  	$r = mysqli_query ($dbc, $q);
  	$row = mysqli_fetch_array($r, MYSQLI_NUM);
  	$u_editor = "$row[0]";
- 	$sql_where = "n.editor_id='$u_editor' AND n.editor_set_writer_id='0' AND n.editor_set_block='0'";
+ 	$sql_where = "WHERE n.editor_id='$u_editor' AND n.editor_set_writer_id='0' AND n.editor_set_block='0'";
 } elseif (isset($by_user_all)) { // Writer's all blocks (including Main and personal)
-	$sql_where = "EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0') OR n.editor_set_writer_id='$by_user_all'";
+	$from = 'users u';
+	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user_all' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0') OR n.editor_set_writer_id='$by_user_all'";
+	// Above improvement thanks https://stackoverflow.com/questions/72526684/sql-join-each-id-in-json-object
+	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0') OR n.editor_set_writer_id='$by_user_all'";
+
+} elseif (isset($observing)) { // Observer seeing all
+	//// DEV following replace the defunct code, delete these when migrated to new MariaDB server ////
+	$sql_where = "SELECT n.id, n.body, n.save_date, n.editor_set_writer_id, n.editor_set_block FROM notes n WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.observing, CONCAT('\"', n.editor_set_writer_id, '\"')) AND u.id = '$observing')";
+	//// DEV delete above when below is on MariaDB and tested ////
+
+	//// Defunct until updated to new server with MariaDB ////
+	//// From https://stackoverflow.com/questions/72515789/sql-join-two-json-columns-by-two-related-ids
+	// $sql_where = "WITH
+	// RECURSIVE cte AS (
+  //   SELECT 0 AS x
+  //   UNION ALL
+  //   SELECT x+1 FROM cte
+	// ),
+	// tbl_users AS (
+	// 	SELECT
+	// 	   id,
+	// 	   name,
+	// 	   JSON_VALUE(blocks,CONCAT('$[',cte.x,']')) AS block
+	// 	FROM users
+	// 	CROSS JOIN cte
+	// 	WHERE JSON_VALUE(blocks,CONCAT('$[',cte.x,']')) IS NOT NULL
+	// ),
+	// tbl_observers AS (
+	// 	SELECT
+	// 	   id,
+	// 	   name,
+	// 	   JSON_VALUE(observing,CONCAT('$[',cte.x,']')) AS writer
+	// 	FROM users
+	// 	CROSS JOIN cte
+	// 	WHERE JSON_VALUE(observing,CONCAT('$[',cte.x,']')) IS NOT NULL
+	// )
+	// SELECT n.id, n.body, n.save_date, n.editor_set_writer_id, n.editor_set_block
+	// FROM tbl_observers o
+	// LEFT JOIN tbl_users u ON u.id = o.writer
+	// INNER JOIN notes n ON n.editor_set_block = u.block
+	// WHERE o.id = '$observing'
+	// ORDER BY project";
+	//// DEV above is defunct code to test and use once on MariaDB ////
 
 } else { // Writer's all blocks (including Main)
- $q = "SELECT editor FROM users WHERE id='$by_user'";
- $r = mysqli_query ($dbc, $q);
- $row = mysqli_fetch_array($r, MYSQLI_NUM);
- $u_editor = "$row[0]";
- $sql_where = "EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
+	$q = "SELECT editor FROM users WHERE id='$by_user'";
+	$r = mysqli_query ($dbc, $q);
+	$row = mysqli_fetch_array($r, MYSQLI_NUM);
+	$u_editor = "$row[0]";
+	$from = 'users u';
+	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user_all' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
+	// Above improvement thanks https://stackoverflow.com/questions/72526684/sql-join-each-id-in-json-object
+	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 }
 $sql_where .= " $SQLcolumnSearch ORDER BY $order_by";
-$qp = "SELECT $sql_cols FROM notes n WHERE $sql_where";
+$qp = (isset($observing)) ? $sql_where : "SELECT $sql_cols FROM $from $sql_where"; // From our $observing option
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
 if (($totalrows == 0) && ((!isset($SQLcolumnSearch)) || ($SQLcolumnSearch == ''))) {echo '<p class="lt sans"><b>Nothing yet</b></p>'; if (isset($_SERVER['HTTP_REFERER'])) {$where_was_i = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL); set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");} return;}
@@ -392,7 +443,8 @@ input.addEventListener('keyup',function(){
 
 // List notes
 $sql_cols = 'n.id, n.body, n.save_date, n.editor_set_writer_id, n.editor_set_block';
-$q = "SELECT $sql_cols FROM notes n WHERE $sql_where LIMIT $itemskip,$pageitems";
+//$q = "SELECT $sql_cols FROM notes n WHERE $sql_where LIMIT $itemskip,$pageitems"; // Delete if below works
+$q = (isset($observing)) ? $sql_where : "SELECT $sql_cols FROM $from $sql_where LIMIT $itemskip,$pageitems"; // From our $observing option
 $r = mysqli_query ($dbc, $q);
 
 // Empty?
@@ -487,3 +539,11 @@ if ($totalpages > 1) {
 		</div>
 	</div>";
 }
+
+// We don't want this messing with other stuff
+unset($editor_id);
+unset($editor_set_writer_id);
+unset($editor_set_block);
+unset($by_main_block);
+unset($by_user_all);
+unset($observing);

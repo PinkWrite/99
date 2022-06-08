@@ -8,8 +8,9 @@ require_once('./includes/form_functions.inc.php');
 
 
 // Include the header
-$active_obsvwrits = '';
+$active_obsvwrits = 'active';
 $active_observees = '';
+$active_binder = '';
 $active_locker = '';
 $active_admin = '';
 $active_editor = '';

@@ -20,6 +20,7 @@ $limit_rows = (isset($limit_rows)) ? $limit_rows : 10 ;
 
 // List notes
 $sql_cols = 'n.id, n.body, n.save_date, n.editor_set_writer_id, n.editor_set_block';
+$from = 'notes n';
 if (isset($editor_set_block)) {
 	// Make sure we should be here
 	if ($usr_type == "Writer") {
@@ -46,7 +47,7 @@ if (isset($editor_set_block)) {
 		}
 	}
 	// Payload
-	$sql_where = "n.editor_set_block='$editor_set_block'";
+	$sql_where = "WHERE n.editor_set_block='$editor_set_block'";
 } elseif (isset($editor_set_writer_id)) {
 	// Make sure we should be here
 	if ($usr_type == "Writer") {
@@ -61,7 +62,7 @@ if (isset($editor_set_block)) {
 		}
 	}
 	// Payload
-  $sql_where = "n.editor_set_writer_id='$userid'";
+  $sql_where = "WHERE n.editor_set_writer_id='$userid'";
 
 } elseif (isset($by_main_block)) { // Writer's Main block
 	// Make sure we should be here
@@ -82,7 +83,7 @@ if (isset($editor_set_block)) {
 	$row = mysqli_fetch_array($r, MYSQLI_NUM);
 	$u_editor = "$row[0]";
 	// Payload
-	$sql_where = "n.editor_id='$u_editor' AND n.editor_set_writer_id='0' AND n.editor_set_block='0'";
+	$sql_where = "WHERE n.editor_id='$u_editor' AND n.editor_set_writer_id='0' AND n.editor_set_block='0'";
 
 } elseif (isset($by_user_all)) { // Writer's all blocks (including Main and personal)
 	// Make sure we should be here
@@ -100,14 +101,20 @@ if (isset($editor_set_block)) {
 		}
 	}
 	// Payload
-	$sql_where = "EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0') OR n.editor_set_writer_id='$by_user_all'";
+	$from = 'users u';
+	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user_all' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0') OR n.editor_set_writer_id='$by_user_all'";
+	// Above improvement thanks https://stackoverflow.com/questions/72526684/sql-join-each-id-in-json-object
+	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0') OR n.editor_set_writer_id='$by_user_all'";
 
 } else {
 	$by_user_all = $userid;
 	// Payload
-	$sql_where = "EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
+	$from = 'users u';
+	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user_all' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
+	// Above improvement thanks https://stackoverflow.com/questions/72526684/sql-join-each-id-in-json-object
+	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 }
-$q = "SELECT $sql_cols FROM notes n WHERE $sql_where ORDER BY save_date DESC LIMIT $limit_rows";
+$q = "SELECT $sql_cols FROM $from $sql_where ORDER BY save_date DESC LIMIT $limit_rows";
 $r = mysqli_query ($dbc, $q);
 
 // Start our row color class

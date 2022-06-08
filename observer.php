@@ -10,6 +10,7 @@ require_once('./includes/form_functions.inc.php');
 // Include the header file
 $active_obsvwrits = '';
 $active_observees = '';
+$active_binder = '';
 $active_locker = '';
 $active_admin = '';
 $active_editor = '';
