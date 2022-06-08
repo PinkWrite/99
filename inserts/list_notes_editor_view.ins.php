@@ -1,6 +1,7 @@
 <?php
 
 // When including, these can be set rather than using GET
+// These must be set in cascade of the following order, those above will override those below
 // $editor_set_writer_id = GET w
 // $editor_set_block = GET b
 // $by_main_block = GET m
@@ -131,7 +132,7 @@ if (isset($_GET['w'])) {
   }
 
 // Observer
-} elseif ( (isset($observing)) && ($observing == $userid) && (($usr_type == "Observer") || ($usr_type == "Editor") || ($usr_type == "Supervisor") || ($usr_type == "Admin")) ) {
+} elseif ( (isset($observing)) && ( (($usr_type == "Observer") && ($observing == $userid)) || ($usr_type == "Supervisor") || ($usr_type == "Admin") ) ) {
 	echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
 
 // No GET & no settings
@@ -248,11 +249,11 @@ $itemskip = $pageitems * ($paged - 1);
 // Prepare our SQL query, but only IDs for pagination
 $sql_cols = 'n.id';
 $from = 'notes n';
-if (isset($editor_set_block)) {
-	$sql_where = "WHERE n.editor_set_block='$editor_set_block'";
-} elseif (isset($editor_set_writer_id)) {
+if (isset($editor_set_writer_id)) {
   $sql_where = "WHERE n.editor_set_writer_id='$editor_set_writer_id'";
-}	elseif (isset($by_main_block)) { // Writer's Main block
+}	elseif (isset($editor_set_block)) {
+	$sql_where = "WHERE n.editor_set_block='$editor_set_block'";
+} elseif (isset($by_main_block)) { // Writer's Main block
  	$q = "SELECT editor FROM users WHERE id='$by_main_block'";
  	$r = mysqli_query ($dbc, $q);
  	$row = mysqli_fetch_array($r, MYSQLI_NUM);

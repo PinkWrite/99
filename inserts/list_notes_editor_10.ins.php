@@ -1,6 +1,7 @@
 <?php
 
 // When including, these can be set, but this will NOT detect them from GET
+// These must be set in cascade of the following order, those above will override those below
 // $editor_set_writer_id = GET w
 // $editor_set_block = GET b
 // $by_main_block = GET m
@@ -21,7 +22,23 @@ $limit_rows = (isset($limit_rows)) ? $limit_rows : 10 ;
 // List notes
 $sql_cols = 'n.id, n.body, n.save_date, n.editor_set_writer_id, n.editor_set_block';
 $from = 'notes n';
-if (isset($editor_set_block)) {
+if (isset($editor_set_writer_id)) {
+	// Make sure we should be here
+	if ($usr_type == "Writer") {
+		if ($editor_set_writer_id != $userid) {
+			unset($editor_set_writer_id);
+		}
+	} elseif ($usr_type == "Observer") {
+		$q = "SELECT id FROM users WHERE JSON_CONTAINS(observing, CONCAT('\"', $editor_set_writer_id, '\"')) AND id='$userid'";
+		$r = mysqli_query ($dbc, $q);
+		if (mysqli_num_rows($r) == 0) {
+			unset($editor_set_writer_id);
+		}
+	}
+	// Payload
+  $sql_where = "WHERE n.editor_set_writer_id='$userid'";
+
+} elseif (isset($editor_set_block)) {
 	// Make sure we should be here
 	if ($usr_type == "Writer") {
 		$q = "SELECT id FROM users WHERE JSON_CONTAINS(blocks, CONCAT('\"', $editor_set_block, '\"')) AND id='$userid'";
@@ -48,22 +65,6 @@ if (isset($editor_set_block)) {
 	}
 	// Payload
 	$sql_where = "WHERE n.editor_set_block='$editor_set_block'";
-} elseif (isset($editor_set_writer_id)) {
-	// Make sure we should be here
-	if ($usr_type == "Writer") {
-		if ($editor_set_writer_id != $userid) {
-			unset($editor_set_writer_id);
-		}
-	} elseif ($usr_type == "Observer") {
-		$q = "SELECT id FROM users WHERE JSON_CONTAINS(observing, CONCAT('\"', $editor_set_writer_id, '\"')) AND id='$userid'";
-		$r = mysqli_query ($dbc, $q);
-		if (mysqli_num_rows($r) == 0) {
-			unset($editor_set_writer_id);
-		}
-	}
-	// Payload
-  $sql_where = "WHERE n.editor_set_writer_id='$userid'";
-
 } elseif (isset($by_main_block)) { // Writer's Main block
 	// Make sure we should be here
 	if ($usr_type == "Writer") {
