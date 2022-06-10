@@ -119,25 +119,25 @@ if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 				$sort_suffix = 's=creation';
 				break;
 		case "heading":
-				$order_by = "n.body ASC";
+				$order_by = "n.body ASC, n.save_date DESC";
 				$heading_cl = 'act_dkgray';
 				$sort_suffix = 's=heading';
 				break;
 		case "block":
 				$sql_order_formula = "editor_set_block";
-				$order_by = "b.name, n.editor_set_block=0 DESC";
+				$order_by = "b.name, n.editor_set_block=0 DESC, n.save_date DESC";
 				$block_cl = 'act_dkgray';
 				$sort_suffix = 's=block';
 				break;
 		case "writer":
 				$sql_order_formula = "editor_set_writer_id";
-				$order_by = "u.name DESC";
+				$order_by = "u.name ASC, n.save_date DESC";
 				$writer_cl = 'act_dkgray';
 				$sort_suffix = 's=writer';
 				break;
 		case "editor":
 				$sql_order_formula = "editor_id";
-				$order_by = "u.name ASC";
+				$order_by = "u.name ASC, n.save_date DESC";
 				$editor_cl = 'act_dkgray';
 				$sort_suffix = 's=editor';
 				break;

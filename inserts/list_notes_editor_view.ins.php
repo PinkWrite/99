@@ -310,7 +310,7 @@ if (isset($editor_set_writer_id)) {
 	$row = mysqli_fetch_array($r, MYSQLI_NUM);
 	$u_editor = "$row[0]";
 	$from = 'users u';
-	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user_all' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
+	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 	// Above improvement thanks https://stackoverflow.com/questions/72526684/sql-join-each-id-in-json-object
 	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 }

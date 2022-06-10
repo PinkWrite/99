@@ -108,12 +108,12 @@ if (isset($editor_set_writer_id)) {
 	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0') OR n.editor_set_writer_id='$by_user_all'";
 
 } else {
-	$by_user_all = $userid;
+	$by_user = $userid;
 	// Payload
 	$from = 'users u';
-	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user_all' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
+	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 	// Above improvement thanks https://stackoverflow.com/questions/72526684/sql-join-each-id-in-json-object
-	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user_all') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
+	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 }
 $q = "SELECT $sql_cols FROM $from $sql_where ORDER BY save_date DESC LIMIT $limit_rows";
 $r = mysqli_query ($dbc, $q);
@@ -184,3 +184,4 @@ unset($editor_set_writer_id);
 unset($editor_set_block);
 unset($by_main_block);
 unset($by_user_all);
+unset($by_user);
