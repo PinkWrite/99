@@ -26,15 +26,15 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 	}
 
 	// Check for a username
-	if ( (isset($_POST['username'])) && ($_POST['username'] != '') ) {
-		if (preg_match('/[A-Za-z0-9]{6,32}$/i', $_POST['username'])) {
-			$username = mysqli_real_escape_string($dbc, strtolower(preg_replace("/[^A-Za-z0-9]/","", $_POST['username'])));
+	if ( (isset($_POST['new_username'])) && ($_POST['new_username'] != '') ) {
+		if (preg_match('/[A-Za-z0-9]{6,32}$/i', $_POST['new_username'])) {
+			$new_username = mysqli_real_escape_string($dbc, strtolower(preg_replace("/[^A-Za-z0-9]/","", $_POST['new_username'])));
 		} else {
-			$username = "";
-			$pass_errors['username'] = 'Please enter a valid username!';
+			$new_username = "";
+			$pass_errors['new_username'] = 'Please enter a valid username!';
 		}
 	} else {
-		$pass_errors['username'] = 'Please enter a valid username!';
+		$pass_errors['new_username'] = 'Please enter a valid username!';
 	}
 
 	// Check for an email and match against the confirmed email
@@ -72,7 +72,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 	if (empty($reg_errors)) {
 
 		// Make sure the email address and username are available
-		$q = "SELECT email, username FROM users WHERE email='$email' OR username='$username'";
+		$q = "SELECT email, username FROM users WHERE email='$email' OR username='$new_username'";
 		$r = mysqli_query ($dbc, $q);
 
 		// Get the number of rows returned
@@ -81,7 +81,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 		if ($rows == 0) { // No dups!
 
 			// Add the user to the database
-			$q = "INSERT INTO users (type, username, email, pass, name, editor, status, blocks, observing, groups) VALUES ('$type', '$username', '$email1', '"  .  password_hash($password, PASSWORD_BCRYPT) .  "', '$name', '$editor_id', 'active', 'null', 'null', 'null')";
+			$q = "INSERT INTO users (type, username, email, pass, name, editor, status, blocks, observing, groups) VALUES ('$type', '$new_username', '$email1', '"  .  password_hash($password, PASSWORD_BCRYPT) .  "', '$name', '$editor_id', 'active', 'null', 'null', 'null')";
 			$r = mysqli_query ($dbc, $q);
 
 			if (mysqli_affected_rows($dbc) == 1) { // If it ran OK
@@ -91,7 +91,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 				$from = '"'.$site_from_email_name.'" <'.$site_from_email.'>';
 				$to = '"'.$name.'" <'.$email.'>';
 				$subject = "Registration: $siteTitle";
-				$message = "<html><p>Thank you for registering at $siteTitle.</p><br />Username: $username<br /><p>You agreed to our Terms & Conditions, which may change and you will receive an email when you do. You also agreed that all sales are final and no refunds are given under any circumstances.</p><br /><a title=\"PinkWrite 99\" href=\"https://pacificdailyads.com\">pacificdailyads.com</a></html>";
+				$message = "<html><p>Thank you for registering at $siteTitle.</p><br />Username: $new_username<br /><p>You agreed to our Terms & Conditions, which may change and you will receive an email when you do. You also agreed that all sales are final and no refunds are given under any circumstances.</p><br /><a title=\"PinkWrite 99\" href=\"https://pacificdailyads.com\">pacificdailyads.com</a></html>";
 				$headers .= 'To: ' . $to . "\r\n";
 				$headers .= 'From: ' . $from . "\r\n";
 				$headers .= 'Bcc: ' . $site_bcc_email . "\r\n";
@@ -103,7 +103,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 
 				// Unset the variables
 				unset ($type);
-				unset ($username);
+				unset ($new_username);
 				unset ($email);
 				unset ($name);
 				unset ($password);
@@ -111,7 +111,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 				unset ($_POST['type']);
 				unset ($_POST['name']);
 				unset ($_POST['project']);
-				unset ($_POST['username']);
+				unset ($_POST['new_username']);
 				unset ($_POST['email1']);
 				unset ($_POST['email2']);
 				unset ($_POST['pass1']);
@@ -132,20 +132,20 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 			if ($rows == 2) { // Both are taken
 
 				$reg_errors['email1'] = 'This email address has already been registered. If you have forgotten your password, use the link at right to have your password sent to you.';
-				$reg_errors['username'] = 'This username has already been registered. Please try another.';
+				$reg_errors['new_username'] = 'This username has already been registered. Please try another.';
 
 			} else { // One or both may be taken
 
 				// Get row
 				$row = mysqli_fetch_array($r, MYSQLI_NUM);
 
-				if( ($row[0] == $_POST['email1']) && ($row[1] == $_POST['username'])) { // Both match
+				if( ($row[0] == $_POST['email1']) && ($row[1] == $_POST['new_username'])) { // Both match
 					$reg_errors['email1'] = 'This email address has already been registered. If you have forgotten your password, use the link at right to have your password sent to you.';
-					$reg_errors['username'] = 'This username has already been registered with this email address. If you have forgotten your password, use the link at right to have your password sent to you.';
+					$reg_errors['new_username'] = 'This username has already been registered with this email address. If you have forgotten your password, use the link at right to have your password sent to you.';
 				} elseif ($row[0] == $_POST['email1']) { // Email match
 					$reg_errors['email1'] = 'This email address has already been registered. <a href=\"forgot_password.php\" align=\"right\">Forgot your password?</a>';
-				} elseif ($row[1] == $_POST['username']) { // Username match
-					$reg_errors['username'] = 'This username has already been registered. Please try another.';
+				} elseif ($row[1] == $_POST['new_username']) { // Username match
+					$reg_errors['new_username'] = 'This username has already been registered. Please try another.';
 				}
 
 			} // End of $rows == 2 ELSE
@@ -176,8 +176,8 @@ echo "<h3>Register</h3>
 		create_form_input('name', 'text', $reg_errors, '');
 		echo "</p>
 
-		<p><label class =\"sans\" for=\"username\"><b>Username</b><br /><small class =\"sans\">6-32 characters, only letters and numbers, case doesn't matter</small></label><br /><br />";
-		create_form_input('username', 'text', $reg_errors, '');
+		<p><label class =\"sans\" for=\'new_username'\"><b>Username</b><br /><small class =\"sans\">6-32 characters, only letters and numbers, case doesn't matter</small></label><br /><br />";
+		create_form_input('new_username', 'text', $reg_errors, '');
 		echo "</p>
 
 		<p><label class =\"sans\" for=\"email1\"><b>Email</b></label><br /><br />";
