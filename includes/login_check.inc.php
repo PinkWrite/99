@@ -31,7 +31,7 @@ if (mysqli_num_rows($r) >= 1) {
 // Don't even start if being hacked
 if ( ((isset($_SESSION['clickathon_count'])) && ($_SESSION['clickathon_count'] > 5) && ((isset($_SESSION['clickathon_time'])) && ($_SESSION['clickathon_time'] > $lastAllowedFailEpoch))) || $ip_blocked == true) {
 	// Message
-	echo '<p class="noticered">Too many login tries from '.$user_ip.'. Try again later.1</p>';
+	echo '<p class="sans noticered">Too many login tries from '.$user_ip.'. Try again later.</p>';
 	return;
 }
 
