@@ -244,7 +244,7 @@ $editor_id = $userid;
 // Start the table
 echo '
 <table class="list sans lt"><tbody>
-<tr><th>Name</th></th><th>Code</th><th>Editor</th><th><div style="display: inline; float:right;">Writs</div></th><th><div style="display: inline; float:right;">Roll</div></th><th><div style="display: inline; float:right;">Editor notes</div></th></tr>';
+<tr><th>Name</th></th><th>Code</th><th>Editor</th><th><div style="display: inline; float:right;">Writs</div></th><th><div style="display: inline; float:right;">Roll</div></th><th><div style="display: inline; float:right;">Memos</div></th></tr>';
 
 // Don't show the Main block in search results
 if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
@@ -262,7 +262,7 @@ if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
 	echo '</div>
 		</td>
 		<td><div style="display: inline; float:right;">';
-	get_switch("Block notes", "List editor notes for this block", "binder_editor.php", "m", $userid, "editNoteButton");
+	get_switch("Block notes", "List memos for this block", "binder_editor.php", "m", $userid, "editNoteButton");
 	echo '</div>
 		</td>
 		</tr>';
@@ -306,7 +306,7 @@ if (mysqli_num_rows($r) > 0) {
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:right;">';
-		get_switch("Block notes", "List editor notes for this block", "binder_editor.php", "m", $userid, "editNoteButton");
+		get_switch("Block notes", "List memos for this block", "binder_editor.php", "m", $userid, "editNoteButton");
 		echo '</div>
 			</td>
 			</tr>';

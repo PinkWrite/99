@@ -11,7 +11,7 @@
 				echo '
 				</li>
 				<li class="user">';
-					set_button("Binder", "View editor notes &amp; tasks", "binder.php", "navDarkButton user $active_binder");
+					set_button("Binder", "View memos &amp; tasks", "binder.php", "navDarkButton user $active_binder");
 				echo '
 				</li>
 				<li class="user">';

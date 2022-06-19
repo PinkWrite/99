@@ -19,7 +19,7 @@ if (isset($_GET['w'])) {
 		$row = mysqli_fetch_array($r, MYSQLI_NUM);
 		$w_name = "$row[0]";
 		$w_email = "$row[1]";
-		echo '<h2 class="sans dk">Editor notes for writer: '.$w_name.' <small>'.$w_email.'</small></h2>';
+		echo '<h2 class="sans dk">Memos for writer: '.$w_name.' <small>'.$w_email.'</small></h2>';
 
 	}
 } elseif (isset($_GET['b'])) {
@@ -32,7 +32,7 @@ if (isset($_GET['w'])) {
 		$row = mysqli_fetch_array($r, MYSQLI_NUM);
 		$b_name = "$row[0]";
 		$b_code = "$row[1]";
-		echo '<h2 class="sans dk">Editor notes for block: '.$b_name.' <small>'.$b_code.'</small></h2>';
+		echo '<h2 class="sans dk">Memos for block: '.$b_name.' <small>'.$b_code.'</small></h2>';
 
 	}
 } elseif (isset($_GET['m'])) {
@@ -47,16 +47,16 @@ if (isset($_GET['w'])) {
 			$row = mysqli_fetch_array($r, MYSQLI_NUM);
 			$e_name = "$row[0]";
 			$e_email = "$row[1]";
-			echo '<h2 class="sans dk">Editor notes for editor Main block: '.$e_name.' <small>'.$e_email.'</small></h2>';
+			echo '<h2 class="sans dk">Memos for editor Main block: '.$e_name.' <small>'.$e_email.'</small></h2>';
 
 		} elseif ($usr_type == "Editor") {
 			$editor_main_block = ($userid == preg_replace("/[^0-9]/","", $_GET['m'])) ? preg_replace("/[^0-9]/","", $_GET['m']) : false;
 			if ($editor_main_block == false) { unset($editor_main_block); }
-			echo '<h2 class="sans dk">My Main block editor notes</h2>';
+			echo '<h2 class="sans dk">My Main block memos</h2>';
 		}
 	}
 
-// Special for Supervisors to view All editor notes
+// Special for Supervisors to view All memos
 } elseif (isset($_GET['v'])) {
 	if (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
 		// Editors can only view their own Main block
@@ -68,18 +68,18 @@ if (isset($_GET['w'])) {
 			$row = mysqli_fetch_array($r, MYSQLI_NUM);
 			$e_name = "$row[0]";
 			$e_email = "$row[1]";
-			echo '<h2 class="sans dk">All editor notes for editor: '.$e_name.' <small>'.$e_email.'</small></h2>';
+			echo '<h2 class="sans dk">All memos for editor: '.$e_name.' <small>'.$e_email.'</small></h2>';
 
 		} else {
 			$editor_all_notes = $userid;
-			echo '<h2 class="sans dk">All my editor notes</h2>';
+			echo '<h2 class="sans dk">All my memos</h2>';
 		}
 	}
 
-// Default: all editor notes
+// Default: all memos
 } elseif (($usr_type == "Editor") || ($usr_type == "Admin") || ($usr_type == "Supervisor")) {
 	$editor_all_notes = $userid;
-	echo '<h2 class="sans dk">All my editor notes</h2>';
+	echo '<h2 class="sans dk">All my memos</h2>';
 }
 
 // Editor limit
@@ -92,7 +92,7 @@ if (($usr_type == "Admin") || ($usr_type == "Supervisor")) {
 }
 
 // New
-set_switch("New editor note +", "Start a new note", "note_editor.php", "new_note", $userid, "newNoteButton");
+set_switch("New memo +", "Start a new note", "note_editor.php", "new_note", $userid, "newNoteButton");
 echo '<br>';
 
 // Sorting options

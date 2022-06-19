@@ -284,7 +284,7 @@ if (mysqli_num_rows($r) == 0) {
 		echo '
 			</td>
 			<td>';
-		get_switch("Notes", "List editor notes for this block", "notes_editor.php", "b", $block_id, "editNoteButton");
+		get_switch("Notes", "List memos for this block", "notes_editor.php", "b", $block_id, "editNoteButton");
 		echo '
 			</td>
 			<td>';

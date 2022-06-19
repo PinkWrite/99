@@ -57,7 +57,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 echo '<br>';
-set_button("Editor notes &rarr;", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
+set_button("Memos &rarr;", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
 
 // Heading
 echo '<h2 class="lt">My Notes</h2>';

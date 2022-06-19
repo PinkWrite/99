@@ -67,11 +67,11 @@ if (isset($_SESSION['user_id'])) {
 // Pinned Notes
 include('inserts/list_pins.ins.php');
 
-// Editor Notes
+// Memos
 $limit_rows = 5;
 include('inserts/list_notes_editor_10.ins.php');
 echo '<br>';
-set_button("All editor notes", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
+set_button("All memos", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
 
 // We need space
 echo '<br><br>';

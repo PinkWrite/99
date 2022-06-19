@@ -270,7 +270,7 @@ if (($SQLcolumnSearch == '') || (!isset($SQLcolumnSearch))) {
 	set_switch("Writs &rarr;", "List my writs for this block", "block.php?v=0", "opened_by", "no_value", "editNoteButton");
 	echo '</div></td>
 		<td><div style="display: inline; float:right;">';
-	set_button("Editor notes &rarr;", "List editor notes for Main block", "notes_view.php", "editNoteButton");
+	set_button("Memos &rarr;", "List memos for Main block", "notes_view.php", "editNoteButton");
 	echo '</div>
 		</td>
 		<td><div style="display: inline; float:right;">';
@@ -310,7 +310,7 @@ while ($rowb = mysqli_fetch_array($rb)) {
 	get_switch("Writs &rarr;", "List my writs for this block", "block.php", "v", $block_id, "editNoteButton");
 	echo '</div></td>
 		<td><div style="display: inline; float:right;">';
-	get_switch("Editor notes &rarr;", "List editor notes for this block", "notes_view.php", "b", "$block_id", "editNoteButton");
+	get_switch("Memos &rarr;", "List memos for this block", "notes_view.php", "b", "$block_id", "editNoteButton");
 	echo '</div></td>
 		<td><div style="display: inline; float:right;">';
 	set_switch("New writ +", "Start a general writ for this block", "writ.php?v=$block_id", "opened_by", $userid, "editNoteButton");

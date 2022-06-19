@@ -25,14 +25,14 @@ if (isset($_GET['w'])) {
 		if ($usr_type == "Writer") {
 			if ($editor_set_writer_id != $userid) {
 				unset($editor_set_writer_id);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo '<h2 class="sans dk">Memos</h2>';
 			}
 		} elseif ($usr_type == "Observer") {
 			$q = "SELECT id FROM users WHERE JSON_CONTAINS(observing, CONCAT('\"', $editor_set_writer_id, '\"')) AND id='$userid'";
 			$r = mysqli_query ($dbc, $q);
 			if (mysqli_num_rows($r) == 0) {
 				unset($editor_set_writer_id);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo isset($observing) ? '<h2 class="sans dk">Memos <small>(observing)</small></h2>' : '<h2 class="sans dk">Memos</small></h2>';
 			}
 		}
 
@@ -42,7 +42,7 @@ if (isset($_GET['w'])) {
 		$row = mysqli_fetch_array($r, MYSQLI_NUM);
 		$w_name = "$row[0]";
 		$w_email = "$row[1]";
-		echo '<h2 class="sans dk">Editor notes for writer: '.$w_name.' <small>'.$w_email.'</small></h2>';
+		echo '<h2 class="sans dk">Memos for writer: '.$w_name.' <small>'.$w_email.'</small></h2>';
 
 		// For filters
 		$writer_only = true;
@@ -58,12 +58,12 @@ if (isset($_GET['w'])) {
 			$r = mysqli_query ($dbc, $q);
 			if (mysqli_num_rows($r) == 0) {
 				unset($editor_set_block);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 			}
 		} elseif ($usr_type == "Observer") {
-			$q = "SELECT observing FROM users WHERE id='$userid'";
-			$r = mysqli_query ($dbc, $q);
-			$row = mysqli_fetch_array($r, MYSQLI_NUM);
+			$qo = "SELECT observing FROM users WHERE id='$userid'";
+			$ro = mysqli_query ($dbc, $qo);
+			$rowo = mysqli_fetch_array($ro, MYSQLI_NUM);
 			$observing_array = json_decode($rowo[0], true);
 			$observes_block = false; // Preset for our test
 			foreach ($observing_array as $u_id) {
@@ -75,7 +75,7 @@ if (isset($_GET['w'])) {
 			}
 			if ($observes_block != true) {
 				unset($editor_set_block);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 			}
 		}
 
@@ -85,7 +85,7 @@ if (isset($_GET['w'])) {
 		$row = mysqli_fetch_array($r, MYSQLI_NUM);
 		$b_name = "$row[0]";
 		$b_code = "$row[1]";
-		echo '<h2 class="sans dk">Editor notes for block: '.$b_name.' <small>'.$b_code.'</small></h2>';
+		echo '<h2 class="sans dk">Memos for block: '.$b_name.' <small>'.$b_code.'</small></h2>';
 
 	}
 
@@ -98,14 +98,14 @@ if (isset($_GET['w'])) {
 		if ($usr_type == "Writer") {
 			if ($by_main_block != $userid) {
 				unset($by_main_block);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 			}
 		} elseif ($usr_type == "Observer") {
 			$q = "SELECT id FROM users WHERE JSON_CONTAINS(observing, CONCAT('\"', $by_main_block, '\"')) AND id='$userid'";
 			$r = mysqli_query ($dbc, $q);
 			if (mysqli_num_rows($r) == 0) {
 				unset($by_main_block);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 			}
 		}
   }
@@ -119,26 +119,26 @@ if (isset($_GET['w'])) {
 		if ($usr_type == "Writer") {
 			if ($by_user_all != $userid) {
 				unset($by_user_all);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 			}
 		} elseif ($usr_type == "Observer") {
 			$q = "SELECT id FROM users WHERE JSON_CONTAINS(observing, CONCAT('\"', $by_user_all, '\"')) AND id='$userid'";
 			$r = mysqli_query ($dbc, $q);
 			if (mysqli_num_rows($r) == 0) {
 				unset($by_user_all);
-				echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+				echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 			}
 		}
   }
 
 // Observer
 } elseif ( (isset($observing)) && ( (($usr_type == "Observer") && ($observing == $userid)) || ($usr_type == "Supervisor") || ($usr_type == "Admin") ) ) {
-	echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+	echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 
 // No GET & no settings
 } else {
 	$by_user = $userid;
-	echo '<h2 class="sans dk">Editor notes <small>(all blocks)</small></h2>';
+	echo '<h2 class="sans dk">Memos <small>(all blocks)</small></h2>';
 }
 
 // Sorting options
@@ -309,13 +309,13 @@ if (isset($editor_set_writer_id)) {
 	$r = mysqli_query ($dbc, $q);
 	$row = mysqli_fetch_array($r, MYSQLI_NUM);
 	$u_editor = "$row[0]";
-	$from = 'users u';
+	$from = "users u";
 	$sql_where = "JOIN notes n ON JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) WHERE u.id = '$by_user' AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 	// Above improvement thanks https://stackoverflow.com/questions/72526684/sql-join-each-id-in-json-object
 	//$sql_where = "WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')) AND u.id = '$by_user') AND n.editor_set_writer_id='0' OR (n.editor_set_writer_id='0' AND n.editor_set_block='0' AND n.writer_id='0')";
 }
 $sql_where .= " $SQLcolumnSearch ORDER BY $order_by";
-$qp = (isset($observing)) ? $sql_where : "SELECT $sql_cols FROM $from $sql_where"; // From our $observing option
+$qp = ((isset($observing)) && (!isset($editor_set_writer_id)) && (!isset($editor_set_block)) && (!isset($by_main_block)) && (!isset($by_user_all))) ? $sql_where : "SELECT $sql_cols FROM $from $sql_where"; // From our $observing option
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
 if (($totalrows == 0) && ((!isset($SQLcolumnSearch)) || ($SQLcolumnSearch == ''))) {echo '<p class="lt sans"><b>Nothing yet</b></p>'; if (isset($_SERVER['HTTP_REFERER'])) {$where_was_i = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL); set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");} return;}
@@ -396,10 +396,6 @@ echo '</td><td>';
 set_button("Creation", "Sort by order of creation", "${where_am_i}${sort_get}s=creation${search_suffix}", $creation_cl);
 echo '</td><td>';
 set_button("Heading", "Sort by heading", "${where_am_i}${sort_get}s=heading${search_suffix}", $heading_cl);
-echo '</td><td><span class="lo sans">&#x15CA;</span></td><td>';
-set_button("Blocks", "Block notes", "${where_am_i_base}?${sort_get}s=${sort}${search_suffix}", $blocks_cl);
-echo '</td><td>';
-set_button("Writer", "Editor notes for me only", "${where_am_i_base}?${sort_get}s=${sort}&w=${userid}${search_suffix}", $writer_cl);
 echo '</td>';
 // Search form inputs
 echo '<td>
@@ -445,7 +441,7 @@ input.addEventListener('keyup',function(){
 // List notes
 $sql_cols = 'n.id, n.body, n.save_date, n.editor_set_writer_id, n.editor_set_block';
 //$q = "SELECT $sql_cols FROM notes n WHERE $sql_where LIMIT $itemskip,$pageitems"; // Delete if below works
-$q = (isset($observing)) ? $sql_where : "SELECT $sql_cols FROM $from $sql_where LIMIT $itemskip,$pageitems"; // From our $observing option
+$q = ((isset($observing)) && (!isset($editor_set_writer_id)) && (!isset($editor_set_block)) && (!isset($by_main_block)) && (!isset($by_user_all))) ? $sql_where : "SELECT $sql_cols FROM $from $sql_where LIMIT $itemskip,$pageitems"; // From our $observing option
 $r = mysqli_query ($dbc, $q);
 
 // Empty?

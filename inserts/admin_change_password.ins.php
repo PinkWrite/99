@@ -4,7 +4,7 @@
 if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && ($_POST['opened_by'] == $userid) ) {
 
 	// For storing errors
-	$pass_errors = array();
+	$reg_errors = array();
 
 	// GET the user being edited
 	if ( (isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1))) ) {
@@ -42,10 +42,10 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 		exit(); // Quit the script
 	}
 
-	if (empty($pass_errors)) { // If everything is OK
+	if (empty($reg_errors)) { // If everything is OK
 
 		// Update the password
-		$q = "UPDATE users SET pass='"  .  password_hash($p, PASSWORD_BCRYPT) .  "' WHERE id='$u_id' LIMIT 1";
+		$q = "UPDATE users SET pass='"  .  password_hash($password, PASSWORD_BCRYPT) .  "' WHERE id='$u_id' LIMIT 1";
 		if ($r = mysqli_query ($dbc, $q)) { // If it ran OK.
 
 			// Fetch user info
@@ -108,10 +108,10 @@ echo "<h3>Change User Password for: $name <small>($username - $email)</small></h
 <input type=\"hidden\" name=\"user_id\" value=\"$u_id\">";
 
 	echo "<p><label class =\"sans\" for=\"pass1\">New Password<br /><small class =\"sans\">6-32 characters, one lowercase letter, one uppercase letter, one number, special characters allowed: ! @ # $ % ! & * + -</small></label><br /><br />";
-	create_form_input('pass1', 'password', $pass_errors, '');
+	create_form_input('pass1', 'password', $reg_errors, '');
 	echo "</p>
 	<p><label class =\"sans\" for=\"pass2\">Confirm New Password</label><br /><br />";
-	create_form_input('pass2', 'password', $pass_errors, '');
+	create_form_input('pass2', 'password', $reg_errors, '');
 	echo "</p>
 	<input type=\"submit\" name=\"submit_button\" value=\"Change &rarr;\" id=\"submit_button\" class=\"formbutton\" />
 </form>";

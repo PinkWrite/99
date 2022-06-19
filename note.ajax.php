@@ -29,8 +29,16 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['user_id'])) && (i
 	$body = trim(preg_replace("/[\r\n]{3,}/", "\n\n", $body)); // [\r\n]{3,} is three empty lines or more
 	// SQL mysqli_real_escape_string
 	$sql_body = mysqli_real_escape_string($dbc, $body);
+	// Editor settings
+	if ((isset($_POST['editor_set_block'])) || (isset($_POST['editor_set_writer_id']))) {
+		$sql_editor_set_block = (isset($_POST['editor_set_block'])) ? mysqli_real_escape_string($dbc, $_POST['editor_set_block']) : 0;
+		$sql_editor_set_writer_id = (isset($_POST['editor_set_writer_id'])) ? mysqli_real_escape_string($dbc, $_POST['editor_set_writer_id']) : 0;
+		$who_sql_cols = ", editor_set_writer_id='$sql_editor_set_writer_id', editor_set_block='$sql_editor_set_block' WHERE editor_id='$userid'";
+	} else {
+		$who_sql_cols = "WHERE writer_id='$userid'";
+	}
 	// Save note
-	$q = "UPDATE notes SET body='$sql_body', save_date=NOW() WHERE writer_id='$userid' AND id='$note_id'";
+	$q = "UPDATE notes SET body='$sql_body', save_date=NOW() $who_sql_cols AND id='$note_id'";
 	$r = mysqli_query ($dbc, $q);
 	if ($r) {
 		// echo AJAX response

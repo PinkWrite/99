@@ -75,6 +75,7 @@ if (($observation == 'all') && ($observer_page_type == 'any')) {
 		echo '<tr class="'.$cc.'">
 			<td><b>'.$writer_name.'</b></td>
 			<td><a title="List work from this writer" href="observer.php?o='.$w_id.'"><button type="button" class="navDarkButton">Observe writs</button></a></td>
+			<td><a title="List work from this writer" href="binder_observer.php?w='.$w_id.'"><button type="button" class="navDarkButton">Observe memos</button></a></td>
 			<td><small>('.$writer_username.')</small></td>
 			<td><small>'.$writer_email.'</small></td>
 		</tr>';

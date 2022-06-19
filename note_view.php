@@ -40,7 +40,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Dashboard
-$dashgreeting = "Editor note for $u_name";
+$dashgreeting = "Memo for $u_name";
 include('./inserts/dash.ins.php');
 
 // Content

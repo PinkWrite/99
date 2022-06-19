@@ -60,7 +60,7 @@ if ((isset($_GET['w'])) && (filter_var($_GET['w'], FILTER_VALIDATE_INT)) ) {
 	// Snippet of notes from blocks, incl Main
 	$limit_rows = 5;
 	$has_editor_notes = true; // So we don't get a header message
-	echo '<h4>Editor notes for me</h4>';
+	echo '<h4>Memos for me</h4>';
 	include('inserts/list_notes_editor_10.ins.php');
 
 	// Now set ID so it doesn't interfere with what's happening above
@@ -73,7 +73,7 @@ if ((isset($_GET['w'])) && (filter_var($_GET['w'], FILTER_VALIDATE_INT)) ) {
 	$limit_rows = 5;
 	$editor_set_writer_id = $userid;
 	$has_editor_notes = true; // So we don't get a header message
-	echo '<h4>Editor notes for me</h4>';
+	echo '<h4>Memos for me</h4>';
 	include('inserts/list_notes_editor_10.ins.php');
 }
 // Binder table

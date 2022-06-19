@@ -57,7 +57,7 @@ if (isset($_SESSION['user_id'])) {
 	exit(); // Quit the script
 }
 
-// Editor notes for this block
+// Memos for this block
 if ((isset($_GET['v'])) && ((filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0'))) {
   $editor_set_block = preg_replace("/[^0-9]/","", $_GET['v']);
 	include('inserts/list_notes_editor_10.ins.php');

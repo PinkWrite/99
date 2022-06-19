@@ -19,22 +19,22 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 			$name = mysqli_real_escape_string($dbc, preg_replace("/[^A-Za-z0-9 \'.-]/","", $_POST['name']));
 		} else {
 			$name = "";
-			$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
+			$reg_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
 		}
 	} else {
-		$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
+		$reg_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
 	}
 
 	// Check for a username
 	if ( (isset($_POST['new_username'])) && ($_POST['new_username'] != '') ) {
-		if (preg_match('/[A-Za-z0-9]{6,32}$/i', $_POST['new_username'])) {
+		if (preg_match('/[A-Za-z0-9]{4,32}$/i', $_POST['new_username'])) {
 			$new_username = mysqli_real_escape_string($dbc, strtolower(preg_replace("/[^A-Za-z0-9]/","", $_POST['new_username'])));
 		} else {
 			$new_username = "";
-			$pass_errors['new_username'] = 'Please enter a valid username!';
+			$reg_errors['new_username'] = 'Please enter a valid username!';
 		}
 	} else {
-		$pass_errors['new_username'] = 'Please enter a valid username!';
+		$reg_errors['new_username'] = 'Please enter a valid username!';
 	}
 
 	// Check for an email and match against the confirmed email
@@ -44,13 +44,13 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 				$email1 = mysqli_real_escape_string($dbc, filter_var($_POST['email1'], FILTER_VALIDATE_EMAIL));
 				$email2 = mysqli_real_escape_string($dbc, filter_var($_POST['email2'], FILTER_VALIDATE_EMAIL));
 			} else {
-				$pass_errors['email2'] = 'Your email addresses did not match!';
+				$reg_errors['email2'] = 'Your email addresses did not match!';
 			}
 		} else {
-			$pass_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
+			$reg_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
 		}
 	} else {
-		$pass_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
+		$reg_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
 	}
 
 	// Check for a password and match against the confirmed password
@@ -197,7 +197,7 @@ echo "
 		create_form_input('name', 'text', $reg_errors, '');
 		echo "</p>
 
-		<p><label class=\"sans\" for=\"new_username\"><b>Username</b><br /><small class =\"sans\">6-32 characters, only letters and numbers, case doesn't matter</small></label><br /><br />";
+		<p><label class=\"sans\" for=\"new_username\"><b>Username</b><br /><small class =\"sans\">4-32 characters, only letters and numbers, case doesn't matter</small></label><br /><br />";
 		create_form_input('new_username', 'text', $reg_errors, '');
 		echo "</p>
 

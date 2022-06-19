@@ -50,7 +50,7 @@ if (isset($_SESSION['user_id'])) {
 	}
 
 	// Dashboard
-	$dashgreeting = "Editor Notes for $u_name";
+	$dashgreeting = "Memos for $u_name";
 	include('./inserts/dash_editor.ins.php');
 
 } else {
@@ -59,7 +59,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Heading
-echo '<h2 class="lt">Editor Notes</h2>';
+echo '<h2 class="lt">Memos</h2>';
 
 // Note table
 if (isset($_GET['w'])) {

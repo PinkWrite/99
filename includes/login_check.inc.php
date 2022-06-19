@@ -42,7 +42,7 @@ $login_errors = array();
 if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['username']))) {
 
 	// Validate the username:
-	if ((!empty($_POST['username'])) && (preg_match ('/^[A-Z0-9]{6,32}$/i', $_POST['username']))) {
+	if ((!empty($_POST['username'])) && (preg_match ('/^[A-Z0-9]{4,32}$/i', $_POST['username']))) {
 		$username = mysqli_real_escape_string ($dbc, $_POST['username']);
 		// Clickathon string
 		$_SESSION['clickathon_usernames'] = (empty($_SESSION['clickathon_usernames'])) ? $username : $_SESSION['clickathon_usernames'] . ', ' . $username ;

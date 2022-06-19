@@ -1,7 +1,7 @@
 <?php
 
 // For storing errors
-$pass_errors = array();
+$reg_errors = array();
 
 // If it's a POST request, handle the form submission
 if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['pass_update'])) ) {
@@ -10,7 +10,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['pass_update'])) ) 
 	if (!empty($_POST['current'])) {
 		$current = mysqli_real_escape_string ($dbc, $_POST['current']);
 	} else {
-		$pass_errors['current'] = 'Please enter your current password!';
+		$reg_errors['current'] = 'Please enter your current password!';
 	}
 
 	// Check for a password and match against the confirmed password
@@ -18,13 +18,13 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['pass_update'])) ) 
 		if ($_POST['pass1'] == $_POST['pass2']) {
 			$p = mysqli_real_escape_string ($dbc, $_POST['pass1']);
 		} else {
-			$pass_errors['pass2'] = 'Your password did not match the confirmed password!';
+			$reg_errors['pass2'] = 'Your password did not match the confirmed password!';
 		}
 	} else {
-		$pass_errors['pass1'] = 'Please enter a valid password!';
+		$reg_errors['pass1'] = 'Please enter a valid password!';
 	}
 
-	if (empty($pass_errors)) { // If everything is OK
+	if (empty($reg_errors)) { // If everything is OK
 
 			// Current password
 			$q = "SELECT pass FROM users WHERE id={$_SESSION['user_id']}";
@@ -34,7 +34,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['pass_update'])) ) 
 			if (password_verify($current, $hp)) { // Correct
 				$allwell_dochange = true;
 			} else {
-				$pass_errors['current'] = 'Your current password is incorrect!';
+				$reg_errors['current'] = 'Your current password is incorrect!';
 			} // End of current password ELSE
 
 		if ($allwell_dochange == true) {
@@ -75,14 +75,14 @@ echo "
 <input type=\"hidden\" name=\"user\" value=\"$userid\" />";
 	// Current password
 	echo "<p><label class =\"sans\" for=\"pass1\"><b>Current Password</b></label><br /><br />";
-	create_form_input('current', 'password', $pass_errors, '');
+	create_form_input('current', 'password', $reg_errors, '');
 	echo "</p>";
 	// New password
 	echo "<p><label class =\"sans\" for=\"pass1\"><b>New Password</b><br /><small class=\"sans lt\">6-32 characters, one lowercase letter, one uppercase letter, one number, special characters allowed: +-!@#$%</small></label><br /><br />";
-	create_form_input('pass1', 'password', $pass_errors, '');
+	create_form_input('pass1', 'password', $reg_errors, '');
 	echo "</p>
 	<p><label class =\"sans\" for=\"pass2\"><b>Confirm New Password</b></label><br /><br />";
-	create_form_input('pass2', 'password', $pass_errors, '');
+	create_form_input('pass2', 'password', $reg_errors, '');
 	echo "</p>
 	<input type=\"submit\" name=\"submit_button\" value=\"Change &rarr;\" id=\"submit_button\" class=\"formbutton\" />
 </form>";

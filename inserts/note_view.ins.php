@@ -11,7 +11,13 @@ if (isset($_GET['v'])) {
 
 if (isset($note_id)) {
 	// Get the post info
-	$q = "SELECT editor_id, editor_set_writer_id, editor_set_block, body, save_date FROM notes WHERE editor_id='$userid' AND id='$note_id'";
+	$q = "SELECT editor_id, editor_set_writer_id, editor_set_block, body, save_date FROM notes n WHERE (
+		editor_id='$userid'
+		OR writer_id='$userid'
+		OR editor_set_writer_id='$userid'
+		OR (SELECT 1 FROM users u WHERE id='$userid' AND JSON_CONTAINS(u.blocks, CONCAT('\"', n.editor_set_block, '\"')))
+		OR (SELECT 1 FROM users u WHERE id='$userid' AND JSON_CONTAINS(u.observing, CONCAT('\"', n.editor_set_writer_id, '\"')))
+	) AND id='$note_id'";
 	$r = mysqli_query ($dbc, $q);
 	if (mysqli_num_rows($r) == 0) {
 		echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';

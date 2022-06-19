@@ -466,7 +466,7 @@ if (mysqli_num_rows($r) == 0) {
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:left;">';
-		get_switch("Notes", "List editor notes", "notes_editor.php", "v", $u_id, "editNoteButton");
+		get_switch("Notes", "List memos", "notes_editor.php", "v", $u_id, "editNoteButton");
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:left;">';

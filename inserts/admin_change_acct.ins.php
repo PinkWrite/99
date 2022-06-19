@@ -9,7 +9,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 	}
 
 	// For storing errors
-	$pass_errors = array();
+	$reg_errors = array();
 
 	// GET the user being edited
 	if ( (isset($_GET['v'])) && (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1))) ) {
@@ -20,7 +20,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 } elseif (($_SERVER['REQUEST_METHOD'] === 'POST') && (!isset($_POST['opened_by']))) {
 
 	// For storing errors
-	$pass_errors = array();
+	$reg_errors = array();
 
 	// Check for a name
 	if ( (isset($_POST['name'])) && ($_POST['name'] != '') ) {
@@ -28,22 +28,22 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 			$name = mysqli_real_escape_string($dbc, preg_replace("/[^A-Za-z0-9 \'.-]/","", $_POST['name']));
 		} else {
 			$name = "";
-			$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
+			$reg_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
 		}
 	} else {
-		$pass_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
+		$reg_errors['name'] = 'Please enter a name, only letters, numbers, aposrophy, and hyphen, 80 characters max!';
 	}
 
 	// Check for a username
 	if ( (isset($_POST['username'])) && ($_POST['username'] != '') ) {
-		if (preg_match('/[A-Za-z0-9]{6,32}$/i', $_POST['username'])) {
+		if (preg_match('/[A-Za-z0-9]{4,32}$/i', $_POST['username'])) {
 			$username = mysqli_real_escape_string($dbc, strtolower(preg_replace("/[^A-Za-z0-9]/","", $_POST['username'])));
 		} else {
 			$username = "";
-			$pass_errors['username'] = 'Please enter a valid username, letters and numbers only, 6-32 characters!';
+			$reg_errors['username'] = 'Please enter a valid username, letters and numbers only, 4-32 characters!';
 		}
 	} else {
-		$pass_errors['username'] = 'Please enter a valid username, letters and numbers only, 6-32 characters!';
+		$reg_errors['username'] = 'Please enter a valid username, letters and numbers only, 4-32 characters!';
 	}
 
 	// Check for an email and match against the confirmed email
@@ -53,13 +53,13 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 				$email1 = mysqli_real_escape_string($dbc, filter_var($_POST['email1'], FILTER_VALIDATE_EMAIL));
 				$email2 = mysqli_real_escape_string($dbc, filter_var($_POST['email2'], FILTER_VALIDATE_EMAIL));
 			} else {
-				$pass_errors['email2'] = 'Your email addresses did not match!';
+				$reg_errors['email2'] = 'Your email addresses did not match!';
 			}
 		} else {
-			$pass_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
+			$reg_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
 		}
 	} else {
-		$pass_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
+		$reg_errors['email1'] = 'Please enter a valid email address, 90 characters max!';
 	}
 
 	// Check for an editor
@@ -67,7 +67,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 		if (filter_var($_POST['editor'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
 			$editor = mysqli_real_escape_string($dbc, preg_replace("/[^0-9]/","", $_POST['editor']));
 		} else {
-			$pass_errors['editor'] = 'Please enter a username, 6-32 characters!';
+			$reg_errors['editor'] = 'Please enter a username, 6-32 characters!';
 		}
 	}
 
@@ -104,7 +104,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['opened_by'])) && 
 	}
 
 	// If everything is OK...
-	if (empty($pass_errors)) {
+	if (empty($reg_errors)) {
 
 		// Update the database
 		$q = "UPDATE users SET email='$email1', name='$name', username='$username', editor='$editor' $type_sql WHERE id='$u_id'";
@@ -164,26 +164,26 @@ echo "<h3>Change user account info</h3>
 	echo (isset($where_was_i)) ? "<input type=\"hidden\" name=\"where_was_i\" value=\"$where_was_i\">" : false ;
 	// Username
 	echo "<p><label class =\"sans\" for=\"username\">Username</label><br /><br />";
-	create_form_input('username', 'text', $pass_errors, $username);
+	create_form_input('username', 'text', $reg_errors, $username);
 	echo "</p>";
 
 	// Name
 	echo "<p><label class =\"sans\" for=\"name\">Name</label><br /><br />";
-	create_form_input('name__o', 'text', $pass_errors, $name);
+	create_form_input('name__o', 'text', $reg_errors, $name);
 	echo "</p>";
 
 	// Email
 	echo "<p><label class =\"sans\" for=\"email1\">Email</label><br /><br />";
-	create_form_input('email1__o', 'email', $pass_errors, $email1);
+	create_form_input('email1__o', 'email', $reg_errors, $email1);
 	echo "</p>
 	<p><label class =\"sans\" for=\"email2\">Double-check email</label><br /><br />";
-	create_form_input('email2__o', 'email', $pass_errors, $email2);
+	create_form_input('email2__o', 'email', $reg_errors, $email2);
 	echo "</p>";
 
 	// Editor
 	echo '<p><label class="sans" for="editor"';
-	if (array_key_exists("editor", $pass_errors)) {
-		echo 'class="error noticered sans" >Editor: <span class="error noticered sans">' . $pass_errors['editor'] . '</span></label>';
+	if (array_key_exists("editor", $reg_errors)) {
+		echo 'class="error noticered sans" >Editor: <span class="error noticered sans">' . $reg_errors['editor'] . '</span></label>';
 	} else {
 		echo '>Editor</label><br /><br />';
 	}
@@ -211,8 +211,8 @@ echo "<h3>Change user account info</h3>
 	// Type
 	if (($usr_type == "Admin") && ($u_id != $userid)) { // Admins can't change themselves
 		echo '<p><label class="sans" for="type"';
-		if (array_key_exists("type", $pass_errors)) {
-			echo 'class="error noticered sans" >Editor: <span class="error noticered sans">' . $pass_errors['type'] . '</span></label>';
+		if (array_key_exists("type", $reg_errors)) {
+			echo 'class="error noticered sans" >Editor: <span class="error noticered sans">' . $reg_errors['type'] . '</span></label>';
 		} else {
 			echo '>User type</label><br /><br />';
 		}

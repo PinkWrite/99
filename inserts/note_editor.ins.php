@@ -113,7 +113,7 @@ if (isset($note_id)) {
 if ( (isset($_SESSION['saved'])) && ($_SESSION['saved'] == $userid) ) {
 	unset($_SESSION['saved']);
 	// New
-	set_switch("New editor note +", "Start a new note", "note_editor.php", "new_note", $editor_id, "newNoteButton");
+	set_switch("New memo +", "Start a new note", "note_editor.php", "new_note", $editor_id, "newNoteButton");
 	echo '<p class="noticegreen sans">Saved</p>';
 	$editing = true;
 
@@ -121,7 +121,7 @@ if ( (isset($_SESSION['saved'])) && ($_SESSION['saved'] == $userid) ) {
 } elseif ( (isset($_SESSION['done_note'])) && ($_SESSION['done_note'] == $userid) ) {
 	unset($_SESSION['done_note']);
 	// New
-	set_switch("New editor note +", "Start a new note", "note_editor.php", "new_note", $editor_id, "newNoteButton");
+	set_switch("New memo +", "Start a new note", "note_editor.php", "new_note", $editor_id, "newNoteButton");
 	echo '<p class="noticegreen sans">Saved</p>';
 }
 
@@ -147,7 +147,7 @@ if ( (isset($editing)) || (isset($newnote)) ) {
 
 	// Block
 	echo '<p><label class="sans" for="editor_set_block">Block:</label>
-	<select class="formselect small" name="editor_set_block" id="block" onchange="onNavWarn();" onkeyup="onNavWarn();">
+	<select form="editform" class="formselect small" name="editor_set_block" id="block" onchange="onNavWarn();" onkeyup="onNavWarn();">
 		<option hidden>Choose...</option>
 		<option value="0"';
 
@@ -176,7 +176,7 @@ if ( (isset($editing)) || (isset($newnote)) ) {
 
 	// Writer
 	echo '<p class="sans"><label class="sans" for="editor_set_writer_id">Writer: </label>
-	<select class="formselect small" name="editor_set_writer_id" id="writer" onchange="onNavWarn();" onkeyup="onNavWarn();">
+	<select form="editform" class="formselect small" name="editor_set_writer_id" id="writer" onchange="onNavWarn();" onkeyup="onNavWarn();">
 		<option hidden>Choose...</option>
 		<option value="0"';
 

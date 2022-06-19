@@ -47,9 +47,9 @@ if (isset($editor_set_writer_id)) {
 			unset($editor_set_block);
 		}
 	} elseif ($usr_type == "Observer") {
-		$q = "SELECT observing FROM users WHERE id='$userid'";
-		$r = mysqli_query ($dbc, $q);
-		$row = mysqli_fetch_array($r, MYSQLI_NUM);
+		$qo = "SELECT observing FROM users WHERE id='$userid'";
+		$ro = mysqli_query ($dbc, $qo);
+		$rowo = mysqli_fetch_array($ro, MYSQLI_NUM);
 		$observing_array = json_decode($rowo[0], true);
 		$observes_block = false; // Preset for our test
 		foreach ($observing_array as $u_id) {
@@ -91,14 +91,14 @@ if (isset($editor_set_writer_id)) {
 	if ($usr_type == "Writer") {
 		if ($by_user_all != $userid) {
 			unset($by_user_all);
-			echo '<h2 class="sans dk">Editor notes <small>(all)</small></h2>';
+			echo '<h2 class="sans dk">Memos <small>(all)</small></h2>';
 		}
 	} elseif ($usr_type == "Observer") {
 		$q = "SELECT id FROM users WHERE JSON_CONTAINS(observing, CONCAT('\"', $by_user_all, '\"')) AND id='$userid'";
 		$r = mysqli_query ($dbc, $q);
 		if (mysqli_num_rows($r) == 0) {
 			unset($by_user_all);
-			echo '<h2 class="sans dk">Editor notes <small>(all)</small></h2>';
+			echo '<h2 class="sans dk">Memos <small>(all)</small></h2>';
 		}
 	}
 	// Payload
@@ -125,7 +125,7 @@ $cc = 'lr';
 if (mysqli_num_rows($r) > 0) {
 
 	// Head message only once
-	echo (!isset($has_editor_notes)) ? '<h4>Editor notes</h4>' : false;
+	echo (!isset($has_editor_notes)) ? '<h4>Memos</h4>' : false;
 	$has_editor_notes = true; // Because we incllude this same file multiple times
 
 	// Start the table
