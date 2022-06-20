@@ -17,7 +17,7 @@ $active_admin = '';
 $active_editor = 'activedash';
 $active_observer = '';
 $active_dash = '';
-$page_title = "$siteTitle";
+$page_title = "Editor Writs :: $siteTitle";
 include('./includes/header.html');
 
 // Logged in or not?
@@ -51,6 +51,7 @@ $dashgreeting = "Editor: $u_name";
 include('./inserts/dash_editor.ins.php');
 
 // Content
+// GET u is required for this page
 include('./inserts/writer_editor.ins.php');
 
 // Include the footer file to complete the template

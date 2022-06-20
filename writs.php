@@ -17,7 +17,7 @@ $active_admin = '';
 $active_editor = '';
 $active_observer = '';
 $active_dash = 'active';
-$page_title = "$siteTitle";
+$page_title = "Writs :: $siteTitle";
 include('./includes/header.html');
 
 // Logged in or not?

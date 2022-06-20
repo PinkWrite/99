@@ -429,7 +429,7 @@ if (mysqli_num_rows($r) == 0) {
 	// Start the table
 	echo '
 	<table class="list sans lt"><tbody>
-	<tr><th>User</th><th class="bulk_check" style="display: none;"></th><th>Blocks</th><th>Roll</th><th>Writs</th><th>Notes</th><th>Observees</th><th>Account</th><th>Password</th></tr>';
+	<tr><th>User</th><th class="bulk_check" style="display: none;"></th><th>Blocks</th><th>Roll</th><th>Writs</th><th>Memos</th><th>Observees</th><th>Account</th><th>Password</th></tr>';
 
 	// Start our row color class
 	$cc = 'lr';
@@ -466,7 +466,7 @@ if (mysqli_num_rows($r) == 0) {
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:left;">';
-		get_switch("Notes", "List memos", "notes_editor.php", "v", $u_id, "editNoteButton");
+		get_switch("Memos", "List memos", "binder_sup.php", "v", $u_id, "editNoteButton");
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:left;">';

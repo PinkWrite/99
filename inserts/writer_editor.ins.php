@@ -5,9 +5,10 @@ if (!isset($_SESSION['user_id'])) {
 	return;
 }
 
+// GET u is required
 if (isset($_GET['u'])) {
 	if (filter_var($_GET['u'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
-		$writer_id = preg_replace("/[^0-9]/","", $_GET['u']);
+		$writer_name = preg_replace("/[^0-9]/","", $_GET['u']);
 	} else {
 		echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
 		exit(); // Quit the script
@@ -18,7 +19,7 @@ if (isset($_GET['u'])) {
 $userid = $_SESSION['user_id'];
 
 // Get the Writer's name & email
-$qw = "SELECT name, email FROM users WHERE id='$writer_id'";
+$qw = "SELECT name, email FROM users WHERE id='$writer_name'";
 $rw = mysqli_query($dbc, $qw);
 $roww = mysqli_fetch_array($rw);
 $writer_name = "$roww[0]";
@@ -33,5 +34,5 @@ echo '<h3 class="lt sans">Writs by: '.$writer_name.' <small>('.$writer_email.')<
 
 // Writ table
 $term_status = 'current';
-$where_am_i = "writer_editor.php?u=$writer_id";
+$where_am_i = "writer_editor.php?u=$writer_name";
 include('inserts/list_editor.ins.php');

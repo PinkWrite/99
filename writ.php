@@ -17,7 +17,7 @@ $active_admin = '';
 $active_editor = '';
 $active_observer = '';
 $active_dash = 'activedash';
-$page_title = "$siteTitle";
+$page_title = "Writ :: $siteTitle";
 include('./includes/header.html');
 
 // Make sure we're not here by accident
