@@ -212,10 +212,10 @@ i.listed_note {
   color: #3f6fb9;
 }
 .note_green {
-  color: #708070;
+  color: #448844;
 }
 .note_orange {
-  color: #7f7a78;
+  color: #ae5f3c;
 }
 
 p, div.correction {
@@ -1208,7 +1208,7 @@ p.noticeorange,
 b.noticeorange,
 i.noticeorange,
 span.noticeorange {
-  color: #777733;
+  color: #ae5f3c;
 }
 
 /* Writ content */
