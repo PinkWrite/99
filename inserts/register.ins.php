@@ -72,7 +72,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 	if (empty($reg_errors)) {
 
 		// Make sure the email address and username are available
-		$q = "SELECT email, username FROM users WHERE email='$email' OR username='$new_username'";
+		$q = "SELECT email, username FROM users WHERE email='$email1' OR username='$new_username'";
 		$r = mysqli_query ($dbc, $q);
 
 		// Get the number of rows returned
@@ -89,7 +89,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 				/*
 				// Send the registration email
 				$from = '"'.$site_from_email_name.'" <'.$site_from_email.'>';
-				$to = '"'.$name.'" <'.$email.'>';
+				$to = '"'.$name.'" <'.$email1.'>';
 				$subject = "Registration: $siteTitle";
 				$message = "<html><p>Thank you for registering at $siteTitle.</p><br />Username: $new_username<br /><p>You agreed to our Terms & Conditions, which may change and you will receive an email when you do. You also agreed that all sales are final and no refunds are given under any circumstances.</p><br /><a title=\"PinkWrite 99\" href=\"https://pacificdailyads.com\">pacificdailyads.com</a></html>";
 				$headers .= 'To: ' . $to . "\r\n";
@@ -104,7 +104,8 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 				// Unset the variables
 				unset ($type);
 				unset ($new_username);
-				unset ($email);
+				unset ($email1);
+				unset ($email2);
 				unset ($name);
 				unset ($password);
 				unset ($project);

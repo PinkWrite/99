@@ -333,7 +333,7 @@ if (mysqli_num_rows($r) == 0) {
 	<p><input type="submit" name="submit_button" value="Save" id="submit_button" class="formbutton"></p>
 	<table class="list sans lt"><tbody>
 	<tr><th><big>Available</big></th><th></th><th></th></tr>
-	<tr><th>Writer</th><th>Editor</th><th>Observing?</th></tr>';
+	<tr><th>Editor</th><th>Observing?</th><th>Writer</th></tr>';
 
 	// Start our row color class
 	$cc = 'lr';
@@ -354,12 +354,9 @@ if (mysqli_num_rows($r) == 0) {
 		$checked = '';
 
 		echo '<tr class="'.$cc.'">
-			<td><b>'.$writer_name.'</b> <small>('.$writer_username.')</small></td>';
-
-			echo '<td>'.$editor_name.'</td>';
-
-			echo '
+			<td>'.$editor_name.'</td>
 			<td><input type="checkbox" name="enrolled_'.$writer_id.'" value="'.$writer_id.'" id="enrolled_'.$writer_id.'"'.$checked.'></td>
+			<td><b>'.$writer_name.'</b> <small>('.$writer_username.')</small></td>
 			</tr>';
 
 		// Rotate our row color class

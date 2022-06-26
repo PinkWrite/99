@@ -72,7 +72,7 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 	if (empty($reg_errors)) {
 
 		// Make sure the email address and username are available
-		$q = "SELECT email, username FROM users WHERE email='$email' OR username='$new_username'";
+		$q = "SELECT email, username FROM users WHERE email='$email1' OR username='$new_username'";
 		$r = mysqli_query ($dbc, $q);
 
 		// Get the number of rows returned
@@ -116,7 +116,8 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['register_new'])) )
 				// Unset the variables
 				unset ($type);
 				unset ($new_username);
-				unset ($email);
+				unset ($email1);
+				unset ($email2);
 				unset ($name);
 				unset ($password);
 				unset ($project);
