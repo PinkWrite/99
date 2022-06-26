@@ -266,7 +266,11 @@ if (mysqli_num_rows($r) == 0) {
 
 		echo '<tr class="'.$cc.'">
 			<td><div style="display: inline; float:left;">';
-		get_switch("Writs", "List this user's writs", "writer_editor.php", "u", $u_id, "editNoteButton");
+		get_switch("Writs", "List this writer's writs", "writer_editor.php", "u", $u_id, "editNoteButton");
+		echo '</div>
+			</td>
+			<td><div style="display: inline; float:left;">';
+		get_switch("Memos", "List this writer's memos", "binder_editor.php", "w", $u_id, "editNoteButton");
 		echo '</div>
 			</td>
 				<td><b>'.$u_name.'</b> <small>('.$u_email.')</small></td>

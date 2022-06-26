@@ -345,7 +345,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	// Main fields
 	echo '
 	<label class ="sans" for="work">Work</label><br /><br />
-	<input type="text" name="work" id="work" class="readBox" onchange="onNavWarn();" onkeyup="onNavWarn();" maxlength="122" required';
+	<input type="text" name="work" id="work" class="readBox" onchange="onNavWarn(); enableSave(\'save_draft\');" onkeyup="onNavWarn(); enableSave(\'save_draft\');" maxlength="122" required';
 
 	// Work value
 	if (isset($work)) {
@@ -357,7 +357,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	echo '
 	<br />
 	<br />
-	<input type="text" name="title" id="title" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" maxlength="122" required';
+	<input type="text" name="title" id="title" class="writingBox" onchange="onNavWarn(); enableSave(\'save_draft\');" onkeyup="onNavWarn(); enableSave(\'save_draft\');" maxlength="122" required';
 
 	// Title value
 	if (isset($title)) {
@@ -376,11 +376,11 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 		<input type="hidden" name="save_draft" value="Save" id="save_draft" class="lt_button" /><br />';
 	} else {
 		echo '
-		<input type="submit" name="save_draft" value="Save" id="save_draft" class="lt_button" onclick="var f=this; setTimeout ( function() {f.disabled=true;}, 0 ); return true;" /> <span id="wordCount" class="wordCounter" ></span><br />
+		<input type="submit" name="save_draft" value="Save" id="save_draft" class="lt_button" onclick="disableSave(\'save_draft\');" /> <span id="wordCount" class="wordCounter" ></span><br />
 		<br />';
 	}
 	echo '
-	<textarea name="draft" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Draft contents...">';
+	<textarea name="draft" id="writingArea" class="writingBox" onchange="onNavWarn(); " onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Draft contents...">';
 
 	// Draft value
 	if (isset($draft)) {
@@ -424,6 +424,13 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 			}
 			function offNavWarn() {
 				window.onbeforeunload = null;
+			}
+			// Save only once
+			function disableSave(id) {
+				setTimeout ( function() { document.getElementById(id).disabled=true; }, 0 ); return true;
+			}
+			function enableSave(id) {
+				document.getElementById(id).removeAttribute('disabled'); }, 0 );
 			}
 		</script>
 	<?php

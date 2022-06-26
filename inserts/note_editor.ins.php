@@ -236,9 +236,9 @@ if ( (isset($editing)) || (isset($newnote)) ) {
 
 	// Note
 	echo '
-	<input type="submit" name="done_note" value="Done" id="done_note" class="lt_button" onclick="var f=this; setTimeout ( function() {f.disabled=true;}, 0 ); return true;" /> <span id="wordCount" class="wordCounter" ></span><br />
+	<input type="submit" name="done_note" value="Done" id="done_note" class="lt_button" onclick="disableSave(\'done_note\');" /> <span id="wordCount" class="wordCounter" ></span><br />
 	<div id="result"><br /></div>
-	<textarea name="body" id="writingArea" class="writingBox" rows="8" cols="82" placeholder="Note. First line is the title..." required onchange="onNavWarn();" onkeyup="onNavWarn();">';
+	<textarea name="body" id="writingArea" class="writingBox" rows="8" cols="82" placeholder="Note. First line is the title..." required onchange="onNavWarn(); enableSave(\'save_note\'); enableSave(\'done_note\');" onkeyup="onNavWarn(); enableSave(\'save_note\'); enableSave(\'done_note\');">';
 
 	// Note body
 	if (isset($body)) {
@@ -293,7 +293,7 @@ if ( (isset($editing)) || (isset($newnote)) ) {
 	// Save (new note)
 	} elseif (isset($newnote)) {
 		echo '
-		<input type="submit" name="save_note" id="save_note" value="Save" class="lt_button small" style="display: inline;" onclick="var f=this; setTimeout ( function() {f.disabled=true;}, 0 ); return true;">
+		<input type="submit" name="save_note" id="save_note" value="Save" class="lt_button small" style="display: inline;" onclick="disableSave(\'save_note\');">
 		</form>';
 		?>
 			<script>
@@ -318,6 +318,13 @@ if ( (isset($editing)) || (isset($newnote)) ) {
 			}
 			function offNavWarn() {
 				window.onbeforeunload = null;
+			}
+			// Save only once
+			function disableSave(id) {
+				setTimeout ( function() { document.getElementById(id).disabled=true; }, 0 ); return true;
+			}
+			function enableSave(id) {
+				document.getElementById(id).removeAttribute('disabled'); }, 0 );
 			}
 		</script>
 	<?php
