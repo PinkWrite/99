@@ -15,11 +15,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="css/styles.css" type="text/css" />
 
+<!-- Clear caching -->
+<meta http-equiv="Cache-Control" content="no-cache" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
 <title><?php // Use a default page title if one wasn't provided...
 if (isset($page_title)) {
   echo $page_title;
 } else {
-  echo $siteTitle';
+  echo $siteTitle;
 }
 ?></title>
 </head>
