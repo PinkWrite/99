@@ -70,6 +70,17 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 			echo '<div class="noticered sans">Database error, could not be submitted.</div>';
 		}
 
+	// Submit edits
+} elseif (isset($_POST['submit_redraft'])) {
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', score=NULL, outof='$sql_outof', edit_notes='$sql_edit_notes', draft_status='saved', edits_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
+		$r = mysqli_query ($dbc, $q);
+		if ($r) {
+			(isset($list_writer)) ? header("Location: writer_editor.php?u=$list_writer") : header("Location: editor.php");
+			exit(); // Quit the script
+		} else {
+			echo '<div class="noticered sans">Database error, could not be submitted.</div>';
+		}
+
 	// Submit score
 	} elseif (isset($_POST['submit_scoring'])) {
 		if ( ($score == '') || ($score == NULL) ) {
@@ -87,9 +98,9 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id'
 		// Submit score NOW
 	} elseif (isset($_POST['submit_scoring_now'])) {
 		if ( ($score == '') || ($score == NULL) ) {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score=NULL, outof='$sql_outof', correction='NO NEED', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score=NULL, outof='$sql_outof', correction='NO NEED FIRST DRAFT SCORED WITHOUT REVISION', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
 		} else {
-			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score='$sql_score', outof='$sql_outof', correction='NO NEED', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
+			$q = "UPDATE writs SET block='$sql_block_id', title='$sql_title', work='$sql_work', notes='$sql_notes', edits='$sql_edits', edits_wordcount='$sql_edits_wordcount', edit_notes='$sql_edit_notes', scoring='$ssql_coring', score='$sql_score', outof='$sql_outof', correction='NO NEED FIRST DRAFT SCORED WITHOUT REVISION', draft_status='reviewed', edits_status='scored', scoring_date=NOW() WHERE writer_id='$writer_id' AND id='$writ_id'";
 		}
 		$r = mysqli_query ($dbc, $q);
 		if ($r) {
@@ -184,12 +195,19 @@ function edit_form() {
 	echo '</textarea>
 	<br />
 	<br />
+	<!-- Submit edits -->
 	<button onclick="showSubmit(\'submit_edits\');" type="button" class="dk_sub_button">Submit edits</button> <!-- type="button" so it will not submit the form -->
 	&nbsp;&nbsp;
-	<input type="submit" name="submit_edits" value="Confirm" id="submit_edits" class="ln_button" style="display:none;" />
+	<input type="submit" name="submit_edits" value="Confirm submit edits" id="submit_edits" class="ln_button" style="display:none;" />
+	&nbsp;&nbsp;
+	<!-- Redraft -->
+	<button onclick="showSubmit(\'submit_redraft\');" type="button" class="dk_sub_button">Redraft</button> <!-- type="button" so it will not submit the form -->
+	&nbsp;&nbsp;
+	<input type="submit" name="submit_redraft" value="Confirm redraft" id="submit_redraft" class="ln_button" style="display:none;" />
+	&nbsp;&nbsp;
 	<div class="right">
 	<p class="sans dk">
-		<input type="submit" name="submit_scoring_now" value="Confirm" id="submit_scoring_now" class="ln_button" style="display:none;" />
+		<input type="submit" name="submit_scoring_now" value="Confirm score now" id="submit_scoring_now" class="ln_button" style="display:none;" />
 		&nbsp;&nbsp;
 		<input type="text" name="scoring" id="scoring" class="lt_text" onchange="onNavWarn();" onkeyup="onNavWarn();"';
 
@@ -206,7 +224,14 @@ function edit_form() {
 		/&nbsp;<input type="number" name="outof" id="outof" class="outof_dk" onchange="onNavWarn();" onkeyup="onNavWarn();" value="'.$outof.'" step="1" min="0" max="1000" />&nbsp;
 	</p>
 	</div>
+	<br />';
+
+	// Redraft
+	echo '
 	<br />
+
+	<br />
+
 	<hr class="review" />';
 
 	// Writer info
@@ -577,16 +602,15 @@ $scoring_date = "$row[22]";
 		echo '<hr class="review" />';
 		echo '<h4 class="review">First draft: <small><i class="dk sans">(<b>Submitted</b> '.$draft_submit_date.')</i></small></h4>
 					<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
-					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>';
-		echo '<hr class="review" />
-					<h4 class="review">Edited diff:</h4>
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>
+					<hr class="review" />';
+		echo '<h4 class="review">Edited diff:</h4>
 					<section class="writcontent revision" id="diffDraftEdits"></section>
 					<h4 class="review">Editor revision: <small><i class="note_blue sans">(<b>Reviewed</b> '.$edits_date.')</i></small></h4>
 					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
 					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>';
 		// HTMLdiff
-		echo '
-					<script src="js/htmldiff.min.js"></script>
+		echo '<script src="js/htmldiff.min.js"></script>
 					<script>
 					let oldHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'`;
 					let curHTML = `'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'`;
@@ -608,11 +632,11 @@ $scoring_date = "$row[22]";
 					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
 					<h4 class="review">Editor revision: <small><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></small></h4>
 					<section class="writcontent revision">".nl2br(preg_replace("/[\r\n]{2,}/", "\n", '.$edits.'))."</section>
-					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>';
-		echo '<hr class="review" />';
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
+					<hr class="review" />';
 		echo '<h4 class="review">Final corrected revision: <small><i class="dk sans">(In-progress <b>Saved</b> '.$corrected_save_date.')</i></small></h4>
 					<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
-								<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>';
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>';
 		echo '<h4 class="review">Notes:</h4>
 					<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		// HTMLdiff
@@ -630,7 +654,7 @@ $scoring_date = "$row[22]";
 }	elseif (($draft_status == 'reviewed') && ($edits_status == 'submitted')) {
 		echo '<h4 class="review">First draft: <small><i class="dk sans">(<b>Submitted</b> '.$draft_submit_date.')</i></small></h4>
 					<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>
-								<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$draft_wordcount.'</span></p>
 					<hr class="review" />
 					<h4 class="review">Edited diff:</h4>
 					<section class="writcontent diff" id="diffDraftEdits"></section>
@@ -638,9 +662,9 @@ $scoring_date = "$row[22]";
 					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
 					<h4 class="review">Editor revision: <small><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></small></h4>
 					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
-					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>';
-		echo '<hr class="review" />
-					<h4 class="review">Final corrected revision: <small><i class="dk sans">(<b>Submitted for scoring</b> '.$corrected_submit_date.')</i></small></h4>
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
+					<hr class="review" />';
+		echo '<h4 class="review">Final corrected revision: <small><i class="dk sans">(<b>Submitted for scoring</b> '.$corrected_submit_date.')</i></small></h4>
 					<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
 					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
 					<h4 class="review">Scored diff:</h4>
@@ -679,16 +703,18 @@ $scoring_date = "$row[22]";
 					<section class="writcontent diff" id="diffDraftEdits"></section>
 					<h5>Editor revision:<br /><small><i class="dk sans">(<b>Submitted</b> '.$corrected_submit_date.')</i></small></h5>
 					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
-					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>';
-		echo '<hr class="review" />
-					<h4 class="review">Final corrected revision:</h4>
-					<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
-					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
-					<hr class="review" />
-					<h5>Scored diff:</h5>
-					<section class="writcontent diff" id="diffEditsFinal"></section>
-					<h5>Remarks: (again)</h5>
-					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>';
+					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
+					<hr class="review" />';
+		if ( $correction != 'NO NEED FIRST DRAFT SCORED WITHOUT REVISION' ) {
+			echo '<h4 class="review">Final corrected revision:</h4>
+						<section class="writcontent correction">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $correction)).'</section>
+						<p class="sans lt">Word count: <span class="wordCountDisplay">'.$correction_wordcount.'</span></p>
+						<hr class="review" />
+						<h5>Scored diff:</h5>
+						<section class="writcontent diff" id="diffEditsFinal"></section>
+						<h5>Remarks: (again)</h5>
+						<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>';
+		}
 		echo '<h4 class="review">Notes:</h4>
 					<section class="writcontent notes">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $notes)).'</section>';
 		echo '<hr class="review" />

@@ -368,6 +368,13 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 
 	echo '<br /><br />';
 
+	// Redraft notes?
+	if ((isset($edit_notes)) && ($edit_notes != '') && ($draft_status == 'saved')) {
+		echo '<h4 class="review">Redraft remarks:</h4>
+		<section class="writcontent remarks" id="edits">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section><br><br>';
+	}
+
+
 	if (isset($writ_id)) {
 		echo '
 		<button type="button" title="Save (Ctrl + S)" class="lt_button" onclick="ajaxFormData(\'editform\', \'writ.ajax.php\', \'ajax_changes\'); offNavWarn();">Save</button>
