@@ -584,6 +584,15 @@ $scoring_date = "$row[22]";
 		echo '<hr class="review" />';
 		echo '<h4 class="review">First draft: <small><i class="dk sans">(In-progress <b>Saved</b> '.$draft_save_date.')</i></small></h4>
 					<section class="writcontent draft">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $draft)).'</section>';
+		// HR?
+		if (( (!empty($edit_notes)) && ($edit_notes != '') ) || ( (!empty($notes)) && ($notes != '') )) {
+			echo '<hr class="review" />';
+		}
+		// Editor notes? (from re-draft)
+		if ( (!empty($edit_notes)) && ($edit_notes != '') ) {
+			echo '<h4 class="review">Editor remarks:</h4>
+			<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>';
+		}
 		// Nothing if there are no notes
 		$show_notes = ( (!empty($notes)) && ($notes != '') ) ? '<h4 class="lt">Notes:</h4><section class="writcontent notes">$notes</section>' : '';
 		echo $show_notes;
@@ -631,7 +640,7 @@ $scoring_date = "$row[22]";
 					<h4 class="review">Editor remarks:</h4>
 					<section class="writcontent remarks">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edit_notes)).'</section>
 					<h4 class="review">Editor revision: <small><i class="dk sans">(<b>Reviewed</b> '.$edits_date.')</i></small></h4>
-					<section class="writcontent revision">".nl2br(preg_replace("/[\r\n]{2,}/", "\n", '.$edits.'))."</section>
+					<section class="writcontent revision">'.nl2br(preg_replace("/[\r\n]{2,}/", "\n", $edits)).'</section>
 					<p class="sans lt">Word count: <span class="wordCountDisplay">'.$edits_wordcount.'</span></p>
 					<hr class="review" />';
 		echo '<h4 class="review">Final corrected revision: <small><i class="dk sans">(In-progress <b>Saved</b> '.$corrected_save_date.')</i></small></h4>
