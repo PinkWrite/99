@@ -321,8 +321,6 @@ function toggle(source) {
 $sql_cols = 'id, writer_id, block, work, title, draft_status, edits_status, score, outof';
 $qw = "SELECT $sql_cols FROM writs WHERE $sql_where LIMIT $itemskip,$pageitems";
 $rw = mysqli_query($dbc, $qw);
-
-echo "<pre>SELECT title FROM writs WHERE $sql_where LIMIT $itemskip,$pageitems</pre>";
 // Empty?
 if (mysqli_num_rows($rw) == 0) {
 	echo '<p class="lt sans">No writs</p>';
