@@ -18,7 +18,8 @@ $creation_cl = 'act_ltgray';
 $work_cl = 'act_ltgray';
 $title_cl = 'act_ltgray';
 $status_cl = 'act_ltgray';
-$coalesce_greatest_dates = "COALESCE ( GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date), draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date )";
+//$coalesce_greatest_dates = "COALESCE ( GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date), draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date )";
+$coalesce_greatest_dates = "GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date)";
 if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 	$sort = preg_replace("/[^a-z]/","", $_GET['s']);
 	switch ($sort) {
@@ -321,6 +322,7 @@ $sql_cols = 'id, writer_id, block, work, title, draft_status, edits_status, scor
 $qw = "SELECT $sql_cols FROM writs WHERE $sql_where LIMIT $itemskip,$pageitems";
 $rw = mysqli_query($dbc, $qw);
 
+echo "<pre>SELECT title FROM writs WHERE $sql_where LIMIT $itemskip,$pageitems</pre>";
 // Empty?
 if (mysqli_num_rows($rw) == 0) {
 	echo '<p class="lt sans">No writs</p>';
