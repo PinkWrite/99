@@ -56,13 +56,19 @@ echo (isset($_SESSION['act_message'])) ? $_SESSION['act_message'] : false ;
 if (isset($_SESSION['act_message'])) {unset($_SESSION['act_message']);}
 
 // $where_am_i
-$where_am_i = "editor.php";
+// Must be different for search forms since there are two navigators on this dashboard page
+//$where_am_i = "editor.php";
 
 // Blocks table
+// $where_am_i
+$where_am_i = "blocks_editor.php";
 echo '<h2 class="lt">Blocks</h2>';
 include('./inserts/list_blocks_editor.ins.php');
+unset($where_am_i);
 
 // Writ table
+// $where_am_i
+$where_am_i = "writs_editor.php";
 echo '<h2 class="lt">Writs</h2>';
 $review_status = 'current';
 include('./inserts/list_editor.ins.php');

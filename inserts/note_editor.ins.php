@@ -113,7 +113,7 @@ if (isset($note_id)) {
 if ( (isset($_SESSION['saved'])) && ($_SESSION['saved'] == $userid) ) {
 	unset($_SESSION['saved']);
 	// New
-	set_switch("New memo +", "Start a new note", "note_editor.php", "new_note", $editor_id, "newNoteButton");
+	set_switch("New memo +", "Start a new memo", "note_editor.php", "new_note", $editor_id, "newNoteButton");
 	echo '<p class="noticegreen sans">Saved</p>';
 	$editing = true;
 
@@ -121,7 +121,7 @@ if ( (isset($_SESSION['saved'])) && ($_SESSION['saved'] == $userid) ) {
 } elseif ( (isset($_SESSION['done_note'])) && ($_SESSION['done_note'] == $userid) ) {
 	unset($_SESSION['done_note']);
 	// New
-	set_switch("New memo +", "Start a new note", "note_editor.php", "new_note", $editor_id, "newNoteButton");
+	set_switch("New memo +", "Start a new memo", "note_editor.php", "new_note", $editor_id, "newNoteButton");
 	echo '<p class="noticegreen sans">Saved</p>';
 }
 

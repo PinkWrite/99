@@ -154,7 +154,7 @@ if ($totalpages > 1) {
 }
 // Search form
 echo '<br>
-<form id="searchform" action="'.$clean_where_am_i.'" method="get">';
+<form id="searchformnotes" action="'.$clean_where_am_i.'" method="get">';
 // All GET arguments
 foreach ($_GET as $name => $value) {
 	echo '<input type="hidden" name="'.$name.'" value="'.$value.'">';
@@ -185,10 +185,10 @@ echo '</td>';
 // Search form inputs
 echo '<td>
 		<div class="search-input">
-		<input type="text" name="r" placeholder="Search" form="searchform" id="searchbox"';
+		<input type="text" name="r" placeholder="Search" form="searchformnotes" id="searchbox"';
 		echo (isset($search_query)) ? ' value="'.$search_query.'"' : false; // Here from searching?
 		echo '>
-		<span data-clear-input onclick="searchClearReset(\'searchbox\', \'searchform\');" id="searchclear">&times;</span>
+		<span data-clear-input onclick="searchClearReset(\'searchbox\', \'searchformnotes\');" id="searchclear">&times;</span>
 		</div>
 		</td><td>
 		<label style="cursor:pointer;">
@@ -196,7 +196,7 @@ echo '<td>
 				<ellipse stroke="#bbb" stroke-width="3" ry="10" rx="10" id="svg_1" cy="12" cx="12" fill="none"/>
 				<line stroke="#bbb" stroke-width="3" id="svg_3" y2="27" x2="27" y1="18" x1="18" fill="none"/>
 			</svg>
-			<input type="submit" form="searchform" value="Search" hidden>
+			<input type="submit" form="searchformnotes" value="Search" hidden>
 		</label>
 		</td>';
 // Finish sorting table

@@ -18,8 +18,8 @@ $creation_cl = 'act_ltgray';
 $work_cl = 'act_ltgray';
 $title_cl = 'act_ltgray';
 $status_cl = 'act_ltgray';
-//$coalesce_greatest_dates = "COALESCE ( GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date), draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date )";
-$coalesce_greatest_dates = "GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date)";
+$coalesce_greatest_dates = "COALESCE ( GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date), draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date )";
+//$coalesce_greatest_dates = "GREATEST(draft_open_date,draft_save_date,draft_submit_date,edits_date,edits_viewed_date,corrected_save_date,corrected_submit_date,scoring_date)";
 if ((isset($_GET['s'])) && (preg_match("/[a-z]/", $_GET['s']))) {
 	$sort = preg_replace("/[^a-z]/","", $_GET['s']);
 	switch ($sort) {
@@ -182,7 +182,7 @@ if ($totalpages > 1) {
 }
 // Search form
 echo '<br>
-<form id="searchform" action="'.$clean_where_am_i.'" method="get">';
+<form id="searchformeditorwrits" action="'.$clean_where_am_i.'" method="get">';
 // All GET arguments
 foreach ($_GET as $name => $value) {
 	echo '<input type="hidden" name="'.$name.'" value="'.$value.'">';
@@ -219,10 +219,10 @@ echo '</td>';
 // Search form inputs
 echo '<td>
 		<div class="search-input">
-		<input type="text" name="r" placeholder="Search" form="searchform" id="searchbox"';
+		<input type="text" name="r" placeholder="Search" form="searchformeditorwrits" id="searchbox"';
 		echo (isset($search_query)) ? ' value="'.$search_query.'"' : false; // Here from searching?
 		echo '>
-		<span data-clear-input onclick="searchClearReset(\'searchbox\', \'searchform\');" id="searchclear">&times;</span>
+		<span data-clear-input onclick="searchClearReset(\'searchbox\', \'searchformeditorwrits\');" id="searchclear">&times;</span>
 		</div>
 		</td><td>
 		<label style="cursor:pointer;">
@@ -230,7 +230,7 @@ echo '<td>
 				<ellipse stroke="#bbb" stroke-width="3" ry="10" rx="10" id="svg_1" cy="12" cx="12" fill="none"/>
 				<line stroke="#bbb" stroke-width="3" id="svg_3" y2="27" x2="27" y1="18" x1="18" fill="none"/>
 			</svg>
-			<input type="submit" form="searchform" value="Search" hidden>
+			<input type="submit" form="searchformeditorwrits" value="Search" hidden>
 		</label>
 		</td>';
 // Finish sorting table
