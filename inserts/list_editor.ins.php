@@ -112,6 +112,25 @@ if (isset($_GET['r'])) {
 	$SQLcolumnSearch = '';
 }
 
+// Writers
+if (isset($_GET['u'])) {
+	if (filter_var($_GET['u'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$u = preg_replace("/[^0-9]/","", $_GET['u']);
+	} else {
+		echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
+		exit(); // Quit the script
+	}
+}
+// Blocks
+if (isset($_GET['v'])) {
+	if (filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
+		$v = preg_replace("/[^0-9]/","", $_GET['v']);
+	} else {
+		echo '<script type="text/javascript"> window.location = "' . PW99_HOME . '" </script>';
+		exit(); // Quit the script
+	}
+}
+
 // Pagination
 // Set pagination variables:
 $pageitems = ($search_suffix == '') ? 250 : 1000; // Search results list a lot
@@ -127,9 +146,10 @@ if (isset($writer_id)) {
 }
 $sql_cols = 'id';
 $sql_blocks_where = (isset($v)) ? "AND block='$v'" : "" ; // This is used to filter specific blocks, by block_editor.php --> block_editor.ins.php
+$sql_writer_where = (isset($u)) ? "AND writer_id='$u'" : "" ; // This is used to filter specific writers, by writer_editor.php --> writer_editor.ins.php
 $sql_where = (isset($list_block_id)) ?
-"$SQLcolumnSearch $listing_who block=$list_block_id AND review_status='$review_status' ORDER BY $order_by" :
-"$SQLcolumnSearch $listing_who review_status='$review_status' ORDER BY $order_by, block DESC" ;
+"$SQLcolumnSearch $listing_who block=$list_block_id AND review_status='$review_status' $sql_writer_where $sql_blocks_where ORDER BY $order_by" :
+"$SQLcolumnSearch $listing_who review_status='$review_status' $sql_writer_where $sql_blocks_where ORDER BY $order_by, block DESC" ;
 $qp = "SELECT $sql_cols FROM writs WHERE $sql_where";
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
