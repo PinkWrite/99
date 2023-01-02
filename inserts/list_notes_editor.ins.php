@@ -92,7 +92,7 @@ if (($usr_type == "Admin") || ($usr_type == "Supervisor")) {
 }
 
 // New
-set_switch("New memo +", "Start a new memo", "note_editor.php", "new_note", $userid, "newNoteButton");
+set_switch("New memo +", "Start a new memo", "note_editor.php", "new_memo", $userid, "newNoteButton");
 echo '<br>';
 
 // Sorting options
@@ -441,15 +441,15 @@ if (mysqli_num_rows($r) == 0) {
 		}
 
 		echo '<td><div style="display: inline; float:right;">';
-		set_switch("Read", "Read this note", "note_editor.php?v=$note_id", "no_post_value", "no_post_value", "act_blue editNoteButton");
+		set_switch("Read", "Read this memo", "note_editor.php?v=$note_id", "no_post_value", "no_post_value", "act_blue editNoteButton");
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:right;">';
-		set_switch("Edit", "Edit this note", "note_editor.php?v=$note_id", "opened_by", $userid, "editNoteButton");
+		set_switch("Edit", "Edit this memo", "note_editor.php?v=$note_id", "opened_by", $userid, "editNoteButton");
 		echo '</div>
 			</td>
 			<td><div style="display: inline; float:right;">';
-		set_switch("Delete", "Delete this note", "delete_note.php", "deleted_note", $note_id, "editNoteButton");
+		set_switch("Delete", "Delete this memo", "delete_memo.php", "deleted_memo", $note_id, "editNoteButton");
 		echo '</div>
 		  </td>
 		</tr>';

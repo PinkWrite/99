@@ -20,11 +20,11 @@ if (isset($_GET['w'])) {
 }
 
 // New note?
-if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['new_note'])) && ($_POST['new_note'] == $userid) ) {
+if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['new_memo'])) && ($_POST['new_memo'] == $userid) ) {
 	$newnote = true;
 
 // Save new note
-} elseif ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['body'])) && (isset($_POST['new_note_save'])) && (!isset($note_id)) ) {
+} elseif ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['body'])) && (isset($_POST['new_memo'])) && (!isset($note_id)) ) {
 	// Writer ID
 	$editor_set_writer_id = (filter_var($_POST['editor_set_writer_id'], FILTER_VALIDATE_INT)) ? filter_var($_POST['editor_set_writer_id'], FILTER_VALIDATE_INT) : 0;
 	// Block ID
@@ -55,7 +55,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['new_note'])) && (
 		}
 
 // Save edited note
-} elseif ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['body'])) && (!isset($_POST['new_note'])) && (isset($note_id)) ) {
+} elseif ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['body'])) && (!isset($_POST['new_memo'])) && (isset($note_id)) ) {
 	// Writer ID
 	$editor_set_writer_id = (filter_var($_POST['editor_set_writer_id'], FILTER_VALIDATE_INT)) ? filter_var($_POST['editor_set_writer_id'], FILTER_VALIDATE_INT) : 0;
 	// Block ID
@@ -113,7 +113,7 @@ if (isset($note_id)) {
 if ( (isset($_SESSION['saved'])) && ($_SESSION['saved'] == $userid) ) {
 	unset($_SESSION['saved']);
 	// New
-	set_switch("New memo +", "Start a new memo", "note_editor.php", "new_note", $editor_id, "newNoteButton");
+	set_switch("New memo +", "Start a new memo", "note_editor.php", "new_memo", $editor_id, "newNoteButton");
 	echo '<p class="noticegreen sans">Saved</p>';
 	$editing = true;
 
@@ -121,7 +121,7 @@ if ( (isset($_SESSION['saved'])) && ($_SESSION['saved'] == $userid) ) {
 } elseif ( (isset($_SESSION['done_note'])) && ($_SESSION['done_note'] == $userid) ) {
 	unset($_SESSION['done_note']);
 	// New
-	set_switch("New memo +", "Start a new memo", "note_editor.php", "new_note", $editor_id, "newNoteButton");
+	set_switch("New memo +", "Start a new memo", "note_editor.php", "new_memo", $editor_id, "newNoteButton");
 	echo '<p class="noticegreen sans">Saved</p>';
 }
 
@@ -131,12 +131,12 @@ if ( (isset($editing)) || (isset($newnote)) ) {
 
 		// Form for new
 		echo '<form id="editform" class="userform" action="note_editor.php" method="post" accept-charset="utf-8" onsubmit="offNavWarn();">
-		<input hidden name="new_note_save" value="true">';
+		<input hidden name="new_memo" value="true">';
 	} elseif (isset($editing)) {
 
 		// Delete button
 		echo '<div style="display: inline; float:right;">';
-		set_switch("Delete", "Delete this note", "delete_note.php", "deleted_note", $note_id, "editNoteButton");
+		set_switch("Delete", "Delete this memo", "delete_memo.php", "deleted_memo", $note_id, "editNoteButton");
 		echo '</div>';
 
 		// Form for editing

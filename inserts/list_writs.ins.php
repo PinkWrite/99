@@ -114,7 +114,7 @@ $itemskip = $pageitems * ($paged - 1);
 $review_status = (isset($review_status)) ? $review_status : 'current'; // Must be set
 $sql_where = "writer_id='$userid'";
 $sql_cols = 'id';
-$qp = "SELECT $sql_cols FROM writs WHERE $SQLcolumnSearch $sql_where";
+$qp = "SELECT $sql_cols FROM writs WHERE $SQLcolumnSearch $sql_where AND term_status='$term_status'";
 $rp = mysqli_query($dbc, $qp);
 $totalrows = mysqli_num_rows($rp);
 if (($totalrows == 0) && ((!isset($SQLcolumnSearch)) || ($SQLcolumnSearch == ''))) {echo '<p class="lt sans"><b>Nothing yet</b></p>'; if (isset($_SERVER['HTTP_REFERER'])) {$where_was_i = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL); set_button("&larr; Go back", "Return to the page that brought you here", $where_was_i, "newNoteButton");} return;}
@@ -301,7 +301,7 @@ input.addEventListener('keyup',function(){
 
 // Run the SQL query for all the info we need
 $sql_cols = 'id, block, work, title, draft_status, edits_status, score, outof';
-$qw = "SELECT $sql_cols FROM writs WHERE $SQLcolumnSearch $sql_where ORDER BY $order_by LIMIT $itemskip,$pageitems";
+$qw = "SELECT $sql_cols FROM writs WHERE $SQLcolumnSearch $sql_where AND term_status='$term_status' ORDER BY $order_by LIMIT $itemskip,$pageitems";
 $rw = mysqli_query ($dbc, $qw);
 
 // Empty?
