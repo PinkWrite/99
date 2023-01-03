@@ -69,7 +69,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['new_memo'])) && (
 	// Save note
 	$q = "UPDATE notes SET body='$sql_body', editor_set_writer_id='$editor_set_writer_id', editor_set_block='$editor_set_block', save_date=NOW() WHERE editor_id='$userid' AND id='$note_id'";
 	$r = mysqli_query ($dbc, $q);
-	if (mysqli_affected_rows($dbc) == 1) {
+	if ((mysqli_affected_rows($dbc) == 1) || ($r)) {
 		// Done or Save?
 		if ( (isset($_POST['done_note'])) && ($_POST['done_note'] == 'Done') ) {
 			$_SESSION['done_note'] = $userid;

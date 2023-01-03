@@ -37,7 +37,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['new_note'])) && (
 			echo '<script type="text/javascript"> window.location = "' . "note.php?v=$note_id" . '" </script>';
 			exit();
 		} else {
-			echo "Database error, could not be saved.";
+			echo '<span class="noticered sans">Database error, could not be saved.</span>';
 		}
 
 // Save edited note
@@ -51,7 +51,7 @@ if ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['new_note'])) && (
 	// Save note
 	$q = "UPDATE notes SET body='$sql_body', save_date=NOW() WHERE writer_id='$userid' AND id='$note_id'";
 	$r = mysqli_query ($dbc, $q);
-	if (mysqli_affected_rows($dbc) == 1) {
+	if ((mysqli_affected_rows($dbc) == 1) || ($r)) {
 		// Done or Save?
 		if ( (isset($_POST['done_note'])) && ($_POST['done_note'] == 'Done') ) {
 			$_SESSION['done_note'] = $userid;
