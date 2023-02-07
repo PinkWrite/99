@@ -387,7 +387,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 		<br />';
 	}
 	echo '
-	<textarea name="draft" id="writingArea" class="writingBox" onchange="onNavWarn(); " onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Draft contents...">';
+	<textarea name="draft" id="writingArea" class="writingBox" onchange="onNavWarn(); " onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" autocapitalize="none" autocorrect="off" autocomplete="off" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Draft contents...">';
 
 	// Draft value
 	if (isset($draft)) {
@@ -555,7 +555,7 @@ if ( (!isset($writ_id)) || ($draft_status == 'saved') ) {
 	&nbsp;<span id="wordCount" class="wordCounter" ></span>
 	<div id="ajax_changes" style="display: inline;"></div><br />
 	<input type="hidden" name="save_correction" value="Save" id="save_correction" class="lt_button" /><br />
-	<textarea name="correction" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Edited contents...">';
+	<textarea name="correction" id="writingArea" class="writingBox" onchange="onNavWarn();" onkeyup="onNavWarn();" rows="8" cols="82" spellcheck="false" autocapitalize="none" autocorrect="off" autocomplete="off" onPaste="return false" onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off placeholder="Edited contents...">';
 
 	// Draft value
 	if (isset($correction)) {
