@@ -190,10 +190,10 @@ if (isset($_GET['r'])) {
 		$getsuffix .= "$name=$value&";
 	}
 	if ($search_query == '') {
-		echo '<script type="text/javascript"> window.location = "' . "${clean_where_am_i}?${getsuffix}" . '" </script>';
+		echo '<script type="text/javascript"> window.location = "' . "{$clean_where_am_i}?{$getsuffix}" . '" </script>';
 		exit(); // Quit the script
 	} elseif ($search_query != $original_search_get) {
-		echo '<script type="text/javascript"> window.location = "' . "${clean_where_am_i}?${getsuffix}r=$search_query" . '" </script>';
+		echo '<script type="text/javascript"> window.location = "' . "{$clean_where_am_i}?{$getsuffix}r=$search_query" . '" </script>';
 		exit(); // Quit the script
 	}
 	// Search SQL query string
@@ -258,25 +258,25 @@ if ($totalpages > 1) {
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-						echo "\" title=\"Page 1\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=1\">&laquo;</a>
+						echo "\" title=\"Page 1\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=1\">&laquo;</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-					 echo "\" title=\"Previous\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
+					 echo "\" title=\"Previous\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
 					</td>
 					<td>
-						<a class=\"paginate current\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
+						<a class=\"paginate current\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == $totalpages) {echo " disabled";}
-					 echo "\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
+					 echo "\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
 					</td>
 					 <td>
 						 <a class=\"paginate";
 						 if ($paged == $totalpages) {echo " disabled";}
-						echo "\" title=\"Last Page\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$totalpages\">&raquo;</a>
+						echo "\" title=\"Last Page\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$totalpages\">&raquo;</a>
 					 </td>
 				</tr>
 			</table>
@@ -309,11 +309,11 @@ echo '
 // Admin view options
 if ($usr_type == "Admin") {
 	echo '<td>';
-set_button("Editors", "List editors", "${where_am_i}${sort_get}${sort_suffix}&t=editors${search_suffix}", $editors_cl);
+set_button("Editors", "List editors", "{$where_am_i}{$sort_get}{$sort_suffix}&t=editors{$search_suffix}", $editors_cl);
 echo '</td><td>';
-set_button("Supervisors", "List supervisors", "${where_am_i}${sort_get}${sort_suffix}&t=supervisors${search_suffix}", $supervisors_cl);
+set_button("Supervisors", "List supervisors", "{$where_am_i}{$sort_get}{$sort_suffix}&t=supervisors{$search_suffix}", $supervisors_cl);
 echo '</td><td>';
-set_button("Admins", "List admins", "${where_am_i}${sort_get}${sort_suffix}&t=admins${search_suffix}", $admins_cl);
+set_button("Admins", "List admins", "{$where_am_i}{$sort_get}{$sort_suffix}&t=admins{$search_suffix}", $admins_cl);
 echo '</td>';
 }
 // Continue normal sorting table
@@ -321,9 +321,9 @@ echo '
 		<td>
 		<span class="lo sans">&uarr;&darr;</span>
 		</td><td>';
-set_button("Creation", "Sort by order of creation", "${where_am_i}${sort_get}s=creation${type_suffix}${search_suffix}", $creation_cl);
+set_button("Creation", "Sort by order of creation", "{$where_am_i}{$sort_get}s=creation{$type_suffix}{$search_suffix}", $creation_cl);
 echo '</td><td>';
-set_button("Name", "Sort by name", "${where_am_i}${sort_get}s=name${type_suffix}${search_suffix}", $name_cl);
+set_button("Name", "Sort by name", "{$where_am_i}{$sort_get}s=name{$type_suffix}{$search_suffix}", $name_cl);
 echo '</td>';
 // Search form inputs
 echo '<td>
@@ -499,25 +499,25 @@ if ($totalpages > 1) {
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-						echo "\" title=\"Page 1\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=1\">&laquo;</a>
+						echo "\" title=\"Page 1\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=1\">&laquo;</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-					 echo "\" title=\"Previous\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
+					 echo "\" title=\"Previous\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
 					</td>
 					<td>
-						<a class=\"paginate current\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
+						<a class=\"paginate current\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == $totalpages) {echo " disabled";}
-					 echo "\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
+					 echo "\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
 					</td>
 					 <td>
 						 <a class=\"paginate";
 						 if ($paged == $totalpages) {echo " disabled";}
-						echo "\" title=\"Last Page\" href=\"${where_am_i}${sort_get}${sort_suffix}${type_suffix}${search_suffix}&p=$totalpages\">&raquo;</a>
+						echo "\" title=\"Last Page\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$type_suffix}{$search_suffix}&p=$totalpages\">&raquo;</a>
 					 </td>
 				</tr>
 			</table>

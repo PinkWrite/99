@@ -235,7 +235,7 @@ if (isset($_SESSION['user_id'])) {
 			echo "Database error, give to tech support: <pre>$q</pre>"; exit();
 		} else {
 			$_SESSION['act_message'] = '<p class="sans noticegreen">Writ(s) archived.</p>';
-			header("Location: ${redirect_php}${get_suffix}");
+			header("Location: {$redirect_php}{$get_suffix}");
 			exit(); // Quit the script
 		}
 
@@ -270,7 +270,7 @@ if (isset($_SESSION['user_id'])) {
 				echo "Database error, give to tech support: <pre>$q</pre>"; exit();
 			} else {
 				$_SESSION['act_message'] = '<p class="sans noticegreen">Writ(s) restored.</p>';
-				header("Location: ${redirect_php}${get_suffix}");
+				header("Location: {$redirect_php}{$get_suffix}");
 				exit(); // Quit the script
 			}
 
@@ -306,7 +306,7 @@ if (isset($_SESSION['user_id'])) {
 				echo "Database error, give to tech support: <pre>$q</pre>"; exit();
 			} else {
 				$_SESSION['act_message'] = '<p class="sans noticegreen">Writ(s) deleted.</p>';
-				header("Location: ${redirect_php}${get_suffix}");
+				header("Location: {$redirect_php}{$get_suffix}");
 				exit(); // Quit the script
 			}
 

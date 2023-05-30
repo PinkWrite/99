@@ -78,7 +78,7 @@ if (isset($e_id)) {
 // Actions
 set_switch("New block +", "Create new block", "block_sup.php", "new_block", $userid, "newNoteButton");
 echo '<br>';
-set_button("Closed blocks &rarr;", "Manage closed blocks", "blocks_closed_sup.php${editor_suffix}", "newNoteButton");
+set_button("Closed blocks &rarr;", "Manage closed blocks", "blocks_closed_sup.php{$editor_suffix}", "newNoteButton");
 echo '<br>';
 
 // Blocks table

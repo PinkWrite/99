@@ -74,10 +74,10 @@ if (isset($_GET['r'])) {
 		$getsuffix .= "$name=$value&";
 	}
 	if ($search_query == '') {
-		echo '<script type="text/javascript"> window.location = "' . "${clean_where_am_i}?${getsuffix}" . '" </script>';
+		echo '<script type="text/javascript"> window.location = "' . "{$clean_where_am_i}?{$getsuffix}" . '" </script>';
 		exit(); // Quit the script
 	} elseif ($search_query != $original_search_get) {
-		echo '<script type="text/javascript"> window.location = "' . "${clean_where_am_i}?${getsuffix}r=$search_query" . '" </script>';
+		echo '<script type="text/javascript"> window.location = "' . "{$clean_where_am_i}?{$getsuffix}r=$search_query" . '" </script>';
 		exit(); // Quit the script
 	}
 	// Search SQL query string
@@ -135,25 +135,25 @@ if ($totalpages > 1) {
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-						echo "\" title=\"Page 1\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=1\">&laquo;</a>
+						echo "\" title=\"Page 1\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=1\">&laquo;</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-					 echo "\" title=\"Previous\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
+					 echo "\" title=\"Previous\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
 					</td>
 					<td>
-						<a class=\"paginate current\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
+						<a class=\"paginate current\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == $totalpages) {echo " disabled";}
-					 echo "\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
+					 echo "\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
 					</td>
 					 <td>
 						 <a class=\"paginate";
 						 if ($paged == $totalpages) {echo " disabled";}
-						echo "\" title=\"Last Page\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$totalpages\">&raquo;</a>
+						echo "\" title=\"Last Page\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$totalpages\">&raquo;</a>
 					 </td>
 				</tr>
 			</table>
@@ -186,13 +186,13 @@ echo '
 		<td>
 		<span class="lo sans">&uarr;&darr;</span>
 		</td><td>';
-set_button("Last occurance", "Sort by last occurance", "${where_am_i}${sort_get}s=occurance${search_suffix}", $occurance_cl);
+set_button("Last occurance", "Sort by last occurance", "{$where_am_i}{$sort_get}s=occurance{$search_suffix}", $occurance_cl);
 echo '</td><td>';
-set_button("Beginning", "Sort from beginning", "${where_am_i}${sort_get}s=beginning${search_suffix}", $beginning_cl);
+set_button("Beginning", "Sort from beginning", "{$where_am_i}{$sort_get}s=beginning{$search_suffix}", $beginning_cl);
 echo '</td><td>';
-set_button("Username", "Sort by username", "${where_am_i}${sort_get}s=username${search_suffix}", $username_cl);
+set_button("Username", "Sort by username", "{$where_am_i}{$sort_get}s=username{$search_suffix}", $username_cl);
 echo '</td><td>';
-set_button("IP Address", "Sort by IP address", "${where_am_i}${sort_get}s=ipaddress${search_suffix}", $ipaddress_cl);
+set_button("IP Address", "Sort by IP address", "{$where_am_i}{$sort_get}s=ipaddress{$search_suffix}", $ipaddress_cl);
 echo '</td>';
 // Search form inputs
 echo '<td>
@@ -285,25 +285,25 @@ if ($totalpages > 1) {
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-						echo "\" title=\"Page 1\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=1\">&laquo;</a>
+						echo "\" title=\"Page 1\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=1\">&laquo;</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == 1) {echo " disabled";}
-					 echo "\" title=\"Previous\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
+					 echo "\" title=\"Previous\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$prevpaged\">&lsaquo;&nbsp;</a>
 					</td>
 					<td>
-						<a class=\"paginate current\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
+						<a class=\"paginate current\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$paged\">Page $paged ($totalpages)</a>
 					</td>
 					<td>
 						<a class=\"paginate";
 						if ($paged == $totalpages) {echo " disabled";}
-					 echo "\" title=\"Next\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
+					 echo "\" title=\"Next\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$nextpaged\">&nbsp;&rsaquo;</a>
 					</td>
 					 <td>
 						 <a class=\"paginate";
 						 if ($paged == $totalpages) {echo " disabled";}
-						echo "\" title=\"Last Page\" href=\"${where_am_i}${sort_get}${sort_suffix}${search_suffix}&p=$totalpages\">&raquo;</a>
+						echo "\" title=\"Last Page\" href=\"{$where_am_i}{$sort_get}{$sort_suffix}{$search_suffix}&p=$totalpages\">&raquo;</a>
 					 </td>
 				</tr>
 			</table>

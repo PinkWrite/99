@@ -75,7 +75,7 @@ if (isset($e_id)) {
 	}
 }
 
-set_button("Open blocks &rarr;", "Return to open blocks", "blocks_sup.php${editor_suffix}", "newNoteButton");
+set_button("Open blocks &rarr;", "Return to open blocks", "blocks_sup.php{$editor_suffix}", "newNoteButton");
 echo '<br>';
 $where_am_i = "blocks_closed_sup.php";
 include('./inserts/list_blocks_closed_sup.ins.php');
