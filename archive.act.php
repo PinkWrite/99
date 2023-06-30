@@ -313,7 +313,7 @@ if (isset($_SESSION['user_id'])) {
 	// Admin archiving all in block, from Admin: Closed Blocks
 	} elseif ( ($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['block_archive'])) && ($_POST['block_archive'] == 'archive all writs')
 		&& (isset($_POST['checksubmit'])) ) {
-		$block_id = (filter_var($_POST['checksubmit'], FILTER_VALIDATE_INT, array('min_range' => 0))) ? $_POST['checksubmit'] : NULL;
+		$block_id = (filter_var($_POST['checksubmit'], FILTER_VALIDATE_INT, array('min_range' => 0))) ? $_POST['checksubmit'] : "";
 		$q = "UPDATE writs SET term_status='archived', review_status='archived' WHERE block=$block_id";
 		$r = mysqli_query ($dbc, $q);
 		if (!$r) {

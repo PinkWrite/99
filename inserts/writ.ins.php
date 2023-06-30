@@ -143,14 +143,14 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['user_form'])) ) {
 	if (isset($_POST['edits'])) { $edits =  htmlspecialchars ($_POST['edits']);  $edits = strip_tags($edits); } else { $edits = NULL;}
 	if (isset($_POST['correction'])) { $correction =  htmlspecialchars ($_POST['correction']); $correction = strip_tags($correction); } else { $correction = NULL;}
 */
-	$block_id = (isset($_POST['block'])) ? preg_replace("/[^0-9]/","", $_POST['block']) : NULL;
-	$title = (isset($_POST['title'])) ? strip_tags(htmlspecialchars(substr($_POST['title'],0,122))) : NULL;
-	$draft = (isset($_POST['draft'])) ? strip_tags(htmlspecialchars($_POST['draft'])) : NULL;
+	$block_id = (isset($_POST['block'])) ? preg_replace("/[^0-9]/","", $_POST['block']) : "";
+	$title = (isset($_POST['title'])) ? strip_tags(htmlspecialchars(substr($_POST['title'],0,122))) : "";
+	$draft = (isset($_POST['draft'])) ? strip_tags(htmlspecialchars($_POST['draft'])) : "";
 	$draft_wordcount = (isset($_POST['draft_wordcount'])) ? filter_var($_POST['draft_wordcount'], FILTER_VALIDATE_INT) : 0;
-	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : NULL;
-	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : NULL;
-	//$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : NULL;
-	$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : NULL;
+	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : "";
+	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : "";
+	//$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : "";
+	$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : "";
 	$correction_wordcount = (isset($_POST['correction_wordcount'])) ? filter_var($_POST['correction_wordcount'], FILTER_VALIDATE_INT) : 0;
 
 	// Trim extra space

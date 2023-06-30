@@ -37,19 +37,19 @@ if ( ($_SERVER['REQUEST_METHOD'] == 'POST') && (isset($_POST['reviewed_writer_id
 	}
 
 	$writer_id = $_POST['reviewed_writer_id'];
-	$block_id = (isset($_POST['block'])) ? filter_var($_POST['block'], FILTER_VALIDATE_INT, array('min_range' => 1)) : NULL;
-	$title = (isset($_POST['title'])) ? strip_tags(htmlspecialchars(substr($_POST['title'],0,122))) : NULL;
-	//$draft = (isset($_POST['draft'])) ? strip_tags(htmlspecialchars($_POST['draft'])) : NULL;
-	$draft_status = (isset($_POST['draft_status'])) ? strip_tags(htmlspecialchars($_POST['draft_status'])) : NULL;
-	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : NULL;
-	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : NULL;
-	$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : NULL;
+	$block_id = (isset($_POST['block'])) ? filter_var($_POST['block'], FILTER_VALIDATE_INT, array('min_range' => 1)) : "";
+	$title = (isset($_POST['title'])) ? strip_tags(htmlspecialchars(substr($_POST['title'],0,122))) : "";
+	//$draft = (isset($_POST['draft'])) ? strip_tags(htmlspecialchars($_POST['draft'])) : "";
+	$draft_status = (isset($_POST['draft_status'])) ? strip_tags(htmlspecialchars($_POST['draft_status'])) : "";
+	$notes = (isset($_POST['notes'])) ? strip_tags(htmlspecialchars($_POST['notes'])) : "";
+	$work = (isset($_POST['work'])) ? strip_tags(htmlspecialchars(substr($_POST['work'],0,122))) : "";
+	$edits = (isset($_POST['edits'])) ? strip_tags(htmlspecialchars($_POST['edits'])) : "";
 	$edits_wordcount = (isset($_POST['edits_wordcount'])) ? filter_var($_POST['edits_wordcount'], FILTER_VALIDATE_INT) : 0;
-	$edit_notes = (isset($_POST['edit_notes'])) ? strip_tags(htmlspecialchars($_POST['edit_notes'])) : NULL;
-	$edits_status = (isset($_POST['edits_status'])) ? strip_tags(htmlspecialchars($_POST['edits_status'])) : NULL;
-	//$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : NULL;
-	$scoring = (isset($_POST['scoring'])) ? strip_tags(htmlspecialchars($_POST['scoring'])) : NULL;
-	$score = (isset($_POST['score'])) ? filter_var($_POST['score'], FILTER_VALIDATE_INT, array('min_range' => 0, 'max_range' => 1000)) : NULL;
+	$edit_notes = (isset($_POST['edit_notes'])) ? strip_tags(htmlspecialchars($_POST['edit_notes'])) : "";
+	$edits_status = (isset($_POST['edits_status'])) ? strip_tags(htmlspecialchars($_POST['edits_status'])) : "";
+	//$correction = (isset($_POST['correction'])) ? strip_tags(htmlspecialchars($_POST['correction'])) : "";
+	$scoring = (isset($_POST['scoring'])) ? strip_tags(htmlspecialchars($_POST['scoring'])) : "";
+	$score = (isset($_POST['score'])) ? filter_var($_POST['score'], FILTER_VALIDATE_INT, array('min_range' => 0, 'max_range' => 1000)) : "";
 	$outof = ( (isset($_POST['outof'])) && ($_POST['outof'] != '') && ($_POST['outof'] != NULL) ) ? filter_var($_POST['outof'], FILTER_VALIDATE_INT, array('min_range' => 0, 'max_range' => 1000)) : 100;
 
 	$title = trim(preg_replace('/\s+/', ' ', $title));
