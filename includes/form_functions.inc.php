@@ -15,8 +15,8 @@ function create_form_input($name, $type, $errors, $value) {
 	// Check for a value in POST
 	if (isset($_POST[$name])) $value = $_POST[$name];
 
-	// Strip slashes if Magic Quotes is enabled
-	if ($value && get_magic_quotes_gpc()) $value = stripslashes($value);
+	// Strip slashes
+	$value = stripslashes($value);
 
 	// Conditional to determine what kind of element to create
 
@@ -78,8 +78,8 @@ function update_form_input($name, $type, $errors, $value) {
 	// Check for a value in POST
 	if (isset($_POST[$name])) $value = $_POST[$name];
 
-	// Strip slashes if Magic Quotes is enabled
-	if ($value && get_magic_quotes_gpc()) $value = stripslashes($value);
+	// Strip slashes
+	$value = stripslashes($value);
 
 	// Conditional to determine what kind of element to create
 
