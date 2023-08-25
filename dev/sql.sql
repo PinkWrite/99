@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS `clickathon` (
   `ip` MEDIUMTEXT NOT NULL,
   `time_stamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `time_epoch` INT UNSIGNED NOT NULL,
+  `unlocked` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
@@ -168,7 +169,7 @@ CREATE TABLE IF NOT EXISTS `group_members` (
 -- Dev cheatsheet
 -- UPDATE users SET groups='[""]' WHERE groups IS NULL;
 -- ALTER TABLE `pw99db`.`clickathon` ADD `time_epoch`  INT UNSIGNED NOT NULL;
-ALTER TABLE `pw99db`.`writs` ADD `task` BIGINT UNSIGNED DEFAULT 0;
+ALTER TABLE `pw99db`.`clickathon` ADD `unlocked` TIMESTAMP NULL DEFAULT NULL;
 
 -- Select my observees
 -- SELECT id FROM users w WHERE EXISTS (SELECT 1 FROM users u WHERE JSON_CONTAINS(u.observing, CONCAT('\"', w.id, '\"')) AND u.id = '$userid');
