@@ -27,7 +27,7 @@ include('./includes/header.html');
     $timeNow = date("Y-m-d H:i:s");
     $timeNowEpoch = strtotime($timeNow);
     $lastAllowedFailEpoch = ($timeNowEpoch - (60 * 60));
-    $qhack = "SELECT id FROM clickathon WHERE ip='$user_ip' AND time_epoch > '$lastAllowedFailEpoch'";
+    $qhack = "SELECT id FROM clickathon WHERE ip='$user_ip' AND time_epoch > '$lastAllowedFailEpoch' AND unlocked IS NULL";
     $rowhack = mysqli_query($dbc, $qhack);
     if (mysqli_num_rows($rowhack) >= 1) {
     	$ip_blocked = true;
