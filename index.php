@@ -56,6 +56,23 @@ if (isset($_SESSION['user_id'])) {
 	$dashgreeting = "Dash for $u_name";
 	include('./inserts/dash.ins.php');
 
+	// Pinned Notes
+	include('inserts/list_pins.ins.php');
+
+	// Memos
+	$limit_rows = 5;
+	include('inserts/list_notes_editor_10.ins.php');
+	echo '<br>';
+	set_button("All memos", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
+
+	// We need space
+	echo '<br><br>';
+
+	// Writ table
+	$term_status = 'current';
+	$where_am_i = "index.php";
+	include('inserts/view_writs.ins.php');
+
 } else {
 	echo '<table style="clear: both; float: left; display: block; position: relative; width: auto;" class="plain"><tbody><tr><td><span class="sans dk"><a href="88">Typing practice: 88 Word Hanon</a></span></td><td><span class="sans dk"><a href="https://github.com/PinkWrite/99">GitHub Source</a></span></td><td><span class="sans dk"><a href="in">Login</a></span></td></tr></tbody></table>
 	<h1 style="clear: both; display: block;">'.$siteTitle.'</h1>
@@ -64,22 +81,7 @@ if (isset($_SESSION['user_id'])) {
 	include('inserts/type_file.ins.php');
 }
 
-// Pinned Notes
-include('inserts/list_pins.ins.php');
 
-// Memos
-$limit_rows = 5;
-include('inserts/list_notes_editor_10.ins.php');
-echo '<br>';
-set_button("All memos", "View all notes from your editor and blocks", "binder.php", "editNoteButton");
-
-// We need space
-echo '<br><br>';
-
-// Writ table
-$term_status = 'current';
-$where_am_i = "index.php";
-include('inserts/view_writs.ins.php');
 
 // Include the footer file to complete the template
 require('./includes/footer.html');
