@@ -1,7 +1,7 @@
 <?php
 
 // Require the configuration before any PHP code as the configuration controls error reporting
-require('./pw99-config.php');
+require('./config.php');
 
 // Destroy the session
 $_SESSION = array(); // Destroy the variables

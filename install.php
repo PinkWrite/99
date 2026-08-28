@@ -6,7 +6,7 @@ require __DIR__ . '/lib/boot.php';
 
 $errors = [];
 $notice = '';
-$hasConfig = is_file(__DIR__ . '/pw99-config.php');
+$hasConfig = is_file(__DIR__ . '/config.php');
 $allowSuper = $hasConfig && !empty($app->config['allow_create_super']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
@@ -88,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
             . "    'github' => 'https://github.com/PinkWrite/99.git',\n"
             . "    'github_branch' => 'master',\n"
             . "];\n";
-        if (file_put_contents(__DIR__ . '/pw99-config.php', $cfg) === false) {
-            $errors[] = 'Could not write pw99-config.php — check folder permissions.';
+        if (file_put_contents(__DIR__ . '/config.php', $cfg) === false) {
+            $errors[] = 'Could not write config.php — check folder permissions.';
         } else {
-            $app->config = require __DIR__ . '/pw99-config.php';
+            $app->config = require __DIR__ . '/config.php';
             $app->db = Db::connect($app->config['db']);
             $app->user = new UserRepo($app);
             require_once __DIR__ . '/sql/migrate.php';
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
     }
 
     if (!$errors && $hasConfig && !$allowSuper) {
-        $errors[] = 'Already installed. Set allow_create_super in pw99-config.php for walk-in Superintendent recovery.';
+        $errors[] = 'Already installed. Set allow_create_super in config.php for walk-in Superintendent recovery.';
     }
 
     if (!$errors && $app->db) {
@@ -130,7 +130,7 @@ function app_export($s) { return var_export((string)$s, true); }
 <link rel="stylesheet" href="css/styles.css">
 </head><body><div id="wrap"><div class="page"><div class="content">
 <h1 class="lt">Install PinkWrite 99</h1>
-<p class="sans dk">SysAdmin only. Mail, host, and database live in <code>pw99-config.php</code>.</p>
+<p class="sans dk">SysAdmin only. Mail, host, and database live in <code>config.php</code>.</p>
 <?php
 foreach ($errors as $e) {
     echo '<p class="sans noticered">' . h($e) . '</p>';

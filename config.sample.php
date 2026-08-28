@@ -1,7 +1,7 @@
 <?php
 /**
  * PinkWrite 99 — SysAdmin config.
- * Copy to pw99-config.php and edit. Never commit the live file.
+ * Copy to config.php and edit. Never commit the live file.
  * The in-app Administrator does not edit this. Mail, host, and DB are SysAdmin work.
  */
 return [

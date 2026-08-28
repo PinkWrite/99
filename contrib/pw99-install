@@ -2,7 +2,7 @@
 # PinkWrite 99 installer. Same script in every package tree.
 # Destination is --webroot (or the commented default). Interactive does not ask for it.
 # Verb: --webroot /srv/www/vapps/pw99.DOMAIN --nginx-server-name DOMAIN
-# Config lives at webroot/pw99-config.php (PHP reads it there) and is copied to /etc/pw99/.
+# Config lives at webroot/config.php (PHP reads it there) and is linked to /etc/pw99/config.
 set -euo pipefail
 
 DB_NAME=pw99
@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
       echo "pw99-install [--webroot DIR] [--etc DIR] [--db-name N] [--db-user U] [--db-pass P] [--host domain.tld] [--nginx-server-name HOST] [--interactive]"
       echo "  --webroot is a flag/default only. Interactive will not prompt for it."
       echo "  --host is everything after https:// (no scheme)."
-      echo "  Verb example: pw99-install --webroot /srv/www/vapps/pw99.inkisaverb.com --host inkisaverb.com --nginx-server-name inkisaverb.com"
+      echo "  Verb example: pw99-install --webroot /srv/www/vapps/pw99.inkisaverb.com --host 99.inkisaverb.com --nginx-server-name 99.inkisaverb.com"
       exit 0;;
     *) echo "unknown $1"; exit 1;;
   esac
@@ -67,10 +67,10 @@ mkdir -p "$WEBROOT" "$ETC"
 if [ "$WEBROOT" != "$APP_ROOT" ]; then
   mkdir -p "$WEBROOT"
   cp -a "$APP_ROOT"/. "$WEBROOT"/
-  rm -f "$WEBROOT/pw99-config.php"
+  rm -f "$WEBROOT/config.php"
 fi
 
-CFG="$WEBROOT/pw99-config.php"
+CFG="$WEBROOT/config.php"
 if [ ! -f "$CFG" ]; then
   cat > "$CFG" <<EOF
 <?php
@@ -108,7 +108,7 @@ return [
 EOF
   chmod 0640 "$CFG"
 fi
-ln -sfn "$CFG" "$ETC/pw99-config.php"
+ln -sfn "$CFG" "$ETC/config"
 
 if command -v mariadb >/dev/null && [ -n "$DB_PASS" ]; then
   mariadb -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME}; CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}'; GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost'; FLUSH PRIVILEGES;" 2>/dev/null || true
@@ -130,6 +130,6 @@ if [ -n "$NGINX_NAME" ] && [ -n "$NGINX_SRC" ]; then
   nginx -t && systemctl reload nginx || true
 fi
 
-echo "Config: $CFG  (also $ETC/pw99-config.php)"
+echo "Config: $CFG  (also $ETC/config)"
 echo "Webroot: $WEBROOT"
 echo "Open https://$HOST/install.php to create the first Superintendent, then set allow_create_super to false."

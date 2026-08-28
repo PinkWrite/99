@@ -44,7 +44,7 @@ final class Update
         }
         $this->copyTree($tmp, $root);
         $this->rmDir($tmp);
-        return 'cloned master over files (pw99-config.php kept)';
+        return 'cloned master over files (config.php kept)';
     }
 
     private function copyTree(string $from, string $to): void
@@ -55,7 +55,7 @@ final class Update
         );
         foreach ($it as $item) {
             $rel = substr($item->getPathname(), strlen($from) + 1);
-            if ($rel === 'pw99-config.php' || str_starts_with($rel, '.git')) {
+            if ($rel === 'config.php' || str_starts_with($rel, '.git')) {
                 continue;
             }
             $dest = $to . '/' . $rel;

@@ -17,7 +17,7 @@ require $pw99Root . '/lib/App.php';
 require $pw99Root . '/lib/Db.php';
 require $pw99Root . '/functions/text.php';
 
-$configFile = $pw99Root . '/pw99-config.php';
+$configFile = $pw99Root . '/config.php';
 $installing = (defined('PW99_INSTALLING') && PW99_INSTALLING === true);
 
 if (!is_file($configFile)) {
@@ -56,7 +56,7 @@ if (!empty($config['db']['name'])) {
         }
         http_response_code(500);
         header('Content-Type: text/plain; charset=utf-8');
-        echo "Database connection failed. The SysAdmin needs to check pw99-config.php.\n";
+        echo "Database connection failed. The SysAdmin needs to check config.php.\n";
         echo "Use 127.0.0.1 (TCP), not localhost (Unix socket).\n";
         exit;
     }

@@ -12,14 +12,14 @@ PHP 8 + MariaDB (InnoDB) + PDO. Object pages import only the modules they use (`
 3. Open `install.php`. Database host should be `127.0.0.1` (TCP), not `localhost` (Unix socket).
 4. Host setting is **scheme-less**: `write.pink`, `99.example.org`, or `example.org/99`. The app always uses `https://`.
 5. That creates a **Superintendent**. Create a Facility, then an Administrator.
-6. Mail, SMTP password, and host live in `pw99-config.php` — SysAdmin work, not the in-app Admin.
+6. Mail, SMTP password, and host live in `config.php` — SysAdmin work, not the in-app Admin.
 
 Walk-in Superintendent recovery: set `allow_create_super` to `true` in config, open `install.php`, then set it `false` again.
 
 ## Update
 - CLI: `php bin/update.php` or `bash bin/pw99-update`
 - Admin / Superintendent locker: **Update app**
-- Pulls GitHub `master`, never overwrites `pw99-config.php`, runs SQL migrations.
+- Pulls GitHub `master`, never overwrites `config.php`, runs SQL migrations.
 
 ## Migrating an old dump
 Import the old database first, then run the updater once. It adds `facilities`, `drafts`/`redrafts` JSON, tests, notifications, 2FA/passkey columns, and maps everyone to a Home facility.

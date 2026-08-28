@@ -9,7 +9,7 @@ chdir($root);
 $import = ['update'];
 require $root . '/lib/boot.php';
 if (!$app->db) {
-    fwrite(STDERR, "No database. Check pw99-config.php\n");
+    fwrite(STDERR, "No database. Check config.php\n");
     exit(1);
 }
 foreach ($app->update->run(true) as $line) {

@@ -15,7 +15,7 @@ Linux, Apache (or nginx), PHP 8, MariaDB. Same class of host as WordPress.
 Arch/Debian/RPM builders live in [99-package](https://github.com/PinkWrite/99-package). Same installer: `contrib/pw99-install`. `--webroot` sets destination; interactive does not ask for it. Verb uses `ink install pw99 -d domain.tld`.
 
 ## Mail
-Edit `pw99-config.php` (`mail` key). SMTP password lives there on purpose. This is SysAdmin work.
+Edit `config.php` (`mail` key). SMTP password lives there on purpose. This is SysAdmin work.
 
 ## Update / old dump
 ```
@@ -25,6 +25,6 @@ Import a legacy dump first; the updater lifts it once.
 
 ## Nginx
 ```
-location = /pw99-config.php { deny all; }
+location = /config.php { deny all; }
 location ~ ^/(lib|sql|bin|functions|dev)/ { deny all; }
 ```
