@@ -1,58 +1,78 @@
 <?php
-
-// Require the configuration before any PHP code as the configuration controls error reporting
-require('./pw99-config.php');
-
-// A settings page requires form functions
-require_once('./includes/form_functions.inc.php');
-
-
-// Include the header
-$active_binder = '';
-$active_writs = 'active';
-$active_blocks = '';
-$active_roll = '';
-$active_locker = '';
-$active_admin = '';
-$active_editor = 'active';
-$active_observer = '';
-$active_dash = '';
-$page_title = "Editor Review :: $siteTitle";
-include('./includes/header.html');
-
-// Logged in or not?
-if (isset($_SESSION['user_id'])) {
-	$userid = $_SESSION['user_id'];
-	$q = "SELECT name, type, email, status FROM users WHERE id='$userid'";
-	$r = mysqli_query ($dbc, $q);
-	$row = mysqli_fetch_array($r, MYSQLI_NUM);
-	$u_name = "$row[0]";
-	$u_type = "$row[1]";
-	$u_email = "$row[2]";
-	$u_status = "$row[3]";
-
-	// Only editors
-	if ( ($u_status != "active") || (($_SESSION['user_is_editor'] != true) && ($_SESSION['user_is_supervisor'] != true) && ($_SESSION['user_is_admin'] != true)) ) {
-		header("Location: " . PW99_HOME);
-		exit(); // Quit the script
-	}
-
-} else {
-	header("Location: " . PW99_HOME);
-	exit(); // Quit the script
+declare(strict_types=1);
+$import = ['auth', 'csrf', 'view', 'html', 'text', 'writ', 'block', 'user', 'notify'];
+require __DIR__ . '/lib/boot.php';
+$app->auth->requireUser();
+if (!$app->auth->atLeast('editor')) {
+    $app->redirect('');
+}
+$wid = (int) ($_GET['w'] ?? $_POST['writ_id'] ?? 0);
+$w = $wid ? $app->writ->find($wid) : null;
+if (!$w) {
+    $app->redirect('editor.php');
 }
 
-// Dashboard
-$dashgreeting = "Editor: $u_name";
-include('./inserts/dash_editor.ins.php');
+$fields = function () use ($w): array {
+    $score = $_POST['score'] ?? '';
+    return [
+        'block_id' => (int) ($_POST['block'] ?? $w['block_id']),
+        'title' => clean_title($_POST['title'] ?? $w['title']),
+        'work' => clean_title($_POST['work'] ?? $w['work']),
+        'notes' => clean_body($_POST['notes'] ?? $w['notes']),
+        'edits' => clean_body($_POST['edits'] ?? $w['edits']),
+        'edits_wordcount' => wordcount($_POST['edits'] ?? $w['edits'] ?? ''),
+        'edit_notes' => clean_body($_POST['edit_notes'] ?? $w['edit_notes']),
+        'scoring' => clean_body($_POST['scoring'] ?? $w['scoring']),
+        'score' => $score === '' ? null : (int) $score,
+        'outof' => (int) ($_POST['outof'] ?? ($w['outof'] ?: 100)),
+    ];
+};
 
-// Heading
-echo '<h2 class="lt">Editor Review</h2>';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
+    $f = $fields();
+    $writerId = (int) $w['writer_id'];
+    if (isset($_POST['submit_edits'])) {
+        $app->writ->submitReview($wid, $f);
+        $app->notify->send($writerId, 'edited_writ', 'Your writ was reviewed', 'writ.php?w=' . $wid);
+        $app->notify->toObserversOf($writerId, 'edited_writ', 'Writ reviewed', 'writ.php?w=' . $wid);
+        $app->redirect('editor.php');
+    } elseif (isset($_POST['submit_redraft'])) {
+        $app->writ->sendRedraft($wid, $f);
+        $app->notify->send($writerId, 'redraft_writ', 'Redraft requested — start from the editor version', 'writ.php?w=' . $wid);
+        $app->redirect('editor.php');
+    } elseif (isset($_POST['submit_scoring'])) {
+        $app->writ->score($wid, $f);
+        $app->notify->send($writerId, 'scored_writ', 'Your writ was scored', 'writ.php?w=' . $wid);
+        $app->notify->toObserversOf($writerId, 'scored_writ', 'Writ scored', 'writ.php?w=' . $wid);
+        $app->redirect('editor.php');
+    }
+}
 
-// Content
-$rformaction = 'review.php'; // This must be set for the include to work
-include('./inserts/review.ins.php');
-
-// Include the footer file to complete the template
-require('./includes/footer.html');
-?>
+$writer = $app->user->find((int) $w['writer_id']);
+$app->view->start('Review', 'editor');
+echo '<p>' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
+echo '<p class="sans">Writer: ' . h($writer['name'] ?? '') . '</p>';
+if ($w['kind'] === 'test') {
+    echo '<p class="sans">This is a test. Auto-score: ' . h((string) $w['test_auto_score']) . '/' . h((string) $w['outof']) . '</p>';
+}
+echo '<form id="editsform" method="post">' . $app->csrf->field();
+echo '<input type="hidden" name="writ_id" value="' . $wid . '">';
+echo '<input type="hidden" name="reviewed_writer_id" value="' . (int) $w['writer_id'] . '">';
+echo '<p class="sans">Work <input name="work" value="' . h($w['work']) . '"> Title <input name="title" value="' . h($w['title']) . '"></p>';
+echo '<h4 class="review">Writer draft</h4><section class="writcontent draft">' . nl_text($w['draft']) . '</section>';
+echo '<p class="sans">Word count: ' . (int) $w['draft_wordcount'] . '</p>';
+echo '<button type="button" class="lt_button" title="Save (Ctrl + S)" onclick="pwAjaxForm(\'editsform\',\'ajax/save-review.php\',\'ajax_changes\');offNavWarn();">Save</button> ';
+echo '<span id="ajax_changes"></span>';
+echo '<p class="sans">Editor revision</p>';
+echo '<textarea name="edits" id="writingArea" class="writingBox" rows="12" cols="82" onchange="onNavWarn()">' . h($w['edits'] ?: $w['draft']) . '</textarea>';
+echo '<p class="sans">Edit notes<br><textarea name="edit_notes" rows="4" cols="82">' . h($w['edit_notes']) . '</textarea></p>';
+echo '<p class="sans">Scoring remarks<br><textarea name="scoring" rows="3" cols="82">' . h($w['scoring']) . '</textarea></p>';
+echo '<p class="sans">Score <input name="score" type="number" min="0" max="1000" value="' . h((string) $w['score']) . '"> / <input name="outof" type="number" value="' . h((string) ($w['outof'] ?: 100)) . '"></p>';
+echo '<p><input type="submit" name="submit_edits" class="lt_button" value="Send review"> ';
+echo '<input type="submit" name="submit_redraft" class="lt_button" value="Send back for redraft"> ';
+echo '<input type="submit" name="submit_scoring" class="lt_button" value="Submit score"></p>';
+echo '<p class="sans">Notes<br><textarea name="notes" rows="3" cols="82">' . h($w['notes']) . '</textarea></p>';
+echo '<input type="hidden" name="save_edit" value="1">';
+echo '</form>';
+echo '<script src="js/pw99.js"></script><script>pwBindSave("editsform","ajax/save-review.php","ajax_changes");</script>';
+$app->view->end();

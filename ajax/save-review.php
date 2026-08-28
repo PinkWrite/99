@@ -1,0 +1,30 @@
+<?php
+declare(strict_types=1);
+$import = ['auth', 'csrf', 'text', 'writ'];
+require dirname(__DIR__) . '/lib/boot.php';
+$app->auth->requireUser();
+if (!$app->auth->atLeast('editor')) {
+    $app->json(['ok' => false, 'error' => 'forbidden'], 403);
+}
+if (!$app->csrf->check()) {
+    $app->json(['ok' => false, 'error' => 'csrf'], 400);
+}
+$wid = (int) ($_POST['writ_id'] ?? 0);
+$w = $app->writ->find($wid);
+if (!$w) {
+    $app->json(['ok' => false, 'error' => 'not found'], 404);
+}
+$score = $_POST['score'] ?? '';
+$app->writ->saveEdits($wid, [
+    'block_id' => (int) ($_POST['block'] ?? $w['block_id']),
+    'title' => clean_title($_POST['title'] ?? $w['title']),
+    'work' => clean_title($_POST['work'] ?? $w['work']),
+    'notes' => clean_body($_POST['notes'] ?? $w['notes']),
+    'edits' => clean_body($_POST['edits'] ?? ''),
+    'edits_wordcount' => wordcount($_POST['edits'] ?? ''),
+    'edit_notes' => clean_body($_POST['edit_notes'] ?? ''),
+    'scoring' => clean_body($_POST['scoring'] ?? ''),
+    'score' => $score === '' ? null : (int) $score,
+    'outof' => (int) ($_POST['outof'] ?? 100),
+]);
+$app->json(['ok' => true, 'msg' => 'Editor revision saved, not finalized.']);

@@ -1,0 +1,7 @@
+Options -Indexes
+
+<Files "pw99-config.php">
+  Require all denied
+</Files>
+
+RedirectMatch 404 ^/(lib|sql|bin|functions|dev)(/|$)

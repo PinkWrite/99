@@ -1,0 +1,36 @@
+<?php
+declare(strict_types=1);
+$import = ['auth', 'csrf', 'text', 'writ'];
+require dirname(__DIR__) . '/lib/boot.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $app->json(['ok' => false, 'error' => 'POST only'], 405);
+}
+$u = $app->auth->requireUser();
+if (!$app->csrf->check()) {
+    $app->json(['ok' => false, 'error' => 'csrf'], 400);
+}
+$wid = (int) ($_POST['writ_id'] ?? 0);
+$w = $app->writ->find($wid);
+if (!$w || (int) $w['writer_id'] !== $app->auth->id()) {
+    $app->json(['ok' => false, 'error' => 'not found'], 404);
+}
+if (!empty($_POST['save_draft']) || isset($_POST['draft'])) {
+    $app->writ->saveDraft($wid, $app->auth->id(), [
+        'title' => clean_title($_POST['title'] ?? ''),
+        'work' => clean_title($_POST['work'] ?? ''),
+        'block_id' => (int) ($_POST['block'] ?? 0),
+        'notes' => clean_body($_POST['notes'] ?? ''),
+        'draft' => clean_body($_POST['draft'] ?? ''),
+        'draft_wordcount' => wordcount($_POST['draft'] ?? ''),
+        'writing_time' => (int) ($_POST['writing_time'] ?? 0),
+    ]);
+}
+if (isset($_POST['correction'])) {
+    $app->writ->saveCorrection($wid, $app->auth->id(), [
+        'notes' => clean_body($_POST['notes'] ?? ''),
+        'correction' => clean_body($_POST['correction'] ?? ''),
+        'correction_wordcount' => wordcount($_POST['correction'] ?? ''),
+    ]);
+}
+$app->json(['ok' => true, 'msg' => 'Saved']);

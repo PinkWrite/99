@@ -1,68 +1,37 @@
 <?php
-
-// Require the configuration before any PHP code as the configuration controls error reporting
-require('./pw99-config.php');
-
-// A settings page requires form functions
-require_once('./includes/form_functions.inc.php');
-
-
-// Include the header file
-$active_writs = '';
-$active_blocks = 'active';
-$active_notes = '';
-$active_binder = '';
-$active_locker = '';
-$active_admin = '';
-$active_editor = '';
-$active_observer = '';
-$active_dash = 'active';
-$page_title = "Blocks :: $siteTitle";
-include('./includes/header.html');
-
-// Make sure we're not here by accident
-if (isset($_SESSION['user_id'])) {
-	// Okay to view this page
-	$userid = $_SESSION['user_id'];
-	$q = "SELECT name, username, email, blocks, level, editor FROM users WHERE id='$userid'";
-	$r = mysqli_query ($dbc, $q);
-	$row = mysqli_fetch_array($r, MYSQLI_NUM);
-	$u_name = "$row[0]";
-	$u_usrn = "$row[1]";
-	$u_email = "$row[2]";
-	$u_class = "$row[3]";
-	$u_level = "$row[4]";
-	$u_editor = "$row[5]";
-
-	if ($_SESSION['user_is_admin'] == true) {
-		$usr_type = "Admin";
-	} elseif ($_SESSION['user_is_supervisor'] == true) {
-		$usr_type = "Supervisor";
-	} elseif ($_SESSION['user_is_editor'] == true) {
-		$usr_type = "Editor";
-	} elseif ($_SESSION['user_is_observer'] == true) {
-		header("Location: observer.php");
-		exit(); // Quit the script
-	} elseif ($_SESSION['user_is_writer'] == true) {
-	 $usr_type = "Writer";
-	}
-
-	// Dashboard
-	$dashgreeting = "Dash for $u_name";
-	include('./inserts/dash.ins.php');
-
-} else {
-  header("Location: " . PW99_HOME);
-  exit(); // Quit the script
+declare(strict_types=1);
+$import = ['auth', 'csrf', 'view', 'html', 'text', 'block', 'notify'];
+require __DIR__ . '/lib/boot.php';
+$app->auth->requireUser();
+if (!$app->auth->atLeast('editor')) {
+    $app->redirect('');
 }
-
-// Heading
-echo '<h2 class="lt">My Blocks</h2>';
-
-// Blocks table
-$where_am_i = "blocks.php";
-include('inserts/list_blocks.ins.php');
-
-// Include the HTML footer
-include('./includes/footer.html');
-?>
+$msg = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST['create'])) {
+    $id = $app->block->create([
+        'facility_id' => $app->auth->facilityId(),
+        'editor_id' => $app->auth->is('editor') ? $app->auth->id() : (int) ($_POST['editor_id'] ?? $app->auth->id()),
+        'name' => clean_title($_POST['name'] ?? 'Block', 120),
+        'code' => clean_title($_POST['code'] ?? '', 10),
+    ]);
+    $app->notify->send($app->auth->id(), 'new_block', 'Block created', 'blocks.php');
+    $msg = 'Block created.';
+}
+$app->view->start('Blocks', 'blocks');
+echo '<h2 class="lt">Blocks</h2>';
+if ($msg) {
+    echo '<p class="sans noticegreen">' . h($msg) . '</p>';
+}
+echo '<form method="post">' . $app->csrf->field();
+echo '<p class="sans">Name <input name="name" required> Code <input name="code" size="8"> ';
+echo '<input type="submit" name="create" class="lt_button" value="Create block"></p></form>';
+echo '<table class="list"><tr><th>Name</th><th>Code</th><th>Status</th><th></th></tr>';
+$list = $app->auth->is('editor')
+    ? $app->block->forEditor($app->auth->id(), false)
+    : $app->block->forFacility($app->auth->facilityId(), false);
+foreach ($list as $b) {
+    echo '<tr><td>' . h($b['name']) . '</td><td>' . h($b['code']) . '</td><td>' . h($b['status']) . '</td><td>';
+    echo button('Open', 'Edit', 'block.php?b=' . (int) $b['id'], 'editNoteButton') . '</td></tr>';
+}
+echo '</table>';
+$app->view->end();

@@ -1263,3 +1263,23 @@ del {
   text-decoration: line-through;
   background-color: #3d2c30;
 }
+
+table.list {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.6em 0 1.4em;
+}
+table.list th, table.list td {
+  text-align: left;
+  padding: 0.35em 0.5em;
+  border-bottom: 1px solid #444;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9em;
+}
+button.act_disabled, button.act_disabled:hover {
+  color: #888;
+  background-color: #3c3c3c;
+  cursor: default;
+}
+span.noticehide { font-weight: bold; }
+

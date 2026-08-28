@@ -1,0 +1,5 @@
+pw99-config.php
+*.log
+.DS_Store
+Thumbs.db
+/tmp/

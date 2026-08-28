@@ -1,77 +1,49 @@
 # PinkWrite 99
 **Typing and Editing for Learners and Teachers**
 
-Teachers, tutors, parents, and other educators can use this to ensure that students focus on learning content and core skill.
+A composition classroom: Writers draft without paste-cheating, Editors review and redraft, Observers watch, Administrators run a Facility (school), a Superintendent runs several Facilities. Blocks are classes.
+
+## Stack
+PHP 8 + MariaDB (InnoDB) + PDO. Object pages import only the modules they use (`$import = ['auth','writ']`).
+
+## Install
+1. Clone into the web folder (`/srv/www/99/webdir` or similar).
+2. Create a MariaDB database and user.
+3. Open `install.php`. Database host should be `127.0.0.1` (TCP), not `localhost` (Unix socket).
+4. Host setting is **scheme-less**: `write.pink`, `99.example.org`, or `example.org/99`. The app always uses `https://`.
+5. That creates a **Superintendent**. Create a Facility, then an Administrator.
+6. Mail, SMTP password, and host live in `pw99-config.php` — SysAdmin work, not the in-app Admin.
+
+Walk-in Superintendent recovery: set `allow_create_super` to `true` in config, open `install.php`, then set it `false` again.
+
+## Update
+- CLI: `php bin/update.php` or `bash bin/pw99-update`
+- Admin / Superintendent locker: **Update app**
+- Pulls GitHub `master`, never overwrites `pw99-config.php`, runs SQL migrations.
+
+## Migrating an old dump
+Import the old database first, then run the updater once. It adds `facilities`, `drafts`/`redrafts` JSON, tests, notifications, 2FA/passkey columns, and maps everyone to a Home facility.
+
+## Roles
+| Role | Seat |
+|---|---|
+| Writer | Student |
+| Observer | Parent / tutor |
+| Editor | Teacher |
+| Supervisor | Facility staff |
+| Admin | One Facility |
+| Superintendent | Many Facilities; password reset is in-person only |
 
 ## Features
+- Writs, Assignments (writ + memo instructions), Tests (MC / fill-in / short answer / T-F)
+- Fill-in: `||` is OR; `|&` is AND/OR (either or both). No exclusive AND.
+- Redraft: editor version becomes the writer's next start. `drafts` and `redrafts` JSON history. **Show history** or gray **no history**.
+- Note → Memo; Memo → Assignment.
+- Lost-password email (Admin and below). TOTP authenticator. Passkeys.
+- In-app + email notification checkboxes in the Locker. Acknowledge deletes the notice.
 
-- Useful for English Composition, writing assignments, and typing practice
-- Copy-paste is disabled, so there is no cheating!
-- Typing page displays a live word-counter
-- A "writer" can type-up "writs" for review and scoring
-- An "editor" can review and recommend changes
-- An "observer" (such as a parent) can watch the writer's progress
-- An "admin" can create "blocks" (such as classes), enroll writers, and assign observers
-- Everyone can keep "notes", either in a special area per user or within each writ project
-- Full supervisor features, including account control and repeat failed login IPs
-- Ready for K12 school or other educational use
-- Easy one-step install as a web app
-- Free because it's OpenSource!
+## 88
+[PinkWrite 88](https://github.com/PinkWrite/88) typing practice ships in `88/`.
 
-### Includes:
-- [PinkWrite 88](https://github.com/PinkWrite/88) (Learn typing to thoughtlessly use correct fingers within hours, included in PinkWrite 99)
-- [PinkWrite 99](https://github.com/PinkWrite/99) (Writing composition and editing, where you are now)
-
-## Web cloud requirements
-(same as WordPress)
-
-- Simple LAMP stack
-  - Linux
-  - Apache web server
-  - MySQL/MariaDB database
-  - PHP
-- FTP or CLI access to a hosted web folder
-- Database and user already setup
-
-## Install Instructions
-- Unzip the [zip file](https://github.com/PinkWrite/99/archive/refs/heads/master.zip) or `git clone` the [git repo](https://github.com/PinkWrite/99.git) into your web folder
-- Make sure you have a MySQL/MariaDB database and user setup
-- Go to your web folder: example.com/`install.php`
-- Follow the one-step instructions
-
-## Admin recovery
-- Download and place `install.php` from the web folder to create a new admin to regain access
-
-## Bugs & Contribution
-
-This is a collaborative effort. ***If you find any bugs or security vulnerabilities, please*** fork and request a pull on [GitHub](https://github.com/PinkWrite/99)!
-
-You are also welcome to help rollout the product roadmap. SysAdmins and ITs for schools are especially welcome to contribute!
-
-## Product Roadmap
-- Score reporting
-  - GUI to see a writer's overall score and per block
-  - XML export with XSL stylesheet
-- Export content per user
-  - Export database information
-  - Can become new database, ready OOB for user to view old assignments on self-hosted PinkWrite 99
-  - Can make things easy for a student (writer) to transfer to another school using PinkWrite 99
-- Tasks
-  - Universal from Admin & per Editor
-  - Templates
-  - Assignable to blocks and writers
-  - Added to writ meta, linked to original template
-- Tests
-  - Text-based creation
-  - Default "correct" answers
-  - Scoring
-  - Assignable to blocks and writers
-- Level management (ie grade/year in school)
-  - Applies to blocks and writers
-- Groups
-  - Spanning blocks, editors, levels
-  - Assignable to blocks, editors, levels
-  - Can receive assigned tasks & tests
-  - Can share common notes
-  
-For detailed and current to-do list, see [99-dev/TODO.md](https://github.com/PinkWrite/99-dev/blob/main/TODO.md)
+## License
+GPLv3

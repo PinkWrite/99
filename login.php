@@ -1,60 +1,79 @@
 <?php
+declare(strict_types=1);
+$import = ['auth', 'csrf', 'view', 'html', 'text', 'passkey', 'totp'];
+require __DIR__ . '/lib/boot.php';
 
-// Require the configuration before any PHP code as the configuration controls error reporting
-require('./pw99-config.php');
+if ($app->auth->user()) {
+    $app->redirect('');
+}
 
-// A settings page requires form functions
-require_once('./includes/form_functions.inc.php');
+$ip = client_ip();
+$err = '';
+$needTotp = !empty($_SESSION['pending_2fa']);
 
-// We need database connection
-
-// Include the header file
-$page_title = "Log In :: $siteTitle";
-include('./includes/header.html');
-
-// Login cluster
-  // We need this first to check errors
-  include('./includes/login_check.inc.php');
-
-  // Redirect Logged-in users
-  if (isset($_SESSION['user_id'])) {
-    header("Location: " . PW99_HOME);
-    exit(); // Quit the script
-  } else {
-
-    // Clickathon?
-    // Recently blocked from this IP?
-    $timeNow = date("Y-m-d H:i:s");
-    $timeNowEpoch = strtotime($timeNow);
-    $lastAllowedFailEpoch = ($timeNowEpoch - (60 * 60));
-    $qhack = "SELECT id FROM clickathon WHERE ip='$user_ip' AND time_epoch > '$lastAllowedFailEpoch' AND unlocked IS NULL";
-    $rowhack = mysqli_query($dbc, $qhack);
-    if (mysqli_num_rows($rowhack) >= 1) {
-    	$ip_blocked = true;
-    } else {
-      $ip_blocked = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passkey'])) {
+    $u = $app->passkey->assert(
+        (string) $_POST['id'],
+        (string) $_POST['clientData'],
+        (string) $_POST['authData'],
+        (string) $_POST['sig']
+    );
+    if ($u && $u['status'] === 'active') {
+        $app->auth->establish($u);
+        $app->redirect('');
     }
-
-    if ( ((isset($_SESSION['clickathon_count'])) && ($_SESSION['clickathon_count'] > 5) && ((isset($_SESSION['clickathon_time'])) && ($_SESSION['clickathon_time'] > $lastAllowedFailEpoch))) || $ip_blocked == true) {
-      // Clickathon
-      echo '<h3>Too many failed logins</h3>';
-
-    } else {
-      // Simple header
-      echo '<table style="clear: both; float: left; display: block; position: relative; width: auto;" class="plain"><tbody><tr><td><span class="sans dk"><a href="88">Typing practice: 88 Word Hanon</a></span></td><td><span class="sans dk"><a href="https://github.com/PinkWrite/99">GitHub Source</a></span></td><td><span class="sans dk"><a href="'.PW99_HOME.'">Home</a></span></td></tr></tbody></table>
-    	<h1 style="clear: both; display: block;">'.SITE_TITLE.'</h1>
-    	<p class="dk sans"><b>Typing and Editing for Learners and Teachers</b>, <a href="https://pinkwrite.com"><small><i>powered by PinkWrite 99</i></small></a></p>';
-
-      // Logged out?
-      echo ((isset($_SESSION['logout'])) && ($_SESSION['logout'] == true)) ? '<p class="sans">You are now logged out. Bye!</p>' : false ;
-      if (isset($_SESSION['logout'])) unset($_SESSION['logout']);
-
-      // Non-logged in users can login
-      $lformaction = 'in'; // This must be set for the include to work
-      require('./includes/login_form.inc.php'); // This must be a separate file, not a function, so the error checks in login.inc.php will work
+    $err = 'Passkey failed.';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['totp_code'])) {
+    if ($app->auth->finishTotp((string) $_POST['totp_code'])) {
+        $app->redirect('');
     }
-  }
+    $err = 'That code did not match.';
+    $needTotp = true;
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
+    if (!$app->csrf->check()) {
+        $err = 'Bad request.';
+    } else {
+        $r = $app->auth->login((string) $_POST['username'], (string) ($_POST['pass'] ?? ''), $ip);
+        if ($r === 'ok') {
+            $app->redirect('');
+        } elseif ($r === 'totp') {
+            $needTotp = true;
+        } elseif ($r === 'blocked') {
+            $err = 'Too many failed logins from this IP. Try later.';
+        } elseif ($r === 'inactive') {
+            $err = 'This account is not active.';
+        } else {
+            $err = 'The username and password do not match those on file.';
+        }
+    }
+}
 
-// Include the HTML footer
-include('./includes/footer.html');
-?>
+$app->view->start('Log In', 'login');
+if (!empty($_SESSION['logout'])) {
+    echo '<p class="sans">You are now logged out. Bye!</p>';
+    unset($_SESSION['logout']);
+}
+echo '<table style="clear:both;float:left;display:block;position:relative;width:auto;" class="plain"><tbody><tr>';
+echo '<td><span class="sans dk"><a href="88">Typing practice: 88 Word Hanon</a></span></td>';
+echo '<td><span class="sans dk"><a href="https://github.com/PinkWrite/99">GitHub Source</a></span></td>';
+echo '</tr></tbody></table>';
+echo '<h1 style="clear:both;display:block;">' . h($app->title()) . '</h1>';
+echo '<p class="dk sans"><b>Typing and Editing for Learners and Teachers</b>, <a href="https://pinkwrite.com"><small><i>powered by PinkWrite 99</i></small></a></p>';
+if ($err) {
+    echo '<p class="sans noticered">' . h($err) . '</p>';
+}
+if ($needTotp) {
+    echo '<h3 class="lt">Authenticator</h3>';
+    echo '<form method="post">' . $app->csrf->field();
+    echo '<p class="sans">Code <input name="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
+    echo '<p><input type="submit" class="lt_button" value="Verify"></p></form>';
+} else {
+    echo '<form method="post" action="login.php">' . $app->csrf->field();
+    echo '<p class="sans">Username<br><input name="username" required autocomplete="username"></p>';
+    echo '<p class="sans">Password<br><input type="password" name="pass" required autocomplete="current-password"></p>';
+    echo '<p><input type="submit" class="lt_button" value="Log in"> ';
+    echo '<a class="dk sans" href="forgot.php">Forgot password?</a></p></form>';
+    echo '<p><button type="button" class="set_gray" id="pkbtn">Sign in with a passkey</button></p>';
+    echo '<script src="js/pw99.js"></script><script>document.getElementById("pkbtn").onclick=function(){pwPasskeyLogin("passkey-options.php");};</script>';
+}
+$app->view->end();

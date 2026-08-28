@@ -1,0 +1,196 @@
+<?php
+declare(strict_types=1);
+
+final class WritRepo
+{
+    private App $app;
+
+    public function __construct(App $app)
+    {
+        $this->app = $app;
+    }
+
+    public function find(int $id): ?array
+    {
+        return $this->app->db->one('SELECT * FROM writs WHERE id = ?', [$id]);
+    }
+
+    public function create(array $row): int
+    {
+        $drafts = $row['drafts'] ?? [];
+        $redrafts = $row['redrafts'] ?? [];
+        $this->app->db->run(
+            'INSERT INTO writs (writer_id, facility_id, block_id, kind, memo_id, test_id, instructions, title, work, draft, draft_wordcount, drafts, redrafts, notes, outof)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [
+                $row['writer_id'],
+                $row['facility_id'] ?? null,
+                $row['block_id'] ?? 0,
+                $row['kind'] ?? 'writ',
+                $row['memo_id'] ?? null,
+                $row['test_id'] ?? null,
+                $row['instructions'] ?? null,
+                $row['title'] ?? '',
+                $row['work'] ?? '',
+                $row['draft'] ?? '',
+                $row['draft_wordcount'] ?? 0,
+                json_enc($drafts),
+                json_enc($redrafts),
+                $row['notes'] ?? '',
+                $row['outof'] ?? 100,
+            ]
+        );
+        return (int) $this->app->db->lastId();
+    }
+
+    public function forWriter(int $writerId, string $term = 'current'): array
+    {
+        return $this->app->db->all(
+            'SELECT * FROM writs WHERE writer_id = ? AND term_status = ? ORDER BY draft_save_date DESC, id DESC',
+            [$writerId, $term]
+        );
+    }
+
+    public function forEditor(int $editorId, string $review = 'current'): array
+    {
+        return $this->app->db->all(
+            'SELECT w.*, u.name AS writer_name FROM writs w
+             JOIN users u ON u.id = w.writer_id
+             WHERE u.editor_id = ? AND w.review_status = ?
+             ORDER BY w.draft_submit_date DESC, w.id DESC',
+            [$editorId, $review]
+        );
+    }
+
+    public function hasHistory(array $w): bool
+    {
+        return count(json_arr($w['drafts'] ?? [])) > 1
+            || count(json_arr($w['redrafts'] ?? [])) > 1;
+    }
+
+    public function saveDraft(int $id, int $writerId, array $fields): bool
+    {
+        $st = $this->app->db->run(
+            'UPDATE writs SET title=?, work=?, block_id=?, notes=?, draft=?, draft_wordcount=?, writing_time=?, draft_status=\'saved\', draft_save_date=NOW()
+             WHERE id=? AND writer_id=?',
+            [
+                $fields['title'], $fields['work'], $fields['block_id'], $fields['notes'],
+                $fields['draft'], $fields['draft_wordcount'], $fields['writing_time'] ?? 0,
+                $id, $writerId,
+            ]
+        );
+        return $st->rowCount() >= 0;
+    }
+
+    public function submitDraft(int $id, int $writerId): void
+    {
+        $w = $this->find($id);
+        if (!$w || (int) $w['writer_id'] !== $writerId) {
+            throw new RuntimeException('Writ not found');
+        }
+        $drafts = json_arr($w['drafts']);
+        $drafts[] = [
+            'at' => date('c'),
+            'body' => $w['draft'],
+            'wordcount' => (int) $w['draft_wordcount'],
+        ];
+        $this->app->db->run(
+            'UPDATE writs SET drafts=?, draft_status=\'submitted\', draft_submit_date=NOW() WHERE id=? AND writer_id=?',
+            [json_enc($drafts), $id, $writerId]
+        );
+    }
+
+    public function saveEdits(int $id, array $fields): void
+    {
+        $this->app->db->run(
+            'UPDATE writs SET block_id=?, title=?, work=?, notes=?, edits=?, edits_wordcount=?, edit_notes=?, scoring=?, score=?, outof=?
+             WHERE id=?',
+            [
+                $fields['block_id'], $fields['title'], $fields['work'], $fields['notes'],
+                $fields['edits'], $fields['edits_wordcount'], $fields['edit_notes'],
+                $fields['scoring'] ?? '', $fields['score'], $fields['outof'],
+                $id,
+            ]
+        );
+    }
+
+    public function submitReview(int $id, array $fields): void
+    {
+        $this->saveEdits($id, $fields);
+        $this->app->db->run(
+            'UPDATE writs SET draft_status=\'reviewed\', edits_status=\'drafting\', edits_date=NOW() WHERE id=?',
+            [$id]
+        );
+    }
+
+    /** Editor redraft: edited text becomes the writer's new starting point. */
+    public function sendRedraft(int $id, array $fields): void
+    {
+        $w = $this->find($id);
+        if (!$w) {
+            throw new RuntimeException('Writ not found');
+        }
+        $this->saveEdits($id, $fields);
+        $redrafts = json_arr($w['redrafts']);
+        $redrafts[] = [
+            'at' => date('c'),
+            'body' => $fields['edits'],
+            'notes' => $fields['edit_notes'] ?? '',
+            'wordcount' => (int) $fields['edits_wordcount'],
+        ];
+        $this->app->db->run(
+            'UPDATE writs SET redrafts=?, draft=?, draft_wordcount=?, draft_status=\'redraft\', edits_status=\'drafting\', edits_date=NOW(), score=NULL
+             WHERE id=?',
+            [json_enc($redrafts), $fields['edits'], $fields['edits_wordcount'], $id]
+        );
+    }
+
+    public function saveCorrection(int $id, int $writerId, array $fields): void
+    {
+        $this->app->db->run(
+            'UPDATE writs SET notes=?, correction=?, correction_wordcount=?, edits_status=\'saved\', corrected_save_date=NOW()
+             WHERE id=? AND writer_id=?',
+            [$fields['notes'], $fields['correction'], $fields['correction_wordcount'], $id, $writerId]
+        );
+    }
+
+    public function submitCorrection(int $id, int $writerId): void
+    {
+        $this->app->db->run(
+            'UPDATE writs SET edits_status=\'submitted\', corrected_submit_date=NOW() WHERE id=? AND writer_id=?',
+            [$id, $writerId]
+        );
+    }
+
+    public function score(int $id, array $fields): void
+    {
+        $this->app->db->run(
+            'UPDATE writs SET scoring=?, score=?, outof=?, edits_status=\'scored\', scoring_date=NOW() WHERE id=?',
+            [$fields['scoring'], $fields['score'], $fields['outof'], $id]
+        );
+    }
+
+    public function markViewed(int $id, int $writerId): void
+    {
+        $this->app->db->run(
+            'UPDATE writs SET edits_status=\'viewed\', edits_viewed_date=NOW()
+             WHERE id=? AND writer_id=? AND draft_status=\'reviewed\' AND edits_status=\'drafting\'',
+            [$id, $writerId]
+        );
+    }
+
+    public function archive(int $id, string $which = 'term'): void
+    {
+        $col = $which === 'review' ? 'review_status' : 'term_status';
+        $this->app->db->run("UPDATE writs SET {$col} = 'archived' WHERE id = ?", [$id]);
+    }
+
+    public function saveTestAnswers(int $id, int $writerId, array $answers, int $auto, int $outof): void
+    {
+        $this->app->db->run(
+            'UPDATE writs SET test_answers=?, test_auto_score=?, draft_status=\'submitted\', draft_submit_date=NOW(), outof=?, score=?
+             WHERE id=? AND writer_id=?',
+            [json_enc($answers), $auto, $outof, $auto, $id, $writerId]
+        );
+    }
+}

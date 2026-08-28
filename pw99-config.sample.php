@@ -1,35 +1,46 @@
 <?php
+/**
+ * PinkWrite 99 — SysAdmin config.
+ * Copy to pw99-config.php and edit. Never commit the live file.
+ * The in-app Administrator does not edit this. Mail, host, and DB are SysAdmin work.
+ */
+return [
+    'configured' => true,
 
-//In case you want to show errors
-// ini_set('display_errors', '1');
-// ini_set('display_startup_errors', '1');
-// error_reporting(E_ALL);
+    // Walk-in recovery: SysAdmin sets true, creates a Superintendent, sets false again.
+    'allow_create_super' => false,
 
-// Start the session
-session_start();
+    // Everything after https:// — no scheme. Examples:
+    //   write.pink
+    //   99.example.org
+    //   www.example.org
+    //   example.org/99
+    // www. is the SysAdmin's choice. The app always uses https://
+    'host' => 'write.pink/99',
 
-// Database
-DEFINE ('DB_NAME', 'pinkwrite99database');
-DEFINE ('DB_USER', 'pinkwrite99user');
-DEFINE ('DB_PASSWORD', 'pinkwrite99password');
-DEFINE ('DB_HOST', 'localhost');
+    'site_title' => 'PinkWrite 99',
 
-// Home URL base
-DEFINE ('PW99_HOME', 'https://99.pinkwrite.com');
+    'db' => [
+        'host' => '127.0.0.1', // TCP. Do not use localhost (that is a Unix socket).
+        'port' => 3306,
+        'name' => 'pw99db',
+        'user' => 'pw99db',
+        'pass' => 'change-me',
+        'charset' => 'utf8mb4',
+    ],
 
-// Site Title
-DEFINE ('SITE_TITLE', 'PinkWrite 99');
+    // Mail is SysAdmin-only. SMTP password lives here on purpose.
+    'mail' => [
+        'transport' => 'mail', // mail | smtp | off
+        'from' => 'noreply@write.pink',
+        'from_name' => 'PinkWrite 99',
+        'smtp_host' => '127.0.0.1',
+        'smtp_port' => 587,
+        'smtp_user' => '',
+        'smtp_pass' => '',
+        'smtp_secure' => 'tls', // tls | ssl | none
+    ],
 
-// *** DANGER ZONE *** Developer & Webmin settings
-$config = [
-  'configured' => true,          // Configured (for install purposes)
-  'allowcreateadmin' => false,   // Only set true for emergency recovery access to an admin account!
+    'github' => 'https://github.com/PinkWrite/99.git',
+    'github_branch' => 'master',
 ];
-
-// Make the connection & character set
-$dbc = mysqli_connect (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-mysqli_set_charset($dbc, 'utf8');
-
-// Friendly variables
-$pw99Home = PW99_HOME;
-$siteTitle = SITE_TITLE;

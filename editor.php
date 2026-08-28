@@ -1,78 +1,31 @@
 <?php
-
-// Require the configuration before any PHP code as the configuration controls error reporting
-require('./pw99-config.php');
-
-// A settings page requires form functions
-require_once('./includes/form_functions.inc.php');
-
-
-// Include the header
-$active_binder = '';
-$active_writs = '';
-$active_blocks = '';
-$active_roll = '';
-$active_locker = '';
-$active_admin = '';
-$active_editor = 'activedash';
-$active_observer = '';
-$active_dash = '';
-$page_title = "Editor :: $siteTitle";
-include('./includes/header.html');
-
-// Logged in or not?
-if (isset($_SESSION['user_id'])) {
-	$userid = $_SESSION['user_id'];
-	$q = "SELECT name, type, email FROM users WHERE id='$userid'";
-	$r = mysqli_query ($dbc, $q);
-	$row = mysqli_fetch_array($r, MYSQLI_NUM);
-	$u_name = "$row[0]";
-	$u_type = "$row[1]";
-	$u_email = "$row[2]";
-
-	// Only admins and editors for this page
-	if ( ($_SESSION['user_is_editor'] != true) && ($_SESSION['user_is_supervisor'] != true) && ($_SESSION['user_is_admin'] != true) ) {
-		header("Location: " . PW99_HOME);
-		exit(); // Quit the script
-	} elseif ($_SESSION['user_is_admin'] == true) {
-		$usr_type = "Admin";
-	} elseif ($_SESSION['user_is_supervisor'] == true) {
-		$usr_type = "Supervisor";
-	} elseif ($_SESSION['user_is_editor'] == true) {
-		$usr_type = "Editor";
-	}
-
-} else {
-	header("Location: " . PW99_HOME);
-	exit(); // Quit the script
+declare(strict_types=1);
+$import = ['auth', 'view', 'html', 'writ', 'block', 'user'];
+require __DIR__ . '/lib/boot.php';
+$app->auth->requireUser();
+if (!$app->auth->atLeast('editor')) {
+    $app->redirect('');
 }
-
-// Dashboard
-$dashgreeting = "Editor Dash for $u_name";
-include('./inserts/dash_editor.ins.php');
-
-// Action message
-echo (isset($_SESSION['act_message'])) ? $_SESSION['act_message'] : false ;
-if (isset($_SESSION['act_message'])) {unset($_SESSION['act_message']);}
-
-// $where_am_i
-// Must be different for search forms since there are two navigators on this dashboard page
-//$where_am_i = "editor.php";
-
-// Blocks table
-// $where_am_i
-$where_am_i = "blocks_editor.php";
+$app->view->start('Editor', 'editor');
 echo '<h2 class="lt">Blocks</h2>';
-include('./inserts/list_blocks_editor.ins.php');
-unset($where_am_i);
-
-// Writ table
-// $where_am_i
-$where_am_i = "writs_editor.php";
+echo '<p>' . button('Manage blocks', 'Blocks', 'blocks.php', 'set_gray') . '</p>';
+echo '<table class="list"><tr><th>Name</th><th>Code</th><th>Status</th></tr>';
+$eid = $app->auth->is('editor') ? $app->auth->id() : 0;
+$blocks = $eid ? $app->block->forEditor($eid, false) : $app->block->forFacility($app->auth->facilityId(), false);
+foreach ($blocks as $b) {
+    echo '<tr><td>' . h($b['name']) . '</td><td>' . h($b['code']) . '</td><td>' . h($b['status']) . '</td></tr>';
+}
+echo '</table>';
 echo '<h2 class="lt">Writs</h2>';
-$review_status = 'current';
-include('./inserts/list_editor.ins.php');
-
-// Include the footer file to complete the template
-require('./includes/footer.html');
-?>
+echo '<table class="list"><tr><th>Writer</th><th>Title</th><th>Kind</th><th>Status</th><th></th></tr>';
+$list = $eid ? $app->writ->forEditor($eid) : $app->db->all(
+    'SELECT w.*, u.name AS writer_name FROM writs w JOIN users u ON u.id = w.writer_id WHERE w.review_status=\'current\' ORDER BY w.id DESC LIMIT 100'
+);
+foreach ($list as $w) {
+    echo '<tr><td>' . h($w['writer_name'] ?? '') . '</td><td>' . h($w['title']) . '</td><td>' . h($w['kind']) . '</td><td>' . h($w['draft_status']) . ' / ' . h($w['edits_status']) . '</td><td>';
+    echo button('Review', 'Review', 'review.php?w=' . (int) $w['id'], 'editNoteButton') . ' ';
+    echo history_button($app->writ->hasHistory($w), 'history.php?w=' . (int) $w['id']);
+    echo '</td></tr>';
+}
+echo '</table>';
+$app->view->end();

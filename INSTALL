@@ -1,19 +1,27 @@
-# [PinkWrite 99](https://github.com/PinkWrite/99) install instructions
+# PinkWrite 99 install
 
-## Web cloud requirements: (same as WordPress)
-- Simple LAMP stack
-  - Linux
-  - Apache web server
-  - MySQL/MariaDB database
-  - PHP
-- FTP or CLI access to a hosted web folder
-- Database and user already setup
+## Requirements
+Linux, Apache (or nginx), PHP 8, MariaDB. Same class of host as WordPress.
 
-## Install Instructions:
-- Unzip the [zip file](https://github.com/PinkWrite/99/archive/refs/heads/master.zip) or `git clone` the [git repo](https://github.com/PinkWrite/99.git) into your web folder
-- Make sure you have a MySQL/MariaDB database and user setup
-- Go to your web folder: example.com/`install.php`
-- Follow the one-step instructions
+## Steps
+1. `git clone https://github.com/PinkWrite/99.git` into the web folder.
+2. Create a database and user.
+3. Visit `install.php`.
+   - DB host: `127.0.0.1` (not `localhost`)
+   - Public host: everything after `https://` (example `write.pink/99`)
+4. Log in as the Superintendent. Create a Facility, then an Administrator.
 
-## Admin recovery:
-- Download and place `install.php` from the web folder to create a new admin to regain access
+## Mail
+Edit `pw99-config.php` (`mail` key). SMTP password lives there on purpose. This is SysAdmin work.
+
+## Update / old dump
+```
+php bin/update.php
+```
+Import a legacy dump first; the updater lifts it once.
+
+## Nginx
+```
+location = /pw99-config.php { deny all; }
+location ~ ^/(lib|sql|bin|functions|dev)/ { deny all; }
+```

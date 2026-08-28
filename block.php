@@ -1,72 +1,29 @@
 <?php
-
-// Require the configuration before any PHP code as the configuration controls error reporting
-require('./pw99-config.php');
-
-// A settings page requires form functions
-require_once('./includes/form_functions.inc.php');
-
-
-// Include the header
-$active_writs = '';
-$active_blocks = 'active';
-$active_notes = '';
-$active_binder = '';
-$active_locker = '';
-$active_admin = '';
-$active_editor = '';
-$active_observer = '';
-$active_dash = 'active';
-$page_title = "Blocks :: $siteTitle";
-$page_title = "$siteTitle";
-include('./includes/header.html');
-
-// Logged in or not?
-if (isset($_SESSION['user_id'])) {
-	// Okay to view this page
-	$userid = $_SESSION['user_id'];
-	$q = "SELECT name, username, email, blocks, level, editor FROM users WHERE id='$userid'";
-	$r = mysqli_query ($dbc, $q);
-	$row = mysqli_fetch_array($r, MYSQLI_NUM);
-	$u_name = "$row[0]";
-	$u_usrn = "$row[1]";
-	$u_email = "$row[2]";
-	$u_class = "$row[3]";
-	$u_level = "$row[4]";
-	$u_editor = "$row[5]";
-
-	if ($_SESSION['user_is_admin'] == true) {
-		$usr_type = "Admin";
-	} elseif ($_SESSION['user_is_supervisor'] == true) {
-		$usr_type = "Supervisor";
-	} elseif ($_SESSION['user_is_editor'] == true) {
-		$usr_type = "Editor";
-	} elseif ($_SESSION['user_is_observer'] == true) {
-		header("Location: observer.php");
-  	exit(); // Quit the script
-	} elseif ($_SESSION['user_is_writer'] == true) {
-	 $usr_type = "Writer";
-	}
-
-	// Dashboard
-	$dashgreeting = "Block with $u_name";
-	include('./inserts/dash.ins.php');
-
-} else {
-	header("Location: " . PW99_HOME);
-	exit(); // Quit the script
+declare(strict_types=1);
+$import = ['auth', 'csrf', 'view', 'html', 'text', 'block'];
+require __DIR__ . '/lib/boot.php';
+$app->auth->requireUser();
+if (!$app->auth->atLeast('editor')) {
+    $app->redirect('');
 }
-
-// Memos for this block
-if ((isset($_GET['v'])) && ((filter_var($_GET['v'], FILTER_VALIDATE_INT, array('min_range' => 0))) || ($_GET['v'] == '0'))) {
-  $editor_set_block = preg_replace("/[^0-9]/","", $_GET['v']);
-	include('inserts/list_notes_editor_10.ins.php');
+$bid = (int) ($_GET['b'] ?? $_POST['b'] ?? 0);
+$b = $app->block->find($bid);
+if (!$b) {
+    $app->redirect('blocks.php');
 }
-
-// Content
-$where_am_i = "blocks.php";
-include('./inserts/block.ins.php');
-
-// Include the footer file to complete the template
-require('./includes/footer.html');
-?>
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
+    $app->block->save($bid, [
+        'name' => clean_title($_POST['name'] ?? '', 120),
+        'code' => clean_title($_POST['code'] ?? '', 10),
+        'status' => ($_POST['status'] ?? '') === 'closed' ? 'closed' : 'open',
+    ]);
+    $b = $app->block->find($bid);
+}
+$app->view->start('Block', 'blocks');
+echo '<form method="post">' . $app->csrf->field();
+echo '<input type="hidden" name="b" value="' . $bid . '">';
+echo '<p class="sans">Name <input name="name" value="' . h($b['name']) . '"> Code <input name="code" value="' . h($b['code']) . '"></p>';
+echo '<p class="sans">Status <select name="status"><option value="open"' . ($b['status'] === 'open' ? ' selected' : '') . '>open</option>';
+echo '<option value="closed"' . ($b['status'] === 'closed' ? ' selected' : '') . '>closed</option></select></p>';
+echo '<p><input type="submit" class="lt_button" value="Save"></p></form>';
+$app->view->end();
