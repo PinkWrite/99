@@ -43,4 +43,12 @@ return [
 
     'github' => 'https://github.com/PinkWrite/99.git',
     'github_branch' => 'master',
+
+    // SysAdmin OAuth. Empty id = that provider is off.
+    // Callback URL for all three: https://{host}/oauth.php
+    'oauth' => [
+        'google' => ['id' => '', 'secret' => ''],
+        'apple'  => ['id' => '', 'secret' => ''], // Apple secret is the JWT you generate from the .p8 key
+        'github' => ['id' => '', 'secret' => ''],
+    ],
 ];

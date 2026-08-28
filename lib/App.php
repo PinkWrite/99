@@ -27,6 +27,7 @@ final class App
     public $totp = null;
     public $passkey = null;
     public $clickathon = null;
+    public $oauth = null;
 
     /** @var array<string,string> */
     private const CATALOG = [
@@ -47,6 +48,7 @@ final class App
         'totp'      => 'lib/Totp.php',
         'passkey'   => 'lib/WebAuthn.php',
         'clickathon'=> 'lib/Clickathon.php',
+        'oauth'     => 'lib/OAuth.php',
     ];
 
     /** @var array<string,true> */
@@ -138,6 +140,11 @@ final class App
                 break;
             case 'clickathon':
                 $this->clickathon = new Clickathon($this);
+                break;
+            case 'oauth':
+                $this->need('auth');
+                $this->need('user');
+                $this->oauth = new OAuth($this);
                 break;
             case 'html':
             case 'text':

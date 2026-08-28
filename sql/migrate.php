@@ -22,6 +22,24 @@ function pw99_migrate(App $app): string
     if ($ver < 1) {
         $db->run('INSERT INTO schema_version (version, note) VALUES (1, ?)', ['initial']);
         $notes[] = 'schema_version=1';
+        $ver = 1;
+    }
+    if ($ver < 2) {
+        if (!$db->tableExists('oauth_identities')) {
+            $db->pdo()->exec("CREATE TABLE oauth_identities (
+              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+              user_id BIGINT UNSIGNED NOT NULL,
+              provider VARCHAR(16) NOT NULL,
+              subject VARCHAR(191) NOT NULL,
+              email VARCHAR(160) DEFAULT NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (id),
+              UNIQUE KEY provider_subject (provider, subject),
+              KEY user_id (user_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+        $db->run('INSERT INTO schema_version (version, note) VALUES (2, ?)', ['oauth google apple github']);
+        $notes[] = 'schema_version=2 oauth';
     }
     return $notes ? implode('; ', $notes) : 'schema current';
 }

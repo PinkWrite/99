@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'text', 'passkey', 'totp'];
+$import = ['auth', 'csrf', 'view', 'html', 'text', 'passkey', 'totp', 'oauth'];
 require __DIR__ . '/lib/boot.php';
 
 if ($app->auth->user()) {
@@ -49,6 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passkey'])) {
 }
 
 $app->view->start('Log In', 'login');
+if (!empty($_SESSION['oauth_err'])) {
+    echo '<p class="sans noticered">' . h((string) $_SESSION['oauth_err']) . '</p>';
+    unset($_SESSION['oauth_err']);
+}
 if (!empty($_SESSION['logout'])) {
     echo '<p class="sans">You are now logged out. Bye!</p>';
     unset($_SESSION['logout']);
@@ -74,6 +78,14 @@ if ($needTotp) {
     echo '<p><input type="submit" class="lt_button" value="Log in"> ';
     echo '<a class="dk sans" href="forgot.php">Forgot password?</a></p></form>';
     echo '<p><button type="button" class="set_gray" id="pkbtn">Sign in with a passkey</button></p>';
+    echo '<p class="sans dk">Authenticator and passkeys stay available after Google, Apple, or GitHub.</p>';
+    echo '<p>';
+    foreach (['google' => 'Google', 'apple' => 'Apple', 'github' => 'GitHub'] as $p => $lab) {
+        if ($app->oauth->enabled($p)) {
+            echo '<a class="lt_button" href="oauth.php?p=' . $p . '">' . h($lab) . '</a> ';
+        }
+    }
+    echo '</p>';
     echo '<script src="js/pw99.js"></script><script>document.getElementById("pkbtn").onclick=function(){pwPasskeyLogin("passkey-options.php");};</script>';
 }
 $app->view->end();

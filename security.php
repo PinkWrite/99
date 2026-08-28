@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'totp', 'passkey', 'user'];
+$import = ['auth', 'csrf', 'view', 'html', 'totp', 'passkey', 'user', 'oauth'];
 require __DIR__ . '/lib/boot.php';
 $u = $app->auth->requireUser();
 
@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         $app->redirect('security.php');
     } elseif (isset($_POST['del_pk'])) {
         $app->passkey->delete((int) $_POST['del_pk'], $app->auth->id());
+    } elseif (isset($_POST['unlink_oauth'])) {
+        $app->oauth->unlink($app->auth->id(), (string) $_POST['unlink_oauth']);
     }
 }
 
@@ -53,4 +55,19 @@ foreach ($app->passkey->list($app->auth->id()) as $pk) {
 }
 echo '</ul>';
 echo '<script src="js/pw99.js"></script><script>document.getElementById("pkadd").onclick=function(){pwPasskeyRegister("passkey-create.php","security.php",' . json_encode($app->csrf->token()) . ');};</script>';
+
+echo '<h2 class="lt">Linked logins</h2>';
+echo '<p class="sans dk">Google, Apple, and GitHub can create an account or attach to this one. Authenticator and passkeys still apply.</p>';
+$have = [];
+foreach ($app->oauth->list($app->auth->id()) as $row) {
+    $have[$row['provider']] = $row;
+    echo '<p class="sans">' . h($row['provider']) . ' · ' . h((string) $row['email']) . ' ';
+    echo post_button('Unlink', 'Unlink', 'security.php', 'unlink_oauth', (string) $row['provider'], 'set_gray', $app->csrf->token());
+    echo '</p>';
+}
+foreach (['google' => 'Google', 'apple' => 'Apple', 'github' => 'GitHub'] as $p => $lab) {
+    if (!isset($have[$p]) && $app->oauth->enabled($p)) {
+        echo '<p><a class="lt_button" href="oauth.php?p=' . $p . '&link=1">Link ' . h($lab) . '</a></p>';
+    }
+}
 $app->view->end();

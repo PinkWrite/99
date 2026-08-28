@@ -40,6 +40,7 @@ Import the old database first, then run the updater once. It adds `facilities`, 
 - Redraft: editor version becomes the writer's next start. `drafts` and `redrafts` JSON history. **Show history** or gray **no history**.
 - Note → Memo; Memo → Assignment.
 - Lost-password email (Admin and below). TOTP authenticator. Passkeys.
+- Google, Apple, and GitHub login (SysAdmin `oauth` keys in config). Create or link. Authenticator and passkeys still apply after a social login.
 - In-app + email notification checkboxes in the Locker. Acknowledge deletes the notice.
 
 ## 88
