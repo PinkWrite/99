@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
 }
 
 $writer = $app->user->find((int) $w['writer_id']);
-$app->view->start('Review', 'editor');
+$app->view->start('Review', 'ewrits', 'editor');
 echo '<p>' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
 echo '<p class="sans">Writer: ' . h($writer['name'] ?? '') . '</p>';
 if ($w['kind'] === 'test') {

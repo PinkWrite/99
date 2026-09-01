@@ -13,10 +13,10 @@ if ($fid) {
     $f = $app->facility->find($fid);
     echo '<p class="sans">' . h($f['name'] ?? '') . '</p>';
 }
-echo '<p>' . button('Staffing', 'Users', 'staffing.php', 'set_gray') . ' ';
-echo button('Enrollment', 'Writers', 'enrollment.php', 'set_gray') . ' ';
-echo button('Blocks', 'Blocks', 'blocks.php', 'set_gray') . ' ';
-echo button('Failed logins', 'Clickathon', 'login-fails.php', 'set_gray') . '</p>';
+echo '<p>' . button('Staffing', 'Users', 'staffing.php', 'navDarkButton') . ' ';
+echo button('Enrollment', 'Writers', 'enrollment.php', 'navDarkButton') . ' ';
+echo button('Blocks', 'Blocks', 'blocks-editor.php', 'navDarkButton') . ' ';
+echo button('Failed logins', 'Clickathon', 'login-fails.php', 'navDarkButton') . '</p>';
 echo '<h3 class="lt">People</h3><table class="list"><tr><th>Name</th><th>Type</th><th>Username</th><th>Status</th></tr>';
 foreach ($app->user->listByFacility($fid) as $row) {
     echo '<tr><td>' . h($row['name']) . '</td><td>' . h($row['type']) . '</td><td>' . h($row['username']) . '</td><td>' . h($row['status']) . '</td></tr>';

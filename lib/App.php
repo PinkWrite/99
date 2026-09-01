@@ -28,6 +28,7 @@ final class App
     public $passkey = null;
     public $clickathon = null;
     public $oauth = null;
+    public $writlist = null;
 
     /** @var array<string,string> */
     private const CATALOG = [
@@ -49,6 +50,7 @@ final class App
         'passkey'   => 'lib/WebAuthn.php',
         'clickathon'=> 'lib/Clickathon.php',
         'oauth'     => 'lib/OAuth.php',
+        'writlist'  => 'lib/WritList.php',
     ];
 
     /** @var array<string,true> */
@@ -145,6 +147,15 @@ final class App
                 $this->need('auth');
                 $this->need('user');
                 $this->oauth = new OAuth($this);
+                break;
+            case 'writlist':
+                $this->need('html');
+                $this->need('csrf');
+                $this->need('writ');
+                $this->need('user');
+                $this->need('note');
+                $this->need('block');
+                $this->writlist = new WritList($this);
                 break;
             case 'html':
             case 'text':

@@ -7,7 +7,7 @@ if (!$app->auth->atLeast('editor')) {
     $app->redirect('');
 }
 $u = $app->auth->user();
-$app->view->start('Editor Writs for ' . $u['name'], 'ewrits', 'editor');
-echo '<h2 class="lt">Writs</h2>';
-$app->writlist->renderEditor('writs-editor.php');
+$app->view->start('Editor Archives', 'locker', 'editor');
+echo '<h2>Editor Archives</h2>';
+$app->writlist->renderEditor('archives-editor.php', 'archived');
 $app->view->end();

@@ -4,7 +4,7 @@ $import = ['auth', 'view', 'html', 'note', 'user'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
 $u = $app->auth->user();
-$app->view->start('Binder', 'binder');
+$app->view->start('Binder', 'binder', 'observer');
 $ids = json_arr($u['observing_json'] ?? '[]');
 echo '<h2 class="lt">Memos for observees</h2>';
 foreach ($ids as $wid) {

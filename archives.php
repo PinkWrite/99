@@ -1,17 +1,13 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'view', 'html', 'writ'];
+$import = ['auth', 'csrf', 'view', 'html', 'writ', 'writlist'];
 require __DIR__ . '/lib/boot.php';
-$u = $app->auth->requireUser();
-$app->view->start('Archives', 'locker');
-echo '<h2 class="lt">Archives</h2>';
-$list = $app->auth->is('writer')
-    ? $app->writ->forWriter($app->auth->id(), 'archived')
-    : $app->writ->forEditor($app->auth->id(), 'archived');
-echo '<table class="list"><tr><th>Title</th><th>Status</th><th></th></tr>';
-foreach ($list as $w) {
-    echo '<tr><td>' . h($w['title']) . '</td><td>' . h($w['draft_status']) . '</td><td>';
-    echo button('Open', 'Open', 'writ.php?w=' . (int) $w['id'], 'editNoteButton') . '</td></tr>';
+$app->auth->requireUser();
+if ($app->auth->is('observer')) {
+    $app->redirect('observer.php');
 }
-echo '</table>';
+$u = $app->auth->user();
+$app->view->start('Archives', 'locker', 'writer');
+echo '<h2 class="lt">Archives</h2>';
+$app->writlist->renderWriter('archives.php', 'archived');
 $app->view->end();

@@ -1,34 +1,67 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'view', 'html', 'writ', 'note', 'user'];
+$import = ['auth', 'csrf', 'view', 'html', 'writ', 'note', 'user', 'block', 'writlist'];
 require __DIR__ . '/lib/boot.php';
 
 if (!$app->auth->user()) {
     $app->redirect('login.php');
 }
+if ($app->auth->is('observer')) {
+    $app->redirect('observer.php');
+}
 $u = $app->auth->user();
-$app->view->start($app->title(), 'dash');
+$uid = $app->auth->id();
+$app->view->start('Dash for ' . $u['name'], 'dash', 'writer');
 echo '<p class="sans dk">Typing and Editing for Learners and Teachers.</p>';
 
-if ($app->auth->is('writer') || $app->auth->is('observer')) {
-    echo '<p>' . button('New writ +', 'Start writing', 'writ.php', 'set_gray') . '</p>';
-    $list = $app->auth->is('writer')
-        ? $app->writ->forWriter($app->auth->id())
-        : [];
-    echo '<h2 class="lt">Writs</h2>';
-    echo '<table class="list"><tr><th>Work</th><th>Title</th><th>Kind</th><th>Status</th><th></th></tr>';
-    foreach ($list as $w) {
-        echo '<tr><td>' . h($w['work']) . '</td><td>' . h($w['title']) . '</td><td>' . h($w['kind']) . '</td><td>' . h($w['draft_status']) . '</td><td>';
-        echo button('Open', 'Open', 'writ.php?w=' . (int) $w['id'], 'editNoteButton');
-        echo ' ' . history_button($app->writ->hasHistory($w), 'history.php?w=' . (int) $w['id']);
-        echo '</td></tr>';
+echo post_button('New note +', 'Start a new note', 'note.php', 'new_note', (string) $uid, 'newNoteButton', $app->csrf->token());
+echo '<br>';
+$pins = $app->note->pinnedFor($uid, 10);
+if ($pins) {
+    $cc = 'lr';
+    echo '<table class="list lt notes sans">';
+    foreach ($pins as $n) {
+        $nid = (int) $n['id'];
+        echo '<tr class="' . $cc . '">';
+        echo '<td><a class="listed_note" href="note.php?n=' . $nid . '">' . h(note_heading($n['body'] ?? '')) . '</a></td>';
+        echo '<td><i class="listed_note">' . h((string) $n['save_date']) . '</i><div style="display:inline;float:right">';
+        echo get_switch('Read', 'Read this note', 'note.php', 'n', (string) $nid, 'act_blue editNoteButton');
+        echo '</div></td><td><div style="display:inline;float:right">';
+        echo post_button('Unpin', 'Unpin from Dashboard', 'note-act.php', 'undash', (string) $nid, 'editNoteButton', $app->csrf->token());
+        echo '</div></td></tr>';
+        $cc = $cc === 'lr' ? 'dr' : 'lr';
     }
     echo '</table>';
 }
 
-if ($app->auth->atLeast('editor')) {
-    echo '<p>' . button('Editor Dash', 'Editor', 'editor.php', 'navDarkButton') . ' ';
-    echo button('New assignment', 'From a memo', 'assignment.php', 'set_gray') . ' ';
-    echo button('New test', 'Compose a test', 'test.php', 'set_gray') . '</p>';
+$memos = $app->note->memosForDash($uid, $app->user->blocksOf($u), 5);
+if ($memos) {
+    echo '<h4>Memos</h4><table class="list lt notes sans"><tbody>';
+    $cc = 'lr';
+    foreach ($memos as $n) {
+        $nid = (int) $n['id'];
+        $who = 'Block: Main';
+        if ((int) $n['editor_set_writer_id'] > 0) {
+            $w = $app->user->find((int) $n['editor_set_writer_id']) ?: [];
+            $who = 'Writer: ' . h((string) ($w['name'] ?? '')) . ' <small>' . h((string) ($w['email'] ?? '')) . '</small>';
+        } elseif ((int) $n['editor_set_block'] > 0) {
+            $b = $app->block->find((int) $n['editor_set_block']) ?: [];
+            $who = 'Block: ' . h((string) ($b['name'] ?? '')) . ' <small>' . h((string) ($b['code'] ?? '')) . '</small>';
+        }
+        echo '<tr class="' . $cc . '">';
+        echo '<td><a class="listed_note" href="note.php?n=' . $nid . '">' . h(note_heading($n['body'] ?? '')) . '</a></td>';
+        echo '<td>' . $who . '</td>';
+        echo '<td><i class="listed_note">' . h((string) $n['save_date']) . '</i></td><td><div style="display:inline;float:right">';
+        echo get_switch('Read', 'Read this note', 'note.php', 'n', (string) $nid, 'act_blue editNoteButton');
+        echo '</div></td></tr>';
+        $cc = $cc === 'lr' ? 'dr' : 'lr';
+    }
+    echo '</tbody></table>';
 }
+echo '<br>';
+echo button('All memos', 'View all notes from your editor and blocks', 'binder.php', 'editNoteButton');
+echo '<br><br>';
+
+echo post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'set_gray', $app->csrf->token());
+$app->writlist->renderWriter('index.php');
 $app->view->end();

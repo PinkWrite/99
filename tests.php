@@ -6,7 +6,7 @@ $app->auth->requireUser();
 if (!$app->auth->atLeast('editor')) {
     $app->redirect('');
 }
-$app->view->start('Tests', 'tests');
+$app->view->start('Tests', 'tests', 'editor');
 echo '<p>' . button('New test', 'Compose', 'test.php', 'newNoteButton') . '</p>';
 echo '<table class="list"><tr><th>Title</th><th>Status</th><th></th></tr>';
 foreach ($app->test->forEditor($app->auth->id()) as $t) {

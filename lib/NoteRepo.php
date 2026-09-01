@@ -110,4 +110,36 @@ final class NoteRepo
             'body' => $n['body'],
         ]);
     }
+
+    public function pin(int $id, int $writerId, bool $pinned): void
+    {
+        $this->app->db->run(
+            'UPDATE notes SET pinned = ? WHERE id = ? AND writer_id = ?',
+            [$pinned ? 1 : 0, $id, $writerId]
+        );
+    }
+
+    public function pinnedFor(int $writerId, int $limit = 10): array
+    {
+        $limit = max(1, min(50, $limit));
+        return $this->app->db->all(
+            "SELECT * FROM notes WHERE pinned = 1 AND writer_id = ? ORDER BY id DESC LIMIT {$limit}",
+            [$writerId]
+        );
+    }
+
+    public function memosForDash(int $writerId, array $blockIds, int $limit = 5): array
+    {
+        $limit = max(1, min(50, $limit));
+        $sql = "SELECT * FROM notes WHERE type IN ('memo','task') AND status = 'live'
+            AND (editor_set_writer_id = ? OR (editor_set_writer_id = 0 AND editor_set_block = 0)";
+        $params = [$writerId];
+        $ids = array_values(array_filter(array_map('intval', $blockIds), static fn ($id) => $id > 0));
+        if ($ids) {
+            $in = implode(',', $ids);
+            $sql .= " OR editor_set_block IN ({$in})";
+        }
+        $sql .= ") ORDER BY save_date DESC LIMIT {$limit}";
+        return $this->app->db->all($sql, $params);
+    }
 }

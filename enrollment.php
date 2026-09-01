@@ -13,9 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST
 $eid = $app->auth->is('editor') ? $app->auth->id() : 0;
 $writers = $eid ? $app->user->writersForEditor($eid) : $app->user->listByFacility($app->auth->facilityId(), 'writer');
 $blocks = $eid ? $app->block->forEditor($eid, false) : $app->block->forFacility($app->auth->facilityId(), false);
-$app->view->start('Enrollment', 'roll');
+$app->view->start('Enrollment', 'roll', 'editor');
 echo '<h2 class="lt">Writers</h2>';
-echo '<p>' . button('Register', 'New', 'register.php', 'set_gray') . '</p>';
+echo '<p>' . button('Register', 'New', 'register.php', 'navDarkButton') . '</p>';
 echo '<table class="list"><tr><th>Name</th><th>Username</th><th>Blocks</th><th></th></tr>';
 foreach ($writers as $w) {
     echo '<tr><td>' . h($w['name']) . '</td><td>' . h($w['username']) . '</td><td>';

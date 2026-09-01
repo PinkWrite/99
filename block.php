@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     ]);
     $b = $app->block->find($bid);
 }
-$app->view->start('Block', 'blocks');
+$app->view->start('Block', 'blocks', 'editor');
 echo '<form method="post">' . $app->csrf->field();
 echo '<input type="hidden" name="b" value="' . $bid . '">';
 echo '<p class="sans">Name <input name="name" value="' . h($b['name']) . '"> Code <input name="code" value="' . h($b['code']) . '"></p>';

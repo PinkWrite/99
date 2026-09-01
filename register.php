@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         $msg = ucfirst($type) . ' created.';
     }
 }
-$app->view->start('Register', 'roll');
+$app->view->start('Register', 'roll', 'editor');
 echo '<h2 class="lt">Register</h2>';
 if ($err) {
     echo '<p class="sans noticered">' . h($err) . '</p>';

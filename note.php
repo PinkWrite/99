@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_note']) && $app->
     $app->redirect('note.php?n=' . $id);
 }
 
-$nid = (int) ($_GET['n'] ?? $_POST['note_id'] ?? 0);
+$nid = (int) ($_GET['n'] ?? $_GET['v'] ?? $_POST['note_id'] ?? 0);
 $n = $nid ? $app->note->find($nid) : null;
 if ($n && (int) $n['writer_id'] === $uid) {
     $app->note->markRead($nid);
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['copy_memo']) && $n &&
     $app->redirect('note.php?n=' . $mid);
 }
 
-$app->view->start($app->auth->atLeast('editor') ? 'Memo' : 'Note', $app->auth->atLeast('editor') ? 'binder' : 'notes');
+$app->view->start($app->auth->atLeast('editor') ? 'Memo' : 'Note', $app->auth->atLeast('editor') ? 'binder' : 'notes', $app->auth->atLeast('editor') ? 'editor' : 'writer');
 echo '<p>' . post_button($app->auth->atLeast('editor') ? 'New memo +' : 'New note +', 'Create', 'note.php', 'new_note', '1', 'newNoteButton', $app->csrf->token()) . '</p>';
 if (!$n) {
     echo '<p class="sans">Open one from the binder, or create new.</p>';

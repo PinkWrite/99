@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && $memo) {
     $msg = count($ids) . ' assignment(s) created.';
 }
 
-$app->view->start('Assignment', 'ewrits');
+$app->view->start('Assignment', 'assign', 'editor');
 echo '<h2 class="lt">Assignment</h2>';
 echo '<p class="sans dk">An assignment is a writ with a memo attached as instructions.</p>';
 if ($msg) {

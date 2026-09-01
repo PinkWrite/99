@@ -13,7 +13,7 @@ if ($app->auth->atLeast('editor') && !$ids) {
         $ids[] = (int) $wr['id'];
     }
 }
-$app->view->start('Observer', 'observer');
+$app->view->start('Observer', 'observer', 'observer');
 echo '<h2 class="lt">Observees</h2>';
 echo '<table class="list"><tr><th>Writer</th><th>Writs</th></tr>';
 foreach ($ids as $id) {

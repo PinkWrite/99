@@ -11,11 +11,12 @@ final class View
         $this->app = $app;
     }
 
-    public function start(string $pageTitle, string $active = ''): void
+    public function start(string $pageTitle, string $active = '', string $dash = 'auto'): void
     {
         $this->started = true;
         $title = $pageTitle . ' :: ' . $this->app->title();
         $u = $this->app->auth->user();
+        $dash = $this->resolveDash($u, $active, $dash);
         echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">' . "\n";
         echo '<html xmlns="http://www.w3.org/1999/xhtml"><head>';
         echo '<link rel="shortcut icon" type="image/png" href="favicon.png"/>';
@@ -26,11 +27,15 @@ final class View
         echo '<meta http-equiv="Cache-Control" content="no-cache" />';
         echo '<title>' . h($title) . '</title></head><body><div id="wrap">';
         if ($u) {
-            $this->topNav($u, $active);
+            $this->topNav($u, $active, $dash);
         }
         echo '<div id="header" class="header"></div><div class="page"><div class="content">';
         if ($u && $active !== 'login') {
-            $this->dashNav($u, $active, $pageTitle);
+            $this->dashNav($u, $active, $pageTitle, $dash);
+        }
+        if (!empty($_SESSION['act_message'])) {
+            echo $_SESSION['act_message'];
+            unset($_SESSION['act_message']);
         }
     }
 
@@ -46,9 +51,37 @@ final class View
         echo '</div></div></body></html>';
     }
 
-    private function topNav(array $u, string $active): void
+    public function setFlash(string $msg, bool $ok = true): void
+    {
+        $_SESSION['act_message'] = $this->notice($msg, $ok);
+    }
+
+    private function resolveDash(?array $u, string $active, string $dash): string
+    {
+        if (in_array($dash, ['writer', 'editor', 'observer'], true)) {
+            return $dash;
+        }
+        $type = (string) ($u['type'] ?? '');
+        if (in_array($active, ['observer', 'owrits'], true) || $type === 'observer') {
+            return 'observer';
+        }
+        if (in_array($active, ['editor', 'ewrits', 'roll', 'tests', 'enrollment', 'assign'], true)) {
+            return 'editor';
+        }
+        return 'writer';
+    }
+
+    private function topNav(array $u, string $active, string $dash): void
     {
         $is = fn ($k) => $active === $k ? 'activedash' : '';
+        $editorTop = $dash === 'editor' ? 'activedash' : $is('editor');
+        $observerTop = $dash === 'observer' ? 'activedash' : $is('observer');
+        $myTop = $dash === 'writer' && in_array($active, ['dash', 'writs', 'notes', 'blocks', 'binder', 'locker'], true)
+            ? 'activedash'
+            : $is('dash');
+        if ($active === 'dash') {
+            $myTop = 'activedash';
+        }
         echo '<div id="top_menu_nav"><div id="topnav"><ul class="topnav">';
         echo '<li><h1><a class="dklink" href="' . h($this->app->url('')) . '">PinkWrite 99</a></h1></li>';
         echo '<li class="user">' . button('Logout', 'Exit from this login session', 'logout.php', 'navButton user') . '</li>';
@@ -58,19 +91,19 @@ final class View
                 echo '<li class="user">' . button('Super', 'Facilities', 'super.php', 'navButton user ' . $is('super')) . '</li>';
             }
             echo '<li class="user">' . button('Admin Dash', 'Admin', 'admin.php', 'navButton user ' . $is('admin')) . '</li>';
-            echo '<li class="user">' . button('Editor Dash', 'Editor', 'editor.php', 'navButton user ' . $is('editor')) . '</li>';
-            echo '<li class="user">' . button('Observer Dash', 'Observer', 'observer.php', 'navButton user ' . $is('observer')) . '</li>';
+            echo '<li class="user">' . button('Editor Dash', 'Editor', 'editor.php', 'navButton user ' . $editorTop) . '</li>';
+            echo '<li class="user">' . button('Observer Dash', 'Observer', 'observer.php', 'navButton user ' . $observerTop) . '</li>';
         } elseif ($type === 'editor') {
-            echo '<li class="user">' . button('Editor Dash', 'Editor', 'editor.php', 'navButton user ' . $is('editor')) . '</li>';
-            echo '<li class="user">' . button('Observer Dash', 'Observer', 'observer.php', 'navButton user ' . $is('observer')) . '</li>';
+            echo '<li class="user">' . button('Editor Dash', 'Editor', 'editor.php', 'navButton user ' . $editorTop) . '</li>';
+            echo '<li class="user">' . button('Observer Dash', 'Observer', 'observer.php', 'navButton user ' . $observerTop) . '</li>';
         } elseif ($type === 'observer') {
-            echo '<li class="user">' . button('Observer Dash', 'Observer', 'observer.php', 'navButton user ' . $is('observer')) . '</li>';
+            echo '<li class="user">' . button('Observer Dash', 'Observer', 'observer.php', 'navButton user ' . $observerTop) . '</li>';
         }
-        echo '<li class="user">' . button('My Dash', 'Home', $this->app->url(''), 'navButton user ' . $is('dash')) . '</li>';
+        echo '<li class="user">' . button('My Dash', 'Home', $this->app->url(''), 'navButton user ' . $myTop) . '</li>';
         echo '</ul></div></div>';
     }
 
-    private function dashNav(array $u, string $active, string $greeting): void
+    private function dashNav(array $u, string $active, string $greeting, string $dash): void
     {
         $is = fn ($k) => $active === $k ? 'active' : '';
         $n = 0;
@@ -81,27 +114,31 @@ final class View
         }
         $noteLabel = $n > 0 ? "Notifications ({$n})" : 'Notifications';
         $type = $u['type'];
+        $dash = $this->resolveDash($u, $active, $dash);
+        $locker = $dash === 'editor'
+            ? 'locker-editor.php'
+            : ($dash === 'observer' ? 'locker-observer.php' : $this->lockerFor($type));
         echo '<div class="dash_menu_nav"><div class="dashnav"><ul class="dashnav">';
         echo '<li class="lt sans">' . h($greeting) . '</li>';
-        echo '<li class="user">' . button('Locker', 'Open your locker', $this->lockerFor($type), 'navDarkButton user ' . $is('locker')) . '</li>';
+        echo '<li class="user">' . button('Locker', 'Open your locker', $locker, 'navDarkButton user ' . $is('locker')) . '</li>';
         echo '<li class="user">' . button($noteLabel, 'Notifications', 'notifications.php', 'navDarkButton user ' . $is('notify')) . '</li>';
-        if ($type === 'writer' || $this->app->auth->atLeast('editor')) {
-            echo '<li class="user">' . button('Binder', 'Memos', $this->binderFor($type), 'navDarkButton user ' . $is('binder')) . '</li>';
-        }
-        if ($type === 'writer') {
-            echo '<li class="user">' . button('Notes', 'Notes', 'notes.php', 'navDarkButton user ' . $is('notes')) . '</li>';
-            echo '<li class="user">' . button('Writs', 'Writs', 'writs.php', 'navDarkButton user ' . $is('writs')) . '</li>';
-        }
-        if ($this->app->auth->atLeast('editor')) {
-            echo '<li class="user">' . button('Roll', 'Writers', 'enrollment.php', 'navDarkButton user ' . $is('roll')) . '</li>';
-            echo '<li class="user">' . button('Blocks', 'Blocks', 'blocks.php', 'navDarkButton user ' . $is('blocks')) . '</li>';
-            echo '<li class="user">' . button('Writs', 'Writs', 'writs-editor.php', 'navDarkButton user ' . $is('ewrits')) . '</li>';
-            echo '<li class="user">' . button('Tests', 'Tests', 'tests.php', 'navDarkButton user ' . $is('tests')) . '</li>';
-        }
-        if ($type === 'observer') {
+        if ($dash === 'observer') {
             echo '<li class="user">' . button('Writs', 'Writs', 'writs-observer.php', 'navDarkButton user ' . $is('owrits')) . '</li>';
+        } elseif ($dash === 'editor') {
+            echo '<li class="user">' . button('Binder', 'List memos', 'binder-editor.php', 'navDarkButton user ' . $is('binder')) . '</li>';
+            echo '<li class="user">' . button('Roll', 'List writers', 'enrollment.php', 'navDarkButton user ' . $is('roll')) . '</li>';
+            echo '<li class="user">' . button('Blocks', 'List blocks', 'blocks-editor.php', 'navDarkButton user ' . $is('blocks')) . '</li>';
+            echo '<li class="user">' . button('Writs', 'List writs', 'writs-editor.php', 'navDarkButton user ' . $is('ewrits')) . '</li>';
+            echo '<li class="user">' . button('New assignment', 'From a memo', 'assignment.php', 'navDarkButton user ' . $is('assign')) . '</li>';
+            echo '<li class="user">' . button('New test', 'Compose a test', 'test.php', 'navDarkButton user ' . $is('tests')) . '</li>';
+        } else {
+            echo '<li class="user">' . button('Binder', 'View memos & tasks', 'binder.php', 'navDarkButton user ' . $is('binder')) . '</li>';
+            echo '<li class="user">' . button('Notes', 'View notes', 'notes.php', 'navDarkButton user ' . $is('notes')) . '</li>';
+            echo '<li class="user">' . button('Blocks', 'View blocks', 'blocks.php', 'navDarkButton user ' . $is('blocks')) . '</li>';
+            echo '<li class="user">' . button('Writs', 'View writs', 'writs.php', 'navDarkButton user ' . $is('writs')) . '</li>';
         }
-        echo '<li class="user lt sans">' . h($u['name']) . ' (' . h($type) . ')</li>';
+        $label = $dash === 'editor' ? 'Editor' : ($dash === 'observer' ? 'Observer' : 'Dash');
+        echo '<li class="user lt sans">' . h($u['name']) . ' (' . h($label) . ')</li>';
         echo '</ul></div></div>';
     }
 
@@ -113,15 +150,6 @@ final class View
             'editor' => 'locker-editor.php',
             'observer' => 'locker-observer.php',
             default => 'locker.php',
-        };
-    }
-
-    private function binderFor(string $type): string
-    {
-        return match ($type) {
-            'editor', 'supervisor', 'admin', 'superintendent' => 'binder-editor.php',
-            'observer' => 'binder-observer.php',
-            default => 'binder.php',
         };
     }
 

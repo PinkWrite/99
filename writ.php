@@ -49,7 +49,7 @@ if ($wid && $w && (int) $w['writer_id'] === $uid) {
     $app->writ->markViewed($wid, $uid);
 }
 
-$app->view->start('Writ', 'writs');
+$app->view->start('Writ', 'writs', 'writer');
 echo '<p>' . post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'newNoteButton', $app->csrf->token()) . '</p>';
 
 if (!$w) {

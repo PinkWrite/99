@@ -1,14 +1,16 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'note'];
+$import = ['auth', 'csrf', 'view', 'html', 'note', 'writlist'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
-$app->view->start('Notes', 'notes');
-echo '<p>' . post_button('New note +', 'Create', 'note.php', 'new_note', '1', 'newNoteButton', $app->csrf->token()) . '</p>';
-echo '<table class="list"><tr><th>Updated</th><th>Preview</th><th></th></tr>';
-foreach ($app->note->forWriter($app->auth->id(), 'note') as $n) {
-    echo '<tr><td>' . h($n['save_date']) . '</td><td>' . h(substr((string) $n['body'], 0, 80)) . '</td><td>';
-    echo button('Open', 'Open', 'note.php?n=' . (int) $n['id'], 'editNoteButton') . '</td></tr>';
+if ($app->auth->is('observer')) {
+    $app->redirect('observer.php');
 }
-echo '</table>';
+$app->view->start('Notes', 'notes', 'writer');
+echo '<br>';
+echo button('Memos →', 'View all notes from your editor and blocks', 'binder.php', 'editNoteButton');
+echo '<h2 class="lt">My Notes</h2>';
+echo post_button('New note +', 'Start a new note', 'note.php', 'new_note', (string) $app->auth->id(), 'newNoteButton', $app->csrf->token());
+echo '<br>';
+$app->writlist->renderNotes('notes.php');
 $app->view->end();
