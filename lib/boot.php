@@ -20,24 +20,49 @@ require $pw99Root . '/functions/text.php';
 $configFile = $pw99Root . '/config.php';
 $installing = (defined('PW99_INSTALLING') && PW99_INSTALLING === true);
 
+$stub = static function () use ($pw99Root, $import): App {
+    $app = new App($pw99Root, [
+        'configured' => false,
+        'host' => '',
+        'site_title' => 'PinkWrite 99',
+        'db' => [],
+        'mail' => ['transport' => 'off'],
+    ], null);
+    $app->load($import);
+    return $app;
+};
+
 if (!is_file($configFile)) {
     if ($installing) {
-        $app = new App($pw99Root, [
-            'configured' => false,
-            'host' => '',
-            'site_title' => 'PinkWrite 99',
-            'db' => [],
-            'mail' => ['transport' => 'off'],
-        ], null);
-        $app->load($import);
+        $app = $stub();
         return;
     }
     header('Location: install.php');
     exit;
 }
 
-$config = require $configFile;
-if (!is_array($config) || empty($config['configured'])) {
+try {
+    $config = require $configFile;
+} catch (Throwable $e) {
+    if ($installing) {
+        $app = $stub();
+        $app->bootError = $e->getMessage();
+        return;
+    }
+    throw $e;
+}
+
+if (!is_array($config)) {
+    if ($installing) {
+        $app = $stub();
+        $app->bootError = 'config.php did not return an array.';
+        return;
+    }
+    header('Location: install.php');
+    exit;
+}
+
+if (empty($config['configured'])) {
     if (!$installing) {
         header('Location: install.php');
         exit;
@@ -64,4 +89,12 @@ if (!empty($config['db']['name'])) {
 }
 
 $app = new App($pw99Root, $config, $db);
-$app->load($import);
+try {
+    $app->load($import);
+} catch (Throwable $e) {
+    if ($installing) {
+        $app->bootError = $e->getMessage();
+        return;
+    }
+    throw $e;
+}
