@@ -18,6 +18,10 @@ function pw99_migrate(App $app): string
     if ($db->tableExists('users') && !$db->columnExists('users', 'facility_id')) {
         $notes[] = pw99_legacy_lift($db);
     }
+    $promo = pw99_ensure_superintendent($db);
+    if ($promo !== '') {
+        $notes[] = $promo;
+    }
     $ver = (int) ($db->val('SELECT MAX(version) FROM schema_version') ?? 0);
     if ($ver < 1) {
         $db->run('INSERT INTO schema_version (version, note) VALUES (1, ?)', ['initial']);
@@ -178,4 +182,24 @@ function pw99_legacy_lift(Db $db): string
 
     pw99_apply_schema_file($db, dirname(__DIR__) . '/sql/schema.sql');
     return 'legacy dump lifted into facility ' . $fid;
+}
+
+function pw99_ensure_superintendent(Db $db): string
+{
+    if (!$db->tableExists('users') || !$db->columnExists('users', 'type')) {
+        return '';
+    }
+    $sid = $db->val("SELECT id FROM users WHERE type = 'superintendent' ORDER BY id LIMIT 1");
+    if ($sid) {
+        return '';
+    }
+    $aid = $db->val("SELECT id FROM users WHERE type = 'admin' ORDER BY id LIMIT 1");
+    if (!$aid) {
+        $aid = $db->val('SELECT id FROM users ORDER BY id LIMIT 1');
+    }
+    if (!$aid) {
+        return '';
+    }
+    $db->run('UPDATE users SET type = ?, facility_id = NULL WHERE id = ?', ['superintendent', (int) $aid]);
+    return 'promoted user ' . $aid . ' to superintendent';
 }
