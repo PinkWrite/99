@@ -18,10 +18,24 @@ Arch/Debian/RPM builders live in [99-package](https://github.com/PinkWrite/99-pa
 Edit `config.php` (`mail` key). SMTP password lives there on purpose. This is SysAdmin work.
 
 ## Update / old dump
+Do **not** run `install.php` on a live old database. That writes an empty schema.
+
+1. Clone **master** into the web folder.
+2. Create an empty MariaDB database. Import the old dump into it (not on top of `sql/schema.sql`).
+3. Copy `config.sample.php` to `config.php`. Set `db.host` to `127.0.0.1`, plus name/user/pass, and `host` (scheme-less).
+4. Lift once:
+
 ```
 php bin/update.php
 ```
-Import a legacy dump first; the updater lifts it once.
+
+Same SQL, if you would rather run it by hand:
+
+```
+mysql -u USER -p DATABASE < sql/legacy-lift.sql
+```
+
+Old column names stay. New columns (`groups_json`, `editor_id`, `block_id`, `kind`, `facilities`, …) are added and copied. Then log in with an existing account.
 
 ## Nginx
 ```
