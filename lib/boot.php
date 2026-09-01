@@ -52,6 +52,7 @@ if (!empty($config['db']['name'])) {
         if ($installing) {
             $app = new App($pw99Root, $config, null);
             $app->bootError = $e->getMessage();
+            $app->load($import);
             return;
         }
         http_response_code(500);
