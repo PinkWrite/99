@@ -12,7 +12,7 @@ session_start();
 DEFINE ('DB_NAME', 'pinkwrite99database');
 DEFINE ('DB_USER', 'pinkwrite99user');
 DEFINE ('DB_PASSWORD', 'pinkwrite99password');
-DEFINE ('DB_HOST', 'localhost');
+DEFINE ('DB_HOST', '127.0.0.1');
 
 // Home URL base
 DEFINE ('PW99_HOME', 'https://99.pinkwrite.com');
@@ -27,7 +27,9 @@ $config = [
 ];
 
 // Make the connection & character set
-$dbc = mysqli_connect (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+// TCP. "localhost" is a Unix socket and fatals if the sock file is missing.
+$db_host = (DB_HOST === 'localhost') ? '127.0.0.1' : DB_HOST;
+$dbc = mysqli_connect ($db_host, DB_USER, DB_PASSWORD, DB_NAME);
 mysqli_set_charset($dbc, 'utf8');
 
 // Friendly variables

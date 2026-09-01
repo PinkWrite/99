@@ -51,15 +51,19 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['db_inputs'])) && (
       $reg_errors['db_pass'] = '64 character max, only alphanumeric characters and _ % # @ ! ? \' ‘ : ; , . * ^ & % $ + = - ~ | / ( ) < > { }';
     }
 
-    // This test (on two lines to make is easy to read) checks for either a valid URL starting with https:// or 'localhost'
-    $db_host =
-      ( ((filter_var($_POST['db_host'],FILTER_VALIDATE_URL)) && (substr($_POST['db_host'], 0, 8) === "https://"))
-      || ($_POST['db_host'] == 'localhost') )
-    ? $_POST['db_host'] : '';
+    // TCP. "localhost" is a Unix socket and fatals if the sock file is missing.
+    $raw_host = trim((string) ($_POST['db_host'] ?? ''));
+    if ($raw_host === 'localhost') {
+      $db_host = '127.0.0.1';
+    } elseif (filter_var($raw_host, FILTER_VALIDATE_IP) || preg_match('/^[A-Za-z0-9.-]+$/', $raw_host)) {
+      $db_host = $raw_host;
+    } else {
+      $db_host = '';
+    }
     if ($db_host == '') {
       echo '<p class="error">Not a valid database host!</p>';
       $no_db_cred_errors = false;
-      $reg_errors['db_host'] = 'Must be "localhost" or a valid URL using https://';
+      $reg_errors['db_host'] = 'Use 127.0.0.1 (TCP). "localhost" is remapped; hostnames and IPs are allowed.';
     }
 
     // Site title
@@ -112,7 +116,8 @@ DEFINE ('SITE_TITLE', '$siteTitle');
 ];
 
 // Make the connection & character set
-\$dbc = mysqli_connect (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+\$db_host = (DB_HOST === 'localhost') ? '127.0.0.1' : DB_HOST;
+\$dbc = mysqli_connect (\$db_host, DB_USER, DB_PASSWORD, DB_NAME);
 mysqli_set_charset(\$dbc, 'utf8');
 
 // Friendly variables
@@ -441,7 +446,8 @@ DEFINE ('SITE_TITLE', '$siteTitle');
 ];
 
 // Make the connection & character set
-\$dbc = mysqli_connect (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+\$db_host = (DB_HOST === 'localhost') ? '127.0.0.1' : DB_HOST;
+\$dbc = mysqli_connect (\$db_host, DB_USER, DB_PASSWORD, DB_NAME);
 mysqli_set_charset(\$dbc, 'utf8');
 
 // Friendly variables
@@ -550,7 +556,7 @@ if ($no_title_errors == false) {
   Database password: <input type="text" name="db_pass"';
   echo (array_key_exists('db_pass', $reg_errors)) ? ' class="noticered"><span class="noticered">'.$reg_errors['db_pass'].'</span>' : '>' ;
   echo '><br><br>
-  Database host: (leave as <i>localhost</i> unless told otherwise) <input type="text" name="db_host" value="localhost"';
+  Database host: (use <i>127.0.0.1</i>, not localhost) <input type="text" name="db_host" value="127.0.0.1"';
   echo (array_key_exists('db_host', $reg_errors)) ? ' class="noticered"><span class="noticered">'.$reg_errors['db_host'].'</span>' : '>' ;
   echo '><br><br>
   </p>';
