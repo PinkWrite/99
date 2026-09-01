@@ -33,27 +33,34 @@ final class UserRepo
         if (is_array($prefs)) {
             $prefs = json_enc($prefs);
         }
-        $this->app->db->run(
-            'INSERT INTO users (type, facility_id, username, email, name, project, level, groups_json, blocks_json, observing_json, editor_id, status, pass, notify_prefs)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            [
-                $row['type'],
-                $row['facility_id'] ?? null,
-                $row['username'],
-                $row['email'],
-                $row['name'],
-                $row['project'] ?? null,
-                $row['level'] ?? 0,
-                $row['groups_json'] ?? '[]',
-                $row['blocks_json'] ?? '[]',
-                $row['observing_json'] ?? '[]',
-                $row['editor_id'] ?? null,
-                $row['status'] ?? 'active',
-                $row['pass'],
-                $prefs,
-            ]
-        );
-        return (int) $this->app->db->lastId();
+        $empty = $row['groups_json'] ?? '[]';
+        $cols = 'type, facility_id, username, email, name, project, level, groups_json, blocks_json, observing_json, editor_id, status, pass, notify_prefs';
+        $vals = [
+            $row['type'],
+            $row['facility_id'] ?? null,
+            $row['username'],
+            $row['email'],
+            $row['name'],
+            $row['project'] ?? null,
+            $row['level'] ?? 0,
+            $empty,
+            $row['blocks_json'] ?? '[]',
+            $row['observing_json'] ?? '[]',
+            $row['editor_id'] ?? null,
+            $row['status'] ?? 'active',
+            $row['pass'],
+            $prefs,
+        ];
+        $db = $this->app->db;
+        foreach (['groups' => $empty, 'blocks' => $row['blocks_json'] ?? '[]', 'observing' => $row['observing_json'] ?? '[]'] as $legacy => $v) {
+            if ($db->columnExists('users', $legacy)) {
+                $cols .= ', `' . $legacy . '`';
+                $vals[] = $v;
+            }
+        }
+        $q = rtrim(str_repeat('?,', count($vals)), ',');
+        $db->run("INSERT INTO users ({$cols}) VALUES ({$q})", $vals);
+        return (int) $db->lastId();
     }
 
     public function setPassword(int $id, string $plain): void

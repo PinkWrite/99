@@ -22,6 +22,10 @@ function pw99_migrate(App $app): string
     if ($promo !== '') {
         $notes[] = $promo;
     }
+    $soft = pw99_soften_legacy_notnull($db);
+    if ($soft !== '') {
+        $notes[] = $soft;
+    }
     $ver = (int) ($db->val('SELECT MAX(version) FROM schema_version') ?? 0);
     if ($ver < 1) {
         $db->run('INSERT INTO schema_version (version, note) VALUES (1, ?)', ['initial']);
@@ -202,4 +206,28 @@ function pw99_ensure_superintendent(Db $db): string
     }
     $db->run('UPDATE users SET type = ?, facility_id = NULL WHERE id = ?', ['superintendent', (int) $aid]);
     return 'promoted user ' . $aid . ' to superintendent';
+}
+
+function pw99_soften_legacy_notnull(Db $db): string
+{
+    $pdo = $db->pdo();
+    $did = [];
+    foreach (['groups', 'blocks', 'observing'] as $col) {
+        if (!$db->columnExists('users', $col)) {
+            continue;
+        }
+        try {
+            $pdo->exec("ALTER TABLE users MODIFY `{$col}` JSON NULL");
+            $did[] = 'users.' . $col;
+        } catch (PDOException $e) {
+        }
+    }
+    if ($db->columnExists('notes', 'group')) {
+        try {
+            $pdo->exec('ALTER TABLE notes MODIFY `group` BIGINT UNSIGNED NULL DEFAULT 0');
+            $did[] = 'notes.group';
+        } catch (PDOException $e) {
+        }
+    }
+    return $did ? 'legacy not-null ' . implode(',', $did) : '';
 }
