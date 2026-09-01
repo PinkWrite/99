@@ -22,7 +22,7 @@ Walk-in Superintendent recovery: set `allow_create_super` to `true` in config, o
 - Pulls GitHub `master`, never overwrites `config.php`, runs SQL migrations.
 
 ## Migrating an old dump
-Import the old database first, then run the updater once. It adds `facilities`, `drafts`/`redrafts` JSON, tests, notifications, 2FA/passkey columns, and maps everyone to a Home facility.
+The mysqli-era tree and `sql/legacy-lift.sql` live on the [legacy](https://github.com/PinkWrite/99/tree/legacy) branch. Read that README. Import the dump into an empty database, then `php bin/update.php` on master (same lift in PHP).
 
 ## Roles
 | Role | Seat |
