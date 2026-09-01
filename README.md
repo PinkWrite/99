@@ -42,6 +42,28 @@ Teachers, tutors, parents, and other educators can use this to ensure that stude
 ## Admin recovery
 - Download and place `install.php` from the web folder to create a new admin to regain access
 
+## Migrating this tree to master
+This branch is the old mysqli app (`pw99-config.php`). [master](https://github.com/PinkWrite/99/tree/master) is the current PDO app (`config.php`).
+
+1. Dump the live database.
+2. Create an empty MariaDB database. Import the dump. Do **not** run master's `install.php` on it (that writes an empty schema).
+3. Lift the dump (this file is on **this** branch):
+
+```
+mysql -u USER -p DATABASE < sql/legacy-lift.sql
+```
+
+4. Put **master** in the web folder (`git clone -b master` or switch the vapp to master). Copy `config.sample.php` to `config.php`. Database host is `127.0.0.1` (TCP), not `localhost`.
+5. From the master web root:
+
+```
+php bin/update.php
+```
+
+That is the same lift in PHP, plus later schema versions. Safe to run more than once. Superintendents and Admins can also use **Update app** in the locker.
+
+Old column names stay. New columns (`groups_json`, `editor_id`, `block_id`, `kind`, `facilities`, …) are added and copied. Then log in with an existing account.
+
 ## Bugs & Contribution
 
 This is a collaborative effort. ***If you find any bugs or security vulnerabilities, please*** fork and request a pull on [GitHub](https://github.com/PinkWrite/99)!
