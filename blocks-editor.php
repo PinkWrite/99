@@ -37,5 +37,5 @@ foreach ($editors as $ed) {
 }
 echo '</select></p>';
 echo '<p><input type="submit" name="create" class="lt_button" value="Create block"></p></form>';
-$app->writlist->renderEditorBlocks('blocks-editor.php');
+$app->writlist->renderEditorBlocks('blocks-editor.php', 'admin');
 $app->view->end();

@@ -96,6 +96,14 @@ final class NoteRepo
         );
     }
 
+    public function memosForBlock(int $blockId): array
+    {
+        return $this->app->db->all(
+            'SELECT * FROM notes WHERE type IN (\'memo\',\'task\') AND status = \'live\' AND editor_set_block = ? ORDER BY id DESC',
+            [$blockId]
+        );
+    }
+
     public function copyNoteToMemo(int $noteId, int $editorId): int
     {
         $n = $this->find($noteId);

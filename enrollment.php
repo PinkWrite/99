@@ -14,6 +14,13 @@ $writers = $app->user->listByFacility($app->auth->facilityId(), 'writer');
 $blocks = $app->block->forFacility($app->auth->facilityId(), false);
 $app->view->start('Writers', 'writers', 'admin');
 echo '<h2 class="lt">Writers</h2>';
+$focus = (int) ($_GET['b'] ?? 0);
+if ($focus > 0) {
+    $fb = $app->block->find($focus);
+    if ($fb) {
+        echo '<p class="sans dk">Block: ' . h($app->block->named($fb)) . '</p>';
+    }
+}
 echo '<p class="sans dk">Writers and the blocks they belong to.</p>';
 echo '<p>' . button('New writer +', 'Register a writer', 'register.php?type=writer', 'newNoteButton') . '</p>';
 echo '<table class="list roll lt sans"><tr><th>Name</th><th>Username</th><th>Blocks</th><th></th></tr>';

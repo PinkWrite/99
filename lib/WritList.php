@@ -154,13 +154,14 @@ final class WritList
         );
     }
 
-    public function renderEditorBlocks(string $whereAmI): void
+    public function renderEditorBlocks(string $whereAmI, string $view = 'editor'): void
     {
+        $admin = $view === 'admin';
         $uid = $this->app->auth->id();
         $st = $this->listState($whereAmI, ['creation', 'name', 'code'], 'creation');
         $where = ["b.status = 'open'"];
         $params = [];
-        if ($this->app->auth->is('editor')) {
+        if (!$admin && $this->app->auth->is('editor')) {
             $where[] = 'b.editor_id = ?';
             $params[] = $uid;
         } elseif ($this->app->auth->facilityId()) {
@@ -179,27 +180,44 @@ final class WritList
             "SELECT COUNT(*) FROM blocks b WHERE " . implode(' AND ', $where),
             $params,
             "SELECT b.*, u.name AS editor_name FROM blocks b LEFT JOIN users u ON u.id = b.editor_id WHERE " . implode(' AND ', $where) . " ORDER BY {$order}",
-            function (array $rows) use ($st, $me) {
-                echo '<table class="list sans lt"><tbody>';
-                echo '<tr><th>Name</th><th>Code</th><th>Editor</th><th><div style="display:inline;float:right">Writs</div></th><th><div style="display:inline;float:right">Writers</div></th><th><div style="display:inline;float:right">Memos</div></th></tr>';
-                if ($st['q'] === '') {
+            function (array $rows) use ($st, $me, $admin) {
+                echo '<table class="list sans lt"><tbody><tr><th>Name</th><th>Code</th><th>Editor</th>';
+                if ($admin) {
+                    echo '<th><div style="display:inline;float:right">Writers</div></th>';
+                    echo '<th><div style="display:inline;float:right">Writs</div></th>';
+                    echo '<th><div style="display:inline;float:right">Memos</div></th>';
+                } else {
+                    echo '<th><div style="display:inline;float:right">Writs</div></th>';
+                    echo '<th><div style="display:inline;float:right">Memos</div></th>';
+                }
+                echo '</tr>';
+                if (!$admin && $st['q'] === '' && $this->app->auth->is('editor')) {
                     echo '<tr><td><a class="listed_note" href="writs-editor.php?v=0"><b>Main</b></a></td><td></td>';
                     echo '<td>' . h((string) ($me['name'] ?? '')) . '</td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in your main Block', 'writs-editor.php', 'v', '0', 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . button('Writers', 'List writers in Main block', 'enrollment.php', 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . button('Block notes', 'List memos for this block', 'memos-editor.php', 'editNoteButton') . '</div></td>';
+                    echo '<td><div style="display:inline;float:right">' . button('Block memos', 'List memos for Main block', 'memos-editor.php', 'editNoteButton') . '</div></td>';
                     echo '</tr>';
                 }
                 $cc = 'lr';
                 foreach ($rows as $b) {
                     $id = (int) $b['id'];
                     echo '<tr class="' . $cc . '">';
-                    echo '<td><a class="listed_note" href="block.php?b=' . $id . '"><b>' . h((string) $b['name']) . '</b></a></td>';
-                    echo '<td><a class="listed_note" href="block.php?b=' . $id . '">' . h((string) $b['code']) . '</a></td>';
+                    if ($admin) {
+                        echo '<td><a class="listed_note" href="block.php?b=' . $id . '"><b>' . h((string) $b['name']) . '</b></a></td>';
+                        echo '<td><a class="listed_note" href="block.php?b=' . $id . '">' . h((string) $b['code']) . '</a></td>';
+                    } else {
+                        echo '<td><a class="listed_note" href="writs-editor.php?v=' . $id . '"><b>' . h((string) $b['name']) . '</b></a></td>';
+                        echo '<td><a class="listed_note" href="writs-editor.php?v=' . $id . '">' . h((string) $b['code']) . '</a></td>';
+                    }
                     echo '<td>' . h((string) ($b['editor_name'] ?? '')) . '</td>';
-                    echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in this Block', 'writs-editor.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . button('Writers', 'List writers', 'enrollment.php', 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . get_switch('Block notes', 'List memos for this block', 'memos-editor.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
+                    if ($admin) {
+                        echo '<td><div style="display:inline;float:right">' . get_switch('Writers', 'List writers in this block', 'enrollment.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
+                        echo '<td><div style="display:inline;float:right">' . get_switch('View', 'View writs in this block', 'block-writs.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
+                        echo '<td><div style="display:inline;float:right">' . get_switch('View', 'View memos for this block', 'block-memos.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
+                    } else {
+                        echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in this Block', 'writs-editor.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
+                        echo '<td><div style="display:inline;float:right">' . get_switch('Block memos', 'List memos for this block', 'memos-editor.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
+                    }
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
@@ -210,7 +228,7 @@ final class WritList
                 'name' => ['Name', 'Sort by name'],
                 'code' => ['Code', 'Sort by code'],
             ],
-            'searchformeditorblocks',
+            $admin ? 'searchformadminblocks' : 'searchformeditorblocks',
             true
         );
     }
