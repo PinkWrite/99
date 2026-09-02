@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'user'];
+$import = ['auth', 'csrf', 'view', 'html', 'user', 'audit'];
 require __DIR__ . '/lib/boot.php';
 $u = $app->auth->requireUser();
 $uid = $app->auth->id();
@@ -9,6 +9,7 @@ $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST['save_contact'])) {
     try {
         $app->user->saveContact($uid, (string) ($_POST['name'] ?? ''), (string) ($_POST['email'] ?? ''));
+        $app->audit->record($uid, 'contact', 'name/email');
         $app->view->setFlash('Saved.');
         $app->redirect('locker.php');
     } catch (InvalidArgumentException $e) {

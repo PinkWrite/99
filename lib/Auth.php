@@ -130,6 +130,9 @@ final class Auth
         $u = $this->app->user->findByUsername($username);
         if (!$u || empty($u['pass']) || !password_verify($pass, $u['pass'])) {
             $this->app->clickathon->fail($ip, $username);
+            if ($u) {
+                $this->logAccount((int) $u['id'], 'login_fail', 'password', 0);
+            }
             return 'bad';
         }
         if ($u['status'] !== 'active') {
@@ -150,6 +153,7 @@ final class Auth
         if (!empty($u['totp_enabled'])) {
             if ($via !== 'password' && $this->deviceTrusted((int) $u['id'])) {
                 $this->establish($u);
+                $this->logAccount((int) $u['id'], 'login', $via);
                 return 'ok';
             }
             $_SESSION['pending_2fa'] = (int) $u['id'];
@@ -157,6 +161,7 @@ final class Auth
             return 'totp';
         }
         $this->establish($u);
+        $this->logAccount((int) $u['id'], 'login', $via);
         return 'ok';
     }
 
@@ -182,6 +187,7 @@ final class Auth
         $via = $this->totpVia();
         unset($_SESSION['pending_2fa'], $_SESSION['pending_2fa_via']);
         $this->establish($u);
+        $this->logAccount((int) $u['id'], 'login', $via . '+authenticator');
         if ($remember && ($via === 'passkey' || $via === 'oauth')) {
             $this->rememberDevice((int) $u['id']);
         }
@@ -293,6 +299,41 @@ final class Auth
             return;
         }
         $this->app->db->run('DELETE FROM totp_devices WHERE user_id = ?', [$userId]);
+    }
+
+    public function canManageAccount(array $target): bool
+    {
+        if (!$this->user) {
+            return false;
+        }
+        $tid = (int) ($target['id'] ?? 0);
+        if ($tid < 1 || $tid === $this->id()) {
+            return false;
+        }
+        if ($this->is('superintendent')) {
+            return true;
+        }
+        if (!$this->atLeast('supervisor')) {
+            return false;
+        }
+        $tr = self::RANK[$target['type'] ?? ''] ?? 0;
+        if ($tr >= (self::RANK[$this->type()] ?? 0)) {
+            return false;
+        }
+        $fid = $this->facilityId();
+        if ($fid && (int) ($target['facility_id'] ?? 0) !== (int) $fid) {
+            return false;
+        }
+        return true;
+    }
+
+    private function logAccount(int $userId, string $action, string $detail = '', ?int $actorId = null): void
+    {
+        try {
+            $this->app->need('audit');
+            $this->app->audit->record($userId, $action, $detail, $actorId);
+        } catch (Throwable $e) {
+        }
     }
 
     private function cookiePath(): string

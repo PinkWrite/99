@@ -45,7 +45,7 @@ if ($msg) {
     echo '<p class="sans noticegreen">' . h($msg) . '</p>';
 }
 
-echo '<table class="list roll lt sans"><tr><th>Name</th><th>Username</th><th>Facilities</th></tr>';
+echo '<table class="list roll lt sans"><tr><th>Name</th><th>Username</th><th>Facilities</th><th></th></tr>';
 $cc = 'lr';
 foreach ($app->user->listByType('admin') as $a) {
     echo '<tr class="' . $cc . '"><td>' . h($a['name']) . '</td><td>' . h($a['username']) . '</td><td>';
@@ -55,7 +55,8 @@ foreach ($app->user->listByType('admin') as $a) {
         $ck = $have === (int) $f['id'] ? ' checked' : '';
         echo '<label><input type="checkbox" name="facilities[]" value="' . (int) $f['id'] . '"' . $ck . '> ' . h($f['name']) . '</label> ';
     }
-    echo '<input type="submit" name="save_admin_facilities" class="lt_button small" value="Save"></form></td></tr>';
+    echo '<input type="submit" name="save_admin_facilities" class="lt_button small" value="Save"></form></td><td>';
+    echo button('Edit', 'Edit account', 'account.php?u=' . (int) $a['id'], 'editNoteButton') . '</td></tr>';
     $cc = $cc === 'lr' ? 'dr' : 'lr';
 }
 echo '</table>';

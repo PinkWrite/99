@@ -66,10 +66,12 @@ $active = match ($sess) {
     'observer' => 'owrits',
     'editor' => 'ewrits',
     'my' => 'dash',
+    'admin' => 'blocks',
+    'super' => 'facilities',
     default => 'writs',
 };
 $app->view->start('Writ', $active, 'auto');
-if ($sess !== 'observer' && $sess !== 'editor' && !$app->auth->is('observer')) {
+if ($sess !== 'observer' && $sess !== 'editor' && $sess !== 'admin' && $sess !== 'super' && !$app->auth->is('observer')) {
     echo '<p>' . post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'newNoteButton', $app->csrf->token()) . '</p>';
 }
 

@@ -12,9 +12,14 @@ $mine = (int) $w['writer_id'] === $app->auth->id();
 if (!$mine && !$app->auth->atLeast('editor') && !$app->auth->is('observer')) {
     $app->redirect('');
 }
-$app->view->start('History', $app->auth->atLeast('editor') && ($_SESSION['pw_dash'] ?? '') === 'editor' ? 'ewrits' : 'writs', 'auto');
+$sess = (string) ($_SESSION['pw_dash'] ?? '');
+$app->view->start('History', $sess === 'editor' ? 'ewrits' : ($sess === 'admin' ? 'blocks' : 'writs'), 'auto');
 echo '<h2 class="lt">History — ' . h($w['title']) . '</h2>';
-echo '<p>' . button('Back to writ', 'Open', $app->auth->atLeast('editor') ? 'review.php?w=' . $wid : 'writ.php?w=' . $wid, 'set_gray') . '</p>';
+$back = 'writ.php?w=' . $wid;
+if ($sess === 'editor') {
+    $back = 'review.php?w=' . $wid;
+}
+echo '<p>' . button('Back to writ', 'Open', $back, 'set_gray') . '</p>';
 $drafts = json_arr($w['drafts']);
 $redrafts = json_arr($w['redrafts']);
 echo '<h3 class="lt">Writer drafts</h3>';

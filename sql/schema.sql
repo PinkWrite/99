@@ -231,6 +231,20 @@ CREATE TABLE IF NOT EXISTS clickathon (
   KEY ip_epoch (ip, time_epoch)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS account_log (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NOT NULL,
+  actor_id BIGINT UNSIGNED DEFAULT NULL,
+  actor_name VARCHAR(120) DEFAULT NULL,
+  action VARCHAR(32) NOT NULL,
+  detail VARCHAR(255) DEFAULT NULL,
+  ip VARCHAR(45) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY user_id (user_id),
+  KEY created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 INSERT IGNORE INTO schema_version (version, note) VALUES (1, 'initial pdo/oop schema');
 
 SET FOREIGN_KEY_CHECKS = 1;

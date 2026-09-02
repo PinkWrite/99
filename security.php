@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'totp', 'passkey', 'user', 'oauth'];
+$import = ['auth', 'csrf', 'view', 'html', 'totp', 'passkey', 'user', 'oauth', 'audit'];
 require __DIR__ . '/lib/boot.php';
 $u = $app->auth->requireUser();
 
@@ -12,10 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
             $app->user->setTotp($app->auth->id(), $_SESSION['totp_pending'], true);
             unset($_SESSION['totp_pending']);
             $u = $app->user->find($app->auth->id());
+            $app->audit->record($app->auth->id(), 'totp_on', 'self');
         }
     } elseif (isset($_POST['totp_off'])) {
         $app->user->setTotp($app->auth->id(), null, false);
         $u = $app->user->find($app->auth->id());
+        $app->audit->record($app->auth->id(), 'totp_off', 'self');
     } elseif (isset($_POST['id'], $_POST['spki'])) {
         $app->passkey->register($app->auth->id(), (string) $_POST['id'], (string) $_POST['spki'], (string) ($_POST['name'] ?? 'Passkey'));
         $app->redirect('security.php');

@@ -34,7 +34,7 @@ foreach ($writers as $w) {
         echo '<label><input type="checkbox" name="blocks[]" value="' . (int) $b['id'] . '"' . $ck . '> ' . h($b['code'] ?: $b['name']) . '</label> ';
     }
     echo '<input type="submit" class="lt_button small" value="Save"></form></td><td>';
-    echo button('Open', 'Writer', 'writer.php?u=' . (int) $w['id'], 'editNoteButton') . '</td></tr>';
+    echo button('Edit', 'Edit account', 'account.php?u=' . (int) $w['id'], 'editNoteButton') . '</td></tr>';
     $cc = $cc === 'lr' ? 'dr' : 'lr';
 }
 echo '</table>';

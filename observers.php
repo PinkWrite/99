@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'text', 'user'];
+$import = ['auth', 'csrf', 'view', 'html', 'text', 'user', 'audit'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
 if (!$app->auth->atLeast('supervisor')) {
@@ -34,7 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST
     }
 }
 if (isset($_POST['status'], $_POST['u']) && $app->csrf->check()) {
-    $app->user->setStatus((int) $_POST['u'], $_POST['status'] === 'dormant' ? 'dormant' : 'active');
+    $st = $_POST['status'] === 'dormant' ? 'dormant' : 'active';
+    $app->user->setStatus((int) $_POST['u'], $st);
+    $app->audit->record((int) $_POST['u'], 'status', $st);
 }
 $app->view->start('Observers', 'observers', 'admin');
 echo '<h2 class="lt">Observers</h2>';
@@ -56,7 +58,8 @@ foreach ($app->user->listByFacility($fid, 'observer') as $row) {
     echo '<form method="post" style="display:inline">' . $app->csrf->field();
     echo '<input type="hidden" name="u" value="' . (int) $row['id'] . '">';
     echo '<input type="hidden" name="status" value="' . ($row['status'] === 'active' ? 'dormant' : 'active') . '">';
-    echo '<input type="submit" class="set_gray" value="' . ($row['status'] === 'active' ? 'Dormant' : 'Activate') . '"></form></td></tr>';
+    echo '<input type="submit" class="set_gray" value="' . ($row['status'] === 'active' ? 'Dormant' : 'Activate') . '"></form> ';
+    echo button('Edit', 'Edit account', 'account.php?u=' . (int) $row['id'], 'editNoteButton') . '</td></tr>';
 }
 echo '</table>';
 $app->view->end();

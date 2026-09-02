@@ -92,6 +92,11 @@ if ($sess === 'observer') {
     $active = 'memos';
 } elseif ($sess === 'my') {
     $dash = 'my';
+} elseif ($sess === 'admin') {
+    $dash = 'admin';
+    $active = 'blocks';
+} elseif ($sess === 'super') {
+    $dash = 'super';
 }
 $app->view->start($isEditor ? 'Memo' : 'Note', $active, $dash);
 if ($isEditor) {

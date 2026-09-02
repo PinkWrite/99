@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'user', 'notify', 'passkey', 'oauth'];
+$import = ['auth', 'csrf', 'view', 'html', 'user', 'notify', 'passkey', 'oauth', 'audit'];
 require __DIR__ . '/lib/boot.php';
 $u = $app->auth->requireUser();
 $msg = $err = '';
@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         $u = $app->user->find($uid) ?? $u;
         $noPass = true;
         $msg = 'Password login is off.';
+        $app->audit->record($uid, 'password_off', 'self');
     } else {
         $cur = (string) ($_POST['current'] ?? '');
         $p1 = (string) ($_POST['pass1'] ?? '');
@@ -31,8 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
             $msg = 'Password changed.';
             $noPass = false;
             $u = $app->user->find($uid) ?? $u;
+            $app->audit->record($uid, 'password', 'self');
             if ($u['editor_id']) {
-                $app->notify->send((int) $u['editor_id'], 'password_change', $u['username'] . ' changed their password', 'writer.php?u=' . $uid);
+                $app->notify->send((int) $u['editor_id'], 'password_change', $u['username'] . ' changed their password', '');
             }
         }
     }

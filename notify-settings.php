@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'notify', 'user'];
+$import = ['auth', 'csrf', 'view', 'html', 'notify', 'user', 'audit'];
 require __DIR__ . '/lib/boot.php';
 $u = $app->auth->requireUser();
 $keys = Notify::keysFor($u['type']);
@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     $app->user->savePrefs($app->auth->id(), ['inapp' => $in, 'email' => $em]);
     $prefs = ['inapp' => $in, 'email' => $em];
     $saved = true;
+    $app->audit->record($app->auth->id(), 'notify', 'self');
 }
 
 $app->view->start('Notification settings', 'locker', 'my');

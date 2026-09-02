@@ -88,6 +88,26 @@ function pw99_migrate(App $app): string
         }
         $db->run('INSERT INTO schema_version (version, note) VALUES (4, ?)', ['remember this machine for totp']);
         $notes[] = 'schema_version=4 totp devices';
+        $ver = 4;
+    }
+    if ($ver < 5) {
+        if (!$db->tableExists('account_log')) {
+            $db->pdo()->exec("CREATE TABLE account_log (
+              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+              user_id BIGINT UNSIGNED NOT NULL,
+              actor_id BIGINT UNSIGNED DEFAULT NULL,
+              actor_name VARCHAR(120) DEFAULT NULL,
+              action VARCHAR(32) NOT NULL,
+              detail VARCHAR(255) DEFAULT NULL,
+              ip VARCHAR(45) DEFAULT NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (id),
+              KEY user_id (user_id),
+              KEY created_at (created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+        $db->run('INSERT INTO schema_version (version, note) VALUES (5, ?)', ['account action log']);
+        $notes[] = 'schema_version=5 account log';
     }
     return $notes ? implode('; ', $notes) : 'schema current';
 }
