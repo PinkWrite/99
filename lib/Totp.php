@@ -14,14 +14,7 @@ final class Totp
         $label = rawurlencode($issuer . ':' . $account);
         return 'otpauth://totp/' . $label
             . '?secret=' . $secret
-            . '&issuer=' . rawurlencode($issuer)
-            . '&algorithm=SHA1&digits=6&period=30';
-    }
-
-    public function qrSvg(string $uri): string
-    {
-        require_once dirname(__DIR__) . '/lib/QrSvg.php';
-        return QrSvg::make($uri);
+            . '&issuer=' . rawurlencode($issuer);
     }
 
     public function verify(string $secret, string $code): bool

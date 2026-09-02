@@ -129,6 +129,44 @@
     location.href = './';
   };
 
+  window.pwDrawTotpQr = function (elId) {
+    var el = document.getElementById(elId);
+    if (!el || typeof qrcodegen === 'undefined') return;
+    var uri = el.getAttribute('data-otpauth') || '';
+    if (!uri) return;
+    var qr = qrcodegen.QrCode.encodeText(uri, qrcodegen.QrCode.Ecc.MEDIUM);
+    var n = qr.size;
+    var q = 4;
+    var dim = n + 2 * q;
+    var parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + dim + ' ' + dim + '" width="240" height="240" shape-rendering="crispEdges" aria-hidden="true">'];
+    parts.push('<rect width="' + dim + '" height="' + dim + '" fill="#ffffff"/>');
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        if (qr.getModule(x, y)) {
+          parts.push('<rect x="' + (x + q) + '" y="' + (y + q) + '" width="1" height="1" fill="#111111"/>');
+        }
+      }
+    }
+    parts.push('</svg>');
+    el.innerHTML = parts.join('');
+  };
+
+  window.pwPkEdit = function (btn) {
+    var form = btn.form;
+    if (!form) return;
+    var label = form.querySelector('.pk-label');
+    var input = form.querySelector('input[name="pk_name"]');
+    var save = form.querySelector('.pk-save');
+    if (label) label.hidden = true;
+    if (input) {
+      input.hidden = false;
+      input.focus();
+      input.select();
+    }
+    btn.hidden = true;
+    if (save) save.hidden = false;
+  };
+
   function pwConfirmMask() {
     var m = document.getElementById('pw-confirm-mask');
     if (m) return m;

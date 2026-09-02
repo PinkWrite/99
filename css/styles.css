@@ -1548,8 +1548,8 @@ input.id-disconnect:hover {
 }
 .totp-qr svg {
   display: block;
-  width: 10.5em;
-  height: 10.5em;
+  width: 15em;
+  height: 15em;
 }
 .totp-secret code {
   font: 1.05em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
@@ -1567,6 +1567,11 @@ table.pk-list td.pk-name form {
   gap: 0.45em;
   margin: 0;
 }
+table.pk-list td.pk-name .pk-label {
+  display: inline-block;
+  min-width: 6em;
+  color: #ccc;
+}
 table.pk-list td.pk-name input[type="text"] {
   width: 12em;
   max-width: 100%;
@@ -1576,6 +1581,31 @@ table.pk-list td.pk-name input[type="text"] {
 table.pk-list td.pk-when {
   white-space: nowrap;
   padding-right: 1em;
+}
+
+.totp-code-line {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  flex-wrap: wrap;
+}
+p.field.totp-code-row .totp-code-line input:not([type="submit"]) {
+  display: inline-block;
+  width: 8.5em;
+  flex: 0 1 auto;
+}
+.totp-code-line input[type="submit"] {
+  flex: 0 0 auto;
+}
+
+form input.set_gray.small,
+input.set_gray.small,
+form input.lt_button.small,
+input.lt_button.small,
+button.lt_button.small {
+  padding: 0.3em 0.7em;
+  font: 0.72em/1.44em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+  border-radius: 4px;
 }
 
 

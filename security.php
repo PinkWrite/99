@@ -61,12 +61,12 @@ if (!empty($u['totp_enabled'])) {
     $secret = $_SESSION['totp_pending'];
     $uri = $app->totp->uri($secret, $u['username'], $app->title());
     echo '<p class="sans">Scan this with your authenticator app, or type the secret below.</p>';
-    echo '<div class="totp-qr">' . $app->totp->qrSvg($uri) . '</div>';
+    echo '<div class="totp-qr" id="totp-qr" data-otpauth="' . h($uri) . '"></div>';
     echo '<p class="sans totp-secret"><code>' . h($secret) . '</code></p>';
     echo '<form method="post">' . $app->csrf->field();
-    echo '<p class="field sans"><label for="totp_code">Code</label>';
-    echo '<input name="code" id="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
-    echo '<p><input type="submit" name="totp_confirm" class="lt_button" value="Confirm"></p></form>';
+    echo '<p class="field sans totp-code-row"><label for="totp_code">Code</label>';
+    echo '<span class="totp-code-line"><input name="code" id="totp_code" inputmode="numeric" autocomplete="one-time-code" required> ';
+    echo '<input type="submit" name="totp_confirm" class="lt_button" value="Confirm"></span></p></form>';
 } else {
     echo '<form method="post">' . $app->csrf->field() . '<input type="submit" name="totp_start" class="lt_button" value="Set up authenticator"></form>';
 }
@@ -80,15 +80,26 @@ if ($pks) {
     foreach ($pks as $pk) {
         echo '<tr><td class="pk-name"><form method="post">' . $app->csrf->field();
         echo '<input type="hidden" name="rename_pk" value="' . (int) $pk['id'] . '">';
-        echo '<input type="text" name="pk_name" value="' . h((string) $pk['name']) . '" maxlength="80" aria-label="Passkey name"> ';
-        echo '<input type="submit" class="lt_button" value="Save"></form></td>';
+        echo '<span class="pk-label sans">' . h((string) $pk['name']) . '</span>';
+        echo '<input type="text" name="pk_name" value="' . h((string) $pk['name']) . '" maxlength="80" hidden aria-label="Passkey name"> ';
+        echo '<button type="button" class="lt_button small pk-edit" onclick="pwPkEdit(this)">Edit</button>';
+        echo '<input type="submit" class="lt_button small pk-save" value="Save" hidden>';
+        echo '</form></td>';
         echo '<td class="sans dk pk-when">' . h((string) $pk['created_at']) . '</td><td>';
-        echo post_button('Remove', 'Delete', 'security.php', 'del_pk', (string) $pk['id'], 'set_gray', $app->csrf->token());
+        echo post_button('Remove', 'Delete', 'security.php', 'del_pk', (string) $pk['id'], 'set_gray small', $app->csrf->token());
         echo '</td></tr>';
     }
     echo '</tbody></table>';
 }
-echo '<script src="js/pw99.js"></script><script>document.getElementById("pkadd").onclick=function(){pwPasskeyRegister("passkey-create.php","security.php",' . json_encode($app->csrf->token()) . ');};</script>';
+$jsV = h(pw99_asset_v(__DIR__ . '/js/pw99.js'));
+$qrV = h(pw99_asset_v(__DIR__ . '/js/qrcodegen.js'));
+echo '<script src="js/qrcodegen.js?v=' . $qrV . '"></script>';
+echo '<script src="js/pw99.js?v=' . $jsV . '"></script>';
+echo '<script>document.getElementById("pkadd").onclick=function(){pwPasskeyRegister("passkey-create.php","security.php",' . json_encode($app->csrf->token()) . ');};';
+if (!empty($_SESSION['totp_pending'])) {
+    echo 'pwDrawTotpQr("totp-qr");';
+}
+echo '</script>';
 
 $have = [];
 foreach ($app->oauth->list($app->auth->id()) as $row) {
