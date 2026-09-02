@@ -58,7 +58,7 @@ foreach ($app->user->listByFacility($fid, 'observer') as $row) {
     echo '<form method="post" style="display:inline">' . $app->csrf->field();
     echo '<input type="hidden" name="u" value="' . (int) $row['id'] . '">';
     echo '<input type="hidden" name="status" value="' . ($row['status'] === 'active' ? 'dormant' : 'active') . '">';
-    echo '<input type="submit" class="set_gray" value="' . ($row['status'] === 'active' ? 'Dormant' : 'Activate') . '"></form> ';
+    echo '<input type="submit" class="editNoteButton" value="' . ($row['status'] === 'active' ? 'Dormant' : 'Activate') . '"></form> ';
     echo button('Edit', 'Edit account', 'account.php?u=' . (int) $row['id'], 'editNoteButton') . '</td></tr>';
 }
 echo '</table>';
