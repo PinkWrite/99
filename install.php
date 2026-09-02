@@ -170,7 +170,7 @@ if (!function_exists('h')) {
 
 ?><!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Install PinkWrite 99</title>
-<link rel="stylesheet" href="css/styles.css?v=<?php echo (int) (@filemtime(__DIR__ . '/css/styles.css') ?: time()); ?>">
+<link rel="stylesheet" href="css/styles.css?v=<?php echo h(function_exists('pw99_asset_v') ? pw99_asset_v(__DIR__ . '/css/styles.css') : (string) time()); ?>">
 </head><body><div id="wrap"><div class="page"><div class="content">
 <h1 class="sans">Install PinkWrite 99</h1>
 <p class="sans">SysAdmin only. Mail, host, and database live in <code>config.php</code>.</p>

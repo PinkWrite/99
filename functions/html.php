@@ -6,6 +6,13 @@ function h(?string $s): string
     return htmlspecialchars((string) $s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** Cache-bust query for a static file: content hash, so a stale sheet cannot survive a CSS edit. */
+function pw99_asset_v(string $abs): string
+{
+    $h = is_file($abs) ? md5_file($abs) : false;
+    return is_string($h) && $h !== '' ? substr($h, 0, 10) : (string) time();
+}
+
 /** Same shape as the original set_button: <a><button class> so CSS on button.* applies. */
 function button(string $text, string $title, string $href, string $class = 'navButton'): string
 {
