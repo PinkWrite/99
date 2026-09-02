@@ -495,15 +495,17 @@ if (typeof searchClearReset !== "function") {
         if ($pages <= 1) {
             return;
         }
-        $href = fn (int $p) => h($where . $sortGet . $sortSuffix . $searchSuffix . '&p=' . $p);
+        $base = $where . $sortGet . $sortSuffix . $searchSuffix . '&p=';
         $dis1 = $page === 1 ? ' disabled' : '';
         $disN = $page === $pages ? ' disabled' : '';
+        $prev = max(1, $page - 1);
+        $next = min($pages, $page + 1);
         echo '<div class="paginate_nav_container"><div class="paginate_nav"><table><tr>';
-        echo '<td><a class="paginate' . $dis1 . '" title="Page 1" href="' . $href(1) . '">&laquo;</a></td>';
-        echo '<td><a class="paginate' . $dis1 . '" title="Previous" href="' . $href(max(1, $page - 1)) . '">&lsaquo;&nbsp;</a></td>';
-        echo '<td><a class="paginate current" href="' . $href($page) . '">Page ' . $page . ' (' . $pages) . '</a></td>';
-        echo '<td><a class="paginate' . $disN . '" title="Next" href="' . $href(min($pages, $page + 1)) . '">&nbsp;&rsaquo;</a></td>';
-        echo '<td><a class="paginate' . $disN . '" title="Last Page" href="' . $href($pages) . '">&raquo;</a></td>';
+        echo '<td><a class="paginate' . $dis1 . '" title="Page 1" href="' . h($base . '1') . '">&laquo;</a></td>';
+        echo '<td><a class="paginate' . $dis1 . '" title="Previous" href="' . h($base . $prev) . '">&lsaquo;&nbsp;</a></td>';
+        echo '<td><a class="paginate current" href="' . h($base . $page) . '">Page ' . $page . ' (' . $pages . ')</a></td>';
+        echo '<td><a class="paginate' . $disN . '" title="Next" href="' . h($base . $next) . '">&nbsp;&rsaquo;</a></td>';
+        echo '<td><a class="paginate' . $disN . '" title="Last Page" href="' . h($base . $pages) . '">&raquo;</a></td>';
         echo '</tr></table></div></div>';
     }
 
