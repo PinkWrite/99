@@ -206,4 +206,8 @@ if ($alreadyInstalled && !$notice) {
     echo '</form>';
 }
 ?>
-</div></div></div></body></html>
+</div>
+<div class="footer">
+<p class="dk sans"><a class="dk" href="Terms.htm">Terms & Conditions</a> | <a class="dk" href="Privacy.htm">Privacy</a> | <a class="dk" href="https://github.com/PinkWrite/99">OpenSource project from GitHub</a> | <a class="dk" href="https://pinkwrite.com">pinkwrite.com</a> &nbsp; - &nbsp; &copy; PinkWrite, <a class="dk" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3</a></p>
+</div>
+</div></div></body></html>
