@@ -297,7 +297,7 @@ final class WritList
                 } else {
                     echo '<th>Status</th><th>Edits</th><th>Score</th><th>Writer</th><th>Block</th>';
                 }
-                echo '<th class="bulk_check" style="display:none"></th></tr>';
+                echo '<th class="bulk_check"></th></tr>';
                 $cc = 'lr';
                 foreach ($rows as $w) {
                     $score = $w['score'];
@@ -316,7 +316,7 @@ final class WritList
                     } else {
                         echo '<td>' . h((string) $w['draft_status']) . '</td><td>' . h((string) $w['edits_status']) . '</td><td>' . $scoreHtml . '<small class="dk">/' . h((string) $outof) . '</small></td><td>' . h((string) ($w['writer_name'] ?? '')) . '</td><td>' . $block . '</td>';
                     }
-                    echo '<td class="bulk_check" style="display:none"><input form="bulk_actions" type="checkbox" name="bulk_' . (int) $w['id'] . '" value="' . (int) $w['id'] . '"></td></tr>';
+                    echo '<td class="bulk_check"><input form="bulk_actions" type="checkbox" name="bulk_' . (int) $w['id'] . '" value="' . (int) $w['id'] . '"></td></tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
                 echo '</tbody></table>';
@@ -562,8 +562,8 @@ if (typeof searchClearReset !== "function") {
     private function bulkBar(string $mode, string $status, int $uid): void
     {
         $key = $mode === 'writer' ? 'writer_archive' : 'editor_archive';
-        echo '<table><tbody><tr><td><div onclick="showBulkActions()" style="cursor:pointer;display:inline;float:right"><button type="button" class="act_ltgray small">Archive actions &#9660;</button></div></td></tr></tbody></table>';
-        echo '<div id="bulk_actions_div" style="display:none"><form id="bulk_actions" method="post" action="archive-act.php">';
+        echo '<table><tbody><tr><td><div onclick="showBulkActions()" style="cursor:pointer;display:inline;float:right"><button type="button" class="act_ltgray small" id="bulk_actions_btn">Archive actions &#9660;</button></div></td></tr></tbody></table>';
+        echo '<div id="bulk_actions_div" hidden><form id="bulk_actions" method="post" action="archive-act.php">';
         echo $this->app->csrf->field();
         echo '<input type="hidden" name="' . h($key) . '" value="' . $uid . '"><br>';
         echo '<table style="float:right;width:auto"><tr>';
@@ -581,8 +581,22 @@ if (typeof searchClearReset !== "function") {
     private function bulkScript(): void
     {
         echo '<script>
-function showBulkActions(){var x=document.getElementById("bulk_actions_div");var cbc=document.getElementsByClassName("bulk_check");x.style.display=x.style.display==="block"?"none":"block";for(var i=0;i<cbc.length;i++){cbc[i].style.display=cbc[i].style.display==="inline"?"none":"inline";}}
-function toggle(source){var cb=document.querySelectorAll("input[type=checkbox]");for(var i=0;i<cb.length;i++){if(cb[i]!=source)cb[i].checked=source.checked;}var s=document.getElementById("checksubmit");if(s)s.checked=false;}
+function showBulkActions(){
+  var bar = document.getElementById("bulk_actions_div");
+  if (!bar) return;
+  var open = bar.hidden;
+  bar.hidden = !open;
+  var tables = document.querySelectorAll("table.list.writ");
+  for (var i = 0; i < tables.length; i++) {
+    tables[i].classList.toggle("bulk-open", open);
+  }
+}
+function toggle(source){
+  var cb = document.querySelectorAll("table.list.writ td.bulk_check input[type=checkbox]");
+  for (var i = 0; i < cb.length; i++) cb[i].checked = source.checked;
+  var s = document.getElementById("checksubmit");
+  if (s) s.checked = false;
+}
 </script>';
     }
 }

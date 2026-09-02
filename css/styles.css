@@ -1327,6 +1327,22 @@ table.list th, table.list td {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.9em;
 }
+table.list.writ th.bulk_check,
+table.list.writ td.bulk_check {
+  width: 2.4em;
+  min-width: 2.4em;
+  max-width: 2.4em;
+  text-align: center;
+  padding-left: 0.15em;
+  padding-right: 0.35em;
+  box-sizing: border-box;
+}
+table.list.writ td.bulk_check input[type="checkbox"] {
+  visibility: hidden;
+}
+table.list.writ.bulk-open td.bulk_check input[type="checkbox"] {
+  visibility: visible;
+}
 button.act_disabled, button.act_disabled:hover {
   color: #888;
   background-color: #3c3c3c;
