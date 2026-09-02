@@ -52,6 +52,23 @@ function pw99_migrate(App $app): string
         }
         $db->run('INSERT INTO schema_version (version, note) VALUES (2, ?)', ['oauth google apple github']);
         $notes[] = 'schema_version=2 oauth';
+        $ver = 2;
+    }
+    if ($ver < 3) {
+        if (!$db->tableExists('writ_comments')) {
+            $db->pdo()->exec("CREATE TABLE writ_comments (
+              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+              writ_id BIGINT UNSIGNED NOT NULL,
+              observer_id BIGINT UNSIGNED NOT NULL,
+              body MEDIUMTEXT,
+              save_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              PRIMARY KEY (id),
+              KEY writ_id (writ_id),
+              KEY observer_id (observer_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+        $db->run('INSERT INTO schema_version (version, note) VALUES (3, ?)', ['observer comments on writs']);
+        $notes[] = 'schema_version=3 comments';
     }
     return $notes ? implode('; ', $notes) : 'schema current';
 }

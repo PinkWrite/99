@@ -6,7 +6,7 @@ $app->auth->requireUser();
 if (!$app->auth->atLeast('supervisor')) {
     $app->redirect('locker.php');
 }
-$app->view->start('Admin Locker', 'locker');
+$app->view->start('Admin Locker', 'locker', 'admin');
 echo '<h2 class="lt">Admin Locker</h2>';
 echo '<p>' . button('Password', 'Change password', 'password.php', 'set_gray') . '</p>';
 echo '<p>' . button('Security', '2FA and passkeys', 'security.php', 'set_gray') . '</p>';

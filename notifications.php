@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ack']) && $app->csrf-
     $app->notify->ack((int) $_POST['ack'], $app->auth->id());
     $app->redirect('notifications.php');
 }
-$app->view->start('Notifications', 'notify');
+$app->view->start('Notifications', 'notify', 'auto');
 echo '<h2 class="lt">Notifications</h2>';
 echo '<p class="sans dk">Open the item, then acknowledge — that deletes the notice for good.</p>';
 $rows = $app->notify->list($app->auth->id());

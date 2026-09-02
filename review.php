@@ -68,11 +68,12 @@ echo '<textarea name="edits" id="writingArea" class="writingBox" rows="12" cols=
 echo '<p class="sans">Edit notes<br><textarea name="edit_notes" rows="4" cols="82">' . h($w['edit_notes']) . '</textarea></p>';
 echo '<p class="sans">Scoring remarks<br><textarea name="scoring" rows="3" cols="82">' . h($w['scoring']) . '</textarea></p>';
 echo '<p class="sans">Score <input name="score" type="number" min="0" max="1000" value="' . h((string) $w['score']) . '"> / <input name="outof" type="number" value="' . h((string) ($w['outof'] ?: 100)) . '"></p>';
-echo '<p>' . confirm_submit('submit_edits', 'Submit edits', 'Confirm submit edits') . ' ';
-echo confirm_submit('submit_redraft', 'Redraft', 'Confirm redraft') . ' ';
-echo confirm_submit('submit_scoring', 'Submit score', 'Confirm') . '</p>';
+echo '<p class="pw-confirm-row">' . confirm_submit('submit_edits', 'Submit edits', 'Confirm submit edits');
+echo confirm_submit('submit_redraft', 'Redraft', 'Confirm redraft');
+echo confirm_submit('submit_scoring', 'Submit score', 'Confirm score') . '</p>';
 echo '<p class="sans">Notes<br><textarea name="notes" rows="3" cols="82">' . h($w['notes']) . '</textarea></p>';
 echo '<input type="hidden" name="save_edit" value="1">';
 echo '</form>';
+echo comments_markup($app->writ->comments($wid), $wid, false, $app->auth->id(), $app->csrf->token());
 echo '<script src="js/pw99.js"></script><script>pwBindSave("editsform","ajax/save-review.php","ajax_changes");</script>';
 $app->view->end();

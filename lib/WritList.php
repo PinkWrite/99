@@ -28,6 +28,19 @@ final class WritList
         $this->writTable($whereAmI, 'observer', 'current', null, null, $writerIds);
     }
 
+    public function dashSortBar(string $whereAmI, string $formId = 'searchformdash'): array
+    {
+        $st = $this->listState($whereAmI, ['activity', 'creation', 'work', 'title', 'status'], 'activity');
+        $this->toolbar($st['where'], $st['sortGet'], $st['searchSuffix'], $st['classes'], $st['q'], $formId, [
+            'activity' => ['Activity', 'Sort by most recent activity'],
+            'creation' => ['Creation', 'Sort by order of creation'],
+            'work' => ['Work', 'Sort by work'],
+            'title' => ['Title', 'Sort by title'],
+            'status' => ['Status', 'Sort by status'],
+        ]);
+        return $st;
+    }
+
     public function renderNotes(string $whereAmI): void
     {
         $uid = $this->app->auth->id();
@@ -109,7 +122,7 @@ final class WritList
                     echo '<tr><td><a class="listed_note" href="writs.php?v=0"><b>Main</b></a></td><td></td>';
                     echo '<td><span class="sans bt">' . h($editorName) . '</span></td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Writs →', 'List my writs for this block', 'writs.php', 'v', '0', 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . button('Memos →', 'List memos for Main block', 'binder.php', 'editNoteButton') . '</div></td>';
+                    echo '<td><div style="display:inline;float:right">' . button('Memos →', 'List memos for Main block', 'memos.php', 'editNoteButton') . '</div></td>';
                     echo '<td><div style="display:inline;float:right">' . post_button('New writ +', 'Start a general task for this block', 'writ.php', 'new_writ', (string) $this->app->auth->id(), 'editNoteButton', $this->app->csrf->token()) . '</div></td>';
                     echo '</tr>';
                 }
@@ -121,7 +134,7 @@ final class WritList
                     echo '<td><a class="listed_note" href="writs.php?v=' . $id . '">' . h((string) $b['code']) . '</a></td>';
                     echo '<td><span class="sans bt">' . h((string) ($b['editor_name'] ?? '')) . '</span></td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Writs →', 'List my writs for this block', 'writs.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . get_switch('Memos →', 'List memos for this block', 'binder.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
+                    echo '<td><div style="display:inline;float:right">' . get_switch('Memos →', 'List memos for this block', 'memos.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
                     echo '<td><div style="display:inline;float:right">' . post_button('New writ +', 'Start a general writ for this block', 'writ.php', 'new_writ', (string) $this->app->auth->id(), 'editNoteButton', $this->app->csrf->token()) . '</div></td>';
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
@@ -174,7 +187,7 @@ final class WritList
                     echo '<td>' . h((string) ($me['name'] ?? '')) . '</td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in your main Block', 'writs-editor.php', 'v', '0', 'editNoteButton') . '</div></td>';
                     echo '<td><div style="display:inline;float:right">' . button('Roll', 'List writers in Main block', 'enrollment.php', 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . button('Block notes', 'List memos for this block', 'binder-editor.php', 'editNoteButton') . '</div></td>';
+                    echo '<td><div style="display:inline;float:right">' . button('Block notes', 'List memos for this block', 'memos-editor.php', 'editNoteButton') . '</div></td>';
                     echo '</tr>';
                 }
                 $cc = 'lr';
@@ -186,7 +199,7 @@ final class WritList
                     echo '<td>' . h((string) ($b['editor_name'] ?? '')) . '</td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in this Block', 'writs-editor.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
                     echo '<td><div style="display:inline;float:right">' . button('Roll', 'List writers', 'enrollment.php', 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . get_switch('Block notes', 'List memos for this block', 'binder-editor.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
+                    echo '<td><div style="display:inline;float:right">' . get_switch('Block notes', 'List memos for this block', 'memos-editor.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }

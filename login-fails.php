@@ -9,7 +9,7 @@ if (!$app->auth->atLeast('supervisor')) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unlock']) && $app->csrf->check()) {
     $app->clickathon->unlock((int) $_POST['unlock']);
 }
-$app->view->start('Failed logins', 'admin');
+$app->view->start('Failed logins', 'admin', 'admin');
 echo '<h2 class="lt">Failed logins</h2>';
 echo '<table class="list"><tr><th>When</th><th>IP</th><th>Usernames</th><th></th></tr>';
 foreach ($app->clickathon->recentFails() as $r) {

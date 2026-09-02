@@ -6,19 +6,21 @@ $app->auth->requireUser();
 if (!$app->auth->atLeast('editor')) {
     $app->redirect('');
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST['u'], $_POST['blocks'])) {
-    $ids = array_map('intval', (array) $_POST['blocks']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST['u'])) {
+    $ids = array_map('intval', (array) ($_POST['blocks'] ?? []));
     $app->user->setBlocks((int) $_POST['u'], $ids);
 }
 $eid = $app->auth->is('editor') ? $app->auth->id() : 0;
 $writers = $eid ? $app->user->writersForEditor($eid) : $app->user->listByFacility($app->auth->facilityId(), 'writer');
 $blocks = $eid ? $app->block->forEditor($eid, false) : $app->block->forFacility($app->auth->facilityId(), false);
-$app->view->start('Enrollment', 'roll', 'editor');
-echo '<h2 class="lt">Writers</h2>';
-echo '<p>' . button('Register', 'New', 'register.php', 'navDarkButton') . '</p>';
-echo '<table class="list"><tr><th>Name</th><th>Username</th><th>Blocks</th><th></th></tr>';
+$app->view->start('Roll', 'roll', 'editor');
+echo '<h2 class="lt">Roll</h2>';
+echo '<p class="sans dk">Writers and the blocks they belong to.</p>';
+echo '<p>' . button('Register', 'New writer', 'register.php', 'newNoteButton') . '</p>';
+echo '<table class="list roll lt sans"><tr><th>Name</th><th>Username</th><th>Blocks</th><th></th></tr>';
+$cc = 'lr';
 foreach ($writers as $w) {
-    echo '<tr><td>' . h($w['name']) . '</td><td>' . h($w['username']) . '</td><td>';
+    echo '<tr class="' . $cc . '"><td>' . h($w['name']) . '</td><td>' . h($w['username']) . '</td><td>';
     echo '<form method="post">' . $app->csrf->field() . '<input type="hidden" name="u" value="' . (int) $w['id'] . '">';
     $have = array_map('intval', json_arr($w['blocks_json']));
     foreach ($blocks as $b) {
@@ -27,6 +29,7 @@ foreach ($writers as $w) {
     }
     echo '<input type="submit" class="lt_button small" value="Save"></form></td><td>';
     echo button('Open', 'Writer', 'writer.php?u=' . (int) $w['id'], 'editNoteButton') . '</td></tr>';
+    $cc = $cc === 'lr' ? 'dr' : 'lr';
 }
 echo '</table>';
 $app->view->end();

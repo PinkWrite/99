@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST
 if (isset($_POST['status'], $_POST['u']) && $app->csrf->check()) {
     $app->user->setStatus((int) $_POST['u'], $_POST['status'] === 'dormant' ? 'dormant' : 'active');
 }
-$app->view->start('Staffing', 'admin');
+$app->view->start('Staffing', 'admin', 'admin');
 echo '<h2 class="lt">Staffing</h2>';
 if ($err) {
     echo '<p class="sans noticered">' . h($err) . '</p>';

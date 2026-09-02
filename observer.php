@@ -23,7 +23,7 @@ if (!$ids) {
         echo '<tr class="' . $cc . '">';
         echo '<td><b>' . h($w['name']) . '</b></td>';
         echo '<td>' . button('Observe writs', 'List work from this writer', 'writs-observer.php?o=' . $id, 'navDarkButton') . '</td>';
-        echo '<td>' . button('Observe memos', 'List memos for this writer', 'binder-observer.php?w=' . $id, 'navDarkButton') . '</td>';
+        echo '<td>' . button('Observe memos', 'List memos for this writer', 'memos-observer.php?w=' . $id, 'navDarkButton') . '</td>';
         echo '<td><small>(' . h((string) $w['username']) . ')</small></td>';
         echo '<td><small>' . h((string) $w['email']) . '</small></td>';
         echo '</tr>';

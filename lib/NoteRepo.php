@@ -145,4 +145,41 @@ final class NoteRepo
         $sql .= ") ORDER BY save_date DESC LIMIT {$limit}";
         return $this->app->db->all($sql, $params);
     }
+
+    /** @return array<int,string> id => "Title (Writer: Name|Block: Name)" */
+    public function labeledForEditor(int $editorId): array
+    {
+        $this->app->need('user');
+        $this->app->need('block');
+        $out = [];
+        foreach ($this->memosForEditor($editorId) as $n) {
+            $title = note_heading($n['body'] ?? '');
+            $paren = 'Main';
+            if ((int) ($n['editor_set_writer_id'] ?? 0) > 0) {
+                $w = $this->app->user->find((int) $n['editor_set_writer_id']) ?: [];
+                $paren = 'Writer: ' . (string) ($w['name'] ?? '');
+            } elseif ((int) ($n['editor_set_block'] ?? 0) > 0) {
+                $b = $this->app->block->find((int) $n['editor_set_block']) ?: [];
+                $paren = 'Block: ' . (string) ($b['name'] ?? '');
+            }
+            $out[(int) $n['id']] = $title . ' (' . $paren . ')';
+        }
+        natcasesort($out);
+        return $out;
+    }
+
+    public function unopenedMemos(int $writerId, array $blockIds, int $limit = 25): array
+    {
+        $limit = max(1, min(50, $limit));
+        $sql = "SELECT * FROM notes WHERE type IN ('memo','task') AND status = 'live' AND seen_writer = 'new'
+            AND (editor_set_writer_id = ? OR (editor_set_writer_id = 0 AND editor_set_block = 0)";
+        $params = [$writerId];
+        $ids = array_values(array_filter(array_map('intval', $blockIds), static fn ($id) => $id > 0));
+        if ($ids) {
+            $in = implode(',', $ids);
+            $sql .= " OR editor_set_block IN ({$in})";
+        }
+        $sql .= ") ORDER BY save_date DESC LIMIT {$limit}";
+        return $this->app->db->all($sql, $params);
+    }
 }

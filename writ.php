@@ -45,12 +45,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $w && $app->csrf->check() && isset(
     $app->redirect('writ.php?w=' . $wid);
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $w && $app->csrf->check() && isset($_POST['new_comment'])) {
+    $body = clean_body($_POST['comment_body'] ?? '');
+    if ($body !== '' && $app->auth->atLeast('observer')) {
+        $app->writ->addComment($wid, $uid, $body);
+    }
+    $app->redirect('writ.php?w=' . $wid);
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $w && $app->csrf->check() && isset($_POST['save_comment'])) {
+    $app->writ->saveComment((int) ($_POST['comment_id'] ?? 0), $uid, clean_body($_POST['comment_body'] ?? ''));
+    $app->redirect('writ.php?w=' . $wid);
+}
+
 if ($wid && $w && (int) $w['writer_id'] === $uid) {
     $app->writ->markViewed($wid, $uid);
 }
 
-$app->view->start('Writ', 'writs', 'writer');
-echo '<p>' . post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'newNoteButton', $app->csrf->token()) . '</p>';
+$sess = (string) ($_SESSION['pw_dash'] ?? '');
+$active = match ($sess) {
+    'observer' => 'owrits',
+    'editor' => 'ewrits',
+    'my' => 'dash',
+    default => 'writs',
+};
+$app->view->start('Writ', $active, 'auto');
+if ($sess !== 'observer' && $sess !== 'editor' && !$app->auth->is('observer')) {
+    echo '<p>' . post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'newNoteButton', $app->csrf->token()) . '</p>';
+}
 
 if (!$w) {
     echo '<p class="sans">Open a writ from your list, or start a new one.</p>';
@@ -61,18 +82,21 @@ if ((int) $w['writer_id'] !== $uid && !$app->auth->atLeast('observer')) {
     $app->redirect('');
 }
 $owner = (int) $w['writer_id'] === $uid;
+$canComment = !$owner && $app->auth->atLeast('observer') && ($sess === 'observer' || $app->auth->is('observer'));
 
-if ($w['kind'] === 'test') {
+if ($w['kind'] === 'test' && $owner) {
     $app->redirect('take-test.php?w=' . $wid);
 }
 
-if ($w['draft_status'] === 'submitted') {
+if ($owner && $w['draft_status'] === 'submitted') {
     echo '<p class="sans noticegreen">Submitted and waiting for review.</p>';
+    echo comments_markup($app->writ->comments($wid), $wid, $canComment, $uid, $app->csrf->token());
     $app->view->end();
     exit;
 }
-if ($w['edits_status'] === 'submitted') {
+if ($owner && $w['edits_status'] === 'submitted') {
     echo '<p class="sans noticegreen">Correction submitted and waiting to be scored.</p>';
+    echo comments_markup($app->writ->comments($wid), $wid, $canComment, $uid, $app->csrf->token());
     $app->view->end();
     exit;
 }
@@ -83,6 +107,8 @@ if ($w['draft_status'] === 'reviewed' && $w['edits_status'] === 'scored') {
     echo '<h4 class="review">Draft</h4><section class="writcontent draft">' . nl_text($w['draft']) . '</section>';
     echo '<h4 class="review">Editor revision</h4><section class="writcontent revision">' . nl_text($w['edits']) . '</section>';
     echo '<h4 class="review">Correction</h4><section class="writcontent correction">' . nl_text($w['correction']) . '</section>';
+    echo '<p class="sans">Notes</p><section class="writcontent notes">' . nl_text($w['notes']) . '</section>';
+    echo comments_markup($app->writ->comments($wid), $wid, $canComment, $uid, $app->csrf->token());
     echo '<p>' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
     $app->view->end();
     exit;
@@ -105,6 +131,11 @@ if (!$owner) {
     if ($w['edits']) {
         echo '<h4 class="review">Editor revision</h4><section class="writcontent revision">' . nl_text($w['edits']) . '</section>';
     }
+    if ($w['correction']) {
+        echo '<h4 class="review">Correction</h4><section class="writcontent correction">' . nl_text($w['correction']) . '</section>';
+    }
+    echo '<p class="sans">Notes</p><section class="writcontent notes">' . nl_text($w['notes']) . '</section>';
+    echo comments_markup($app->writ->comments($wid), $wid, $canComment, $uid, $app->csrf->token());
     echo '<p>' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
     $app->view->end();
     exit;
@@ -148,5 +179,6 @@ if ($reviewed) {
 }
 echo '<p class="sans">Notes<br><textarea name="notes" rows="4" cols="82" onchange="onNavWarn()">' . h($w['notes']) . '</textarea></p>';
 echo '</form>';
+echo comments_markup($app->writ->comments($wid), $wid, false, $uid, $app->csrf->token());
 echo '<script src="js/pw99.js"></script><script>pwWord("writingArea","wordCount","wordCountInput");pwNoPaste("writingArea");pwBindSave("editform","ajax/save-writ.php","ajax_changes");</script>';
 $app->view->end();

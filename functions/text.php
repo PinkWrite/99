@@ -28,11 +28,11 @@ function writ_title(?string $s): string
     return $t !== '' ? $t : 'Untitled';
 }
 
-/** Blank work stores as the SQL id so the list always has a work name. */
+/** Blank work stores as task-{id} so the list always has a work name. */
 function writ_work(?string $s, int $id): string
 {
     $w = clean_title($s);
-    return $w !== '' ? $w : (string) $id;
+    return $w !== '' ? $w : 'task-' . $id;
 }
 
 function clean_body(?string $s): string

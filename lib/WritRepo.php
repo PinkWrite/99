@@ -131,6 +131,13 @@ final class WritRepo
             throw new RuntimeException('Writ not found');
         }
         $this->saveEdits($id, $fields);
+        $drafts = json_arr($w['drafts']);
+        $drafts[] = [
+            'at' => date('c'),
+            'body' => $w['draft'],
+            'wordcount' => (int) $w['draft_wordcount'],
+            'kind' => 'pre-redraft',
+        ];
         $redrafts = json_arr($w['redrafts']);
         $redrafts[] = [
             'at' => date('c'),
@@ -139,9 +146,9 @@ final class WritRepo
             'wordcount' => (int) $fields['edits_wordcount'],
         ];
         $this->app->db->run(
-            'UPDATE writs SET redrafts=?, draft=?, draft_wordcount=?, draft_status=\'redraft\', edits_status=\'drafting\', edits_date=NOW(), score=NULL
+            'UPDATE writs SET drafts=?, redrafts=?, draft=?, draft_wordcount=?, draft_status=\'redraft\', edits_status=\'drafting\', edits_date=NOW(), score=NULL
              WHERE id=?',
-            [json_enc($redrafts), $fields['edits'], $fields['edits_wordcount'], $id]
+            [json_enc($drafts), json_enc($redrafts), $fields['edits'], $fields['edits_wordcount'], $id]
         );
     }
 
@@ -192,5 +199,66 @@ final class WritRepo
              WHERE id=? AND writer_id=?',
             [json_enc($answers), $auto, $outof, $auto, $id, $writerId]
         );
+    }
+
+    public function comments(int $writId): array
+    {
+        if (!$this->app->db->tableExists('writ_comments')) {
+            return [];
+        }
+        return $this->app->db->all(
+            'SELECT c.*, u.name AS observer_name FROM writ_comments c
+             LEFT JOIN users u ON u.id = c.observer_id
+             WHERE c.writ_id = ? ORDER BY c.id ASC',
+            [$writId]
+        );
+    }
+
+    public function addComment(int $writId, int $observerId, string $body): int
+    {
+        $this->app->db->run(
+            'INSERT INTO writ_comments (writ_id, observer_id, body) VALUES (?,?,?)',
+            [$writId, $observerId, $body]
+        );
+        return (int) $this->app->db->lastId();
+    }
+
+    public function saveComment(int $id, int $observerId, string $body): bool
+    {
+        $st = $this->app->db->run(
+            'UPDATE writ_comments SET body = ?, save_date = NOW() WHERE id = ? AND observer_id = ?',
+            [$body, $id, $observerId]
+        );
+        return $st->rowCount() > 0;
+    }
+
+    /** @return array{0:list<array>,1:bool} */
+    public function dashList(array $where, array $params, string $sort, int $limit = 25): array
+    {
+        $order = match ($sort) {
+            'creation' => 'w.id DESC',
+            'work' => 'w.work ASC',
+            'title' => 'w.title ASC',
+            'status' => "w.draft_status='submitted' DESC, w.edits_status='submitted' DESC, w.id DESC",
+            default => 'GREATEST(
+                COALESCE(w.draft_open_date,\'1970-01-01\'),
+                COALESCE(w.draft_save_date,\'1970-01-01\'),
+                COALESCE(w.draft_submit_date,\'1970-01-01\'),
+                COALESCE(w.edits_date,\'1970-01-01\'),
+                COALESCE(w.scoring_date,\'1970-01-01\'),
+                COALESCE(w.draft_save_date,\'1970-01-01\')
+            ) DESC',
+        };
+        $sql = 'SELECT w.*, u.name AS writer_name FROM writs w LEFT JOIN users u ON u.id = w.writer_id';
+        if ($where) {
+            $sql .= ' WHERE ' . implode(' AND ', $where);
+        }
+        $sql .= ' ORDER BY ' . $order . ' LIMIT ' . (int) ($limit + 1);
+        $rows = $this->app->db->all($sql, $params);
+        $more = count($rows) > $limit;
+        if ($more) {
+            array_pop($rows);
+        }
+        return [$rows, $more];
     }
 }

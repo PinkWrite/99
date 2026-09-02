@@ -85,6 +85,11 @@ final class UserRepo
         ]);
     }
 
+    public function listByType(string $type): array
+    {
+        return $this->app->db->all('SELECT * FROM users WHERE type = ? ORDER BY name', [$type]);
+    }
+
     public function listByFacility(?int $facilityId, ?string $type = null): array
     {
         if ($facilityId) {

@@ -1,79 +1,28 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'csrf', 'view', 'html', 'text', 'facility', 'user', 'notify'];
+$import = ['auth', 'csrf', 'view', 'html', 'note'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
 if (!$app->auth->is('superintendent')) {
     $app->redirect('');
 }
-$msg = $err = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
-    if (isset($_POST['new_facility'])) {
-        $id = $app->facility->create(clean_title($_POST['fname'] ?? '', 120), clean_title($_POST['fcode'] ?? '', 16));
-        $app->notify->send($app->auth->id(), 'new_facility', 'Facility created', 'super.php');
-        $msg = 'Facility created.';
-    } elseif (isset($_POST['enter'])) {
-        $_SESSION['facility_id'] = (int) $_POST['enter'];
-        $msg = 'Working inside that facility.';
-    } elseif (isset($_POST['leave'])) {
-        unset($_SESSION['facility_id']);
-    } elseif (isset($_POST['new_admin'])) {
-        $fid = (int) $_POST['facility_id'];
-        $un = (string) $_POST['username'];
-        $em = (string) $_POST['email'];
-        if (!preg_match('/^[A-Za-z0-9]{4,32}$/', $un) || !filter_var($em, FILTER_VALIDATE_EMAIL)) {
-            $err = 'Username or email not valid.';
-        } elseif ($app->user->findByUsername($un) || $app->user->findByEmail($em)) {
-            $err = 'Username or email already used.';
-        } else {
-            $id = $app->user->create([
-                'type' => 'admin',
-                'facility_id' => $fid,
-                'username' => $un,
-                'email' => $em,
-                'name' => clean_title($_POST['name'] ?? $un, 80),
-                'pass' => password_hash((string) $_POST['pass'], PASSWORD_DEFAULT),
-            ]);
-            $app->notify->send($app->auth->id(), 'new_admin', 'Admin ' . $un, 'super.php');
-            $msg = 'Administrator created.';
-        }
+$u = $app->auth->user();
+$app->view->start('Super Dash', 'super', 'super');
+echo '<h2 class="lt">Super Dash</h2>';
+echo '<p class="sans dk">Pinned notes. Facilities and administrators are on the sub-dash.</p>';
+$pins = $app->note->pinnedFor($app->auth->id(), 25);
+if (!$pins) {
+    echo '<p class="sans dk">No pinned notes.</p>';
+} else {
+    $cc = 'lr';
+    echo '<table class="list lt notes sans">';
+    foreach ($pins as $n) {
+        $nid = (int) $n['id'];
+        echo '<tr class="' . $cc . '"><td><a class="listed_note" href="note.php?n=' . $nid . '">' . h(note_heading($n['body'] ?? '')) . '</a></td>';
+        echo '<td><i class="listed_note">' . h((string) $n['save_date']) . '</i></td>';
+        echo '<td>' . get_switch('Read', 'Read', 'note.php', 'n', (string) $nid, 'act_blue editNoteButton') . '</td></tr>';
+        $cc = $cc === 'lr' ? 'dr' : 'lr';
     }
+    echo '</table>';
 }
-$app->view->start('Super Dash', 'super');
-echo '<h2 class="lt">Facilities</h2>';
-echo '<p class="sans dk">A Facility is a school. Blocks are classes inside a facility.</p>';
-if ($err) {
-    echo '<p class="sans noticered">' . h($err) . '</p>';
-}
-if ($msg) {
-    echo '<p class="sans noticegreen">' . h($msg) . '</p>';
-}
-echo '<form method="post">' . $app->csrf->field();
-echo '<p class="sans">New facility name <input name="fname" required> code <input name="fcode" size="8"> ';
-echo '<input type="submit" name="new_facility" class="lt_button" value="Create"></p></form>';
-
-echo '<table class="list"><tr><th>Name</th><th>Code</th><th>Status</th><th></th></tr>';
-foreach ($app->facility->all() as $f) {
-    echo '<tr><td>' . h($f['name']) . '</td><td>' . h($f['code']) . '</td><td>' . h($f['status']) . '</td><td>';
-    echo post_button('Enter', 'Work as this facility', 'super.php', 'enter', (string) $f['id'], 'editNoteButton', $app->csrf->token());
-    echo '</td></tr>';
-}
-echo '</table>';
-if (!empty($_SESSION['facility_id'])) {
-    echo '<p class="sans">In facility #' . (int) $_SESSION['facility_id'] . ' ';
-    echo post_button('Leave', 'Clear', 'super.php', 'leave', '1', 'set_gray', $app->csrf->token()) . '</p>';
-}
-
-echo '<h2 class="lt">New Administrator</h2>';
-echo '<form method="post">' . $app->csrf->field();
-echo '<p class="sans">Facility<br><select class="formselect" name="facility_id">';
-foreach ($app->facility->all() as $f) {
-    echo '<option value="' . (int) $f['id'] . '">' . h($f['name']) . '</option>';
-}
-echo '</select></p>';
-echo '<p class="sans">Name<br><input name="name"></p>';
-echo '<p class="sans">Email<br><input type="email" name="email" required></p>';
-echo '<p class="sans">Username<br><input name="username" required></p>';
-echo '<p class="sans">Password<br><input type="password" name="pass" required></p>';
-echo '<p><input type="submit" name="new_admin" class="lt_button" value="Create admin"></p></form>';
 $app->view->end();

@@ -1366,7 +1366,51 @@ p.save-row {
 }
 
 .pw-confirm-wrap .pw-confirm-cancel {
-  margin-right: 0;
+  margin-right: 0.6em;
+}
+
+.pw-confirm-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75em;
+  margin: 0.8em 0 1.2em;
+}
+
+.pw-confirm-wrap .pw-confirm-go[hidden],
+.pw-confirm-wrap .pw-confirm-cancel[hidden],
+.pw-confirm-wrap .pw-confirm-yes[hidden] {
+  display: none !important;
+}
+
+p.field {
+  margin: 0.7em 0;
+}
+p.field label {
+  display: block;
+  margin-bottom: 0.25em;
+}
+p.field input[type="text"],
+p.field input[type="email"],
+p.field input[type="password"],
+p.field input[type="number"],
+p.field textarea {
+  display: block;
+  max-width: 100%;
+}
+
+.comment-block {
+  margin: 0.6em 0 1em;
+}
+
+.see-all {
+  margin: 0.4em 0 1.2em;
+}
+
+table.roll td form label {
+  display: inline-block;
+  margin: 0.15em 0.6em 0.15em 0;
+  white-space: nowrap;
 }
 
 

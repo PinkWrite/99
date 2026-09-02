@@ -12,7 +12,7 @@ $mine = (int) $w['writer_id'] === $app->auth->id();
 if (!$mine && !$app->auth->atLeast('editor') && !$app->auth->is('observer')) {
     $app->redirect('');
 }
-$app->view->start('History', $app->auth->atLeast('editor') ? 'ewrits' : 'writs', $app->auth->atLeast('editor') ? 'editor' : 'writer');
+$app->view->start('History', $app->auth->atLeast('editor') && ($_SESSION['pw_dash'] ?? '') === 'editor' ? 'ewrits' : 'writs', 'auto');
 echo '<h2 class="lt">History — ' . h($w['title']) . '</h2>';
 echo '<p>' . button('Back to writ', 'Open', $app->auth->atLeast('editor') ? 'review.php?w=' . $wid : 'writ.php?w=' . $wid, 'set_gray') . '</p>';
 $drafts = json_arr($w['drafts']);

@@ -61,6 +61,58 @@ function confirm_submit(string $name, string $firstLabel, string $confirmLabel):
         . '</span>';
 }
 
+/**
+ * Named options; value posted is the array key (an id). $empty is the value=0 label.
+ * @param array<int|string,string> $options
+ */
+function form_select(string $name, array $options, $selected = 0, string $empty = '', string $class = 'formselect', string $attrs = ''): string
+{
+    $html = '<select class="' . h($class) . '" name="' . h($name) . '" id="' . h($name) . '"';
+    if ($attrs !== '') {
+        $html .= ' ' . $attrs;
+    }
+    $html .= '>';
+    if ($empty !== '') {
+        $sel0 = ((string) $selected === '0' || $selected === '' || $selected === null) ? ' selected' : '';
+        $html .= '<option value="0"' . $sel0 . '>' . h($empty) . '</option>';
+    }
+    foreach ($options as $val => $label) {
+        $sel = ((string) $val === (string) $selected) ? ' selected' : '';
+        $html .= '<option value="' . h((string) $val) . '"' . $sel . '>' . h($label) . '</option>';
+    }
+    return $html . '</select>';
+}
+
+function comments_markup(array $comments, int $writId, bool $canEdit, int $uid, string $csrf): string
+{
+    $html = '<h4 class="review">Comments</h4>';
+    if (!$comments && !$canEdit) {
+        return $html . '<p class="sans dk">None yet.</p>';
+    }
+    foreach ($comments as $c) {
+        $mine = $canEdit && (int) $c['observer_id'] === $uid;
+        $html .= '<div class="writcontent remarks comment-block"><p class="sans dk"><b>'
+            . h((string) ($c['observer_name'] ?? 'Observer')) . '</b> · '
+            . h((string) ($c['save_date'] ?? '')) . '</p>';
+        if ($mine) {
+            $html .= '<form method="post" class="comment-form">' . '<input type="hidden" name="_csrf" value="' . h($csrf) . '">'
+                . '<input type="hidden" name="comment_id" value="' . (int) $c['id'] . '">'
+                . '<textarea name="comment_body" class="writingBox" rows="3" cols="82">' . h((string) $c['body']) . '</textarea>'
+                . '<p class="save-row"><button type="submit" name="save_comment" class="lt_button small" value="1">Save comment</button></p></form>';
+        } else {
+            $html .= '<section>' . nl_text((string) $c['body']) . '</section>';
+        }
+        $html .= '</div>';
+    }
+    if ($canEdit) {
+        $html .= '<form method="post" class="comment-form">' . '<input type="hidden" name="_csrf" value="' . h($csrf) . '">'
+            . '<p class="sans">New comment</p>'
+            . '<textarea name="comment_body" class="writingBox" rows="3" cols="82" placeholder="Observer comment…"></textarea>'
+            . '<p class="save-row"><button type="submit" name="new_comment" class="lt_button small" value="1">Post comment</button></p></form>';
+    }
+    return $html;
+}
+
 function nl_text(?string $s): string
 {
     return nl2br(h($s), false);
