@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * Google, Apple, GitHub OAuth. SysAdmin puts client id/secret in config.
+ * Google and GitHub OAuth. SysAdmin puts client id/secret in config.
  * After social login, Authenticator / passkey still apply if the account has them.
  */
 final class OAuth
@@ -23,7 +23,7 @@ final class OAuth
     /** @return array<string,string> provider => label, only those with keys */
     public function providers(): array
     {
-        $all = ['google' => 'Google', 'github' => 'GitHub', 'apple' => 'Apple'];
+        $all = ['google' => 'Google', 'github' => 'GitHub'];
         $out = [];
         foreach ($all as $p => $lab) {
             if ($this->enabled($p)) {
@@ -59,17 +59,6 @@ final class OAuth
                 'state' => $state,
             ]);
             return 'https://github.com/login/oauth/authorize?' . $q;
-        }
-        if ($provider === 'apple') {
-            $q = http_build_query([
-                'client_id' => $this->cfg('apple', 'id'),
-                'redirect_uri' => $cb,
-                'response_type' => 'code',
-                'response_mode' => 'query',
-                'scope' => 'name email',
-                'state' => $state,
-            ]);
-            return 'https://appleid.apple.com/auth/authorize?' . $q;
         }
         throw new RuntimeException('unknown provider');
     }
@@ -206,25 +195,6 @@ final class OAuth
                 'name' => (string) ($info['name'] ?? $info['login'] ?? 'Writer'),
             ];
         }
-        if ($p === 'apple') {
-            $tok = $this->postForm('https://appleid.apple.com/auth/token', [
-                'code' => $code,
-                'client_id' => $this->cfg('apple', 'id'),
-                'client_secret' => $this->cfg('apple', 'secret'),
-                'redirect_uri' => $cb,
-                'grant_type' => 'authorization_code',
-            ]);
-            $idtok = (string) ($tok['id_token'] ?? '');
-            $claims = $this->jwtPayload($idtok);
-            if (!$claims) {
-                return null;
-            }
-            return [
-                'sub' => (string) ($claims['sub'] ?? ''),
-                'email' => (string) ($claims['email'] ?? ''),
-                'name' => (string) ($claims['email'] ?? 'Writer'),
-            ];
-        }
         return null;
     }
 
@@ -295,17 +265,5 @@ final class OAuth
         curl_close($ch);
         $j = json_decode((string) $raw, true);
         return is_array($j) ? $j : [];
-    }
-
-    private function jwtPayload(string $jwt): ?array
-    {
-        $parts = explode('.', $jwt);
-        if (count($parts) < 2) {
-            return null;
-        }
-        $p = strtr($parts[1], '-_', '+/');
-        $p .= str_repeat('=', (4 - strlen($p) % 4) % 4);
-        $j = json_decode(base64_decode($p) ?: '', true);
-        return is_array($j) ? $j : null;
     }
 }

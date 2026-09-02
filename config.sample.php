@@ -52,16 +52,14 @@ return [
 
     // SysAdmin OAuth. Empty id or secret = that provider is off (button hidden).
     // Not stored in the database. Not editable in the app, even by a Superintendent.
-    // Callback URL for all three: https://{host}/oauth.php
+    // Callback for both: https://{host}/oauth.php
     // Google:  https://console.cloud.google.com/apis/credentials
-    //          https://developers.google.com/identity/protocols/oauth2/web-server
-    // GitHub:  https://github.com/settings/developers
-    //          https://docs.github.com/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app
-    // Apple:   https://developer.apple.com/account/resources/identifiers/list/serviceId
-    //          https://developer.apple.com/sign-in-with-apple/get-started/
+    //          OAuth client type: Web application
+    //          Authorized redirect URI: https://{host}/oauth.php
+    // GitHub:  https://github.com/settings/developers  (OAuth Apps)
+    //          Authorization callback URL: https://{host}/oauth.php
     'oauth' => [
         'google' => ['id' => '', 'secret' => ''],
-        'apple'  => ['id' => '', 'secret' => ''], // Apple secret is the JWT you generate from the .p8 key
         'github' => ['id' => '', 'secret' => ''],
     ],
 ];

@@ -106,7 +106,7 @@ foreach ($app->oauth->list($app->auth->id()) as $row) {
     $have[$row['provider']] = $row;
 }
 $linkRows = '';
-foreach (['google' => 'Google', 'github' => 'GitHub', 'apple' => 'Apple'] as $p => $lab) {
+foreach (['google' => 'Google', 'github' => 'GitHub'] as $p => $lab) {
     $on = isset($have[$p]);
     if (!$on && !$app->oauth->enabled($p)) {
         continue;

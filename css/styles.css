@@ -1481,7 +1481,7 @@ table.roll td form label {
   white-space: nowrap;
 }
 
-/* Equal-width identity buttons (passkey + Google / GitHub / Apple). */
+/* Equal-width identity buttons (passkey + Google / GitHub). */
 .login-id {
   display: flex;
   flex-direction: column;

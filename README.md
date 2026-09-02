@@ -51,8 +51,8 @@ The mysqli-era tree and `sql/legacy-lift.sql` live on the [legacy](https://githu
 - Fill-in: `||` is OR; `|&` is AND/OR (either or both). No exclusive AND.
 - Redraft: editor version becomes the writer's next start. `drafts` and `redrafts` JSON history. **Show history** or gray **no history**.
 - Note → Memo; Memo → Assignment.
-- Lost-password email (Admin and below). TOTP authenticator. Passkeys. After passkey or Google / GitHub / Apple, Authenticator can **Remember this machine** for 30 days; password login always asks for the code.
-- Google, Apple, and GitHub login (SysAdmin `oauth` keys in config). Create or link. Authenticator and passkeys still apply after a social login.
+- Lost-password email (Admin and below). TOTP authenticator. Passkeys. After passkey or Google / GitHub, Authenticator can **Remember this machine** for 30 days; password login always asks for the code.
+- Google and GitHub login (SysAdmin `oauth` keys in config). Create or link. Authenticator and passkeys still apply after a social login.
 - In-app + email notification checkboxes in the Locker. Acknowledge deletes the notice.
 
 ## 88

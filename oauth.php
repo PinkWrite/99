@@ -18,12 +18,12 @@ if (isset($_GET['code'], $_GET['state'])) {
     $app->redirect($app->auth->user() ? 'security.php' : 'login.php');
 }
 
-if (in_array($p, ['google', 'apple', 'github'], true) && $app->oauth->enabled($p)) {
+if (in_array($p, ['google', 'github'], true) && $app->oauth->enabled($p)) {
     header('Location: ' . $app->oauth->start($p, $link));
     exit;
 }
 
-if (in_array($p, ['google', 'apple', 'github'], true) && !$app->oauth->enabled($p)) {
+if (in_array($p, ['google', 'github'], true) && !$app->oauth->enabled($p)) {
     $_SESSION['oauth_err'] = 'That sign-in is not set up on this site.';
     $app->redirect($link ? 'security.php' : 'login.php');
 }
