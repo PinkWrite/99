@@ -92,12 +92,14 @@ if ($w['kind'] === 'test' && $owner) {
 
 if ($owner && $w['draft_status'] === 'submitted') {
     echo '<p class="sans noticegreen">Submitted and waiting for review.</p>';
+    echo writ_times($w);
     echo comments_markup($app->writ->comments($wid), $wid, $canComment, $uid, $app->csrf->token());
     $app->view->end();
     exit;
 }
 if ($owner && $w['edits_status'] === 'submitted') {
     echo '<p class="sans noticegreen">Correction submitted and waiting to be scored.</p>';
+    echo writ_times($w);
     echo comments_markup($app->writ->comments($wid), $wid, $canComment, $uid, $app->csrf->token());
     $app->view->end();
     exit;
@@ -105,6 +107,7 @@ if ($owner && $w['edits_status'] === 'submitted') {
 if ($w['draft_status'] === 'reviewed' && $w['edits_status'] === 'scored') {
     echo '<h3 class="lt">' . h($w['work']) . ' — ' . h($w['title']) . '</h3>';
     echo '<h4 class="lt">Score: ' . h((string) $w['score']) . '<small class="dk">/' . h((string) $w['outof']) . '</small></h4>';
+    echo writ_times($w);
     echo '<h4 class="review">Scoring</h4><section class="writcontent remarks">' . nl_text($w['scoring']) . '</section>';
     echo '<h4 class="review">Draft</h4><section class="writcontent draft">' . nl_text($w['draft']) . '</section>';
     echo '<h4 class="review">Editor revision</h4><section class="writcontent revision">' . nl_text($w['edits']) . '</section>';
@@ -126,6 +129,7 @@ if ($u['type'] === 'writer') {
 
 if (!$owner) {
     echo '<h3 class="lt">' . h($w['work']) . ' — ' . h($w['title']) . '</h3>';
+    echo writ_times($w);
     if ($w['instructions']) {
         echo '<h4 class="review">Instructions</h4><section class="writcontent remarks">' . nl_text($w['instructions']) . '</section>';
     }
@@ -167,6 +171,7 @@ if ($redraft && $w['edit_notes']) {
     echo '<h4 class="review">Redraft remarks</h4><section class="writcontent remarks">' . nl_text($w['edit_notes']) . '</section>';
 }
 echo '<p class="save-row">' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
+echo writ_times($w);
 echo '<p class="save-row"><button type="button" class="lt_button" title="Save (Ctrl + S)" onclick="pwAjaxForm(\'editform\',\'ajax/save-writ.php\',\'ajax_changes\');offNavWarn();">Save</button> ';
 echo '<span id="wordCount" class="wordCounter"></span> <span id="ajax_changes"></span></p>';
 

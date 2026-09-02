@@ -202,6 +202,9 @@ final class Auth
         $_SESSION['name'] = $u['name'];
         $this->user = $u;
         unset($_SESSION['pending_2fa'], $_SESSION['pending_2fa_via']);
+        if ($this->app->db && $this->app->db->columnExists('users', 'last_seen')) {
+            $this->app->db->run('UPDATE users SET last_seen = NOW() WHERE id = ?', [(int) $u['id']]);
+        }
     }
 
     public function logout(): void

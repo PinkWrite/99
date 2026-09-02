@@ -52,6 +52,7 @@ $writer = $app->user->find((int) $w['writer_id']);
 $app->view->start('Review', 'ewrits', 'editor');
 echo '<p class="save-row">' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
 echo '<p class="sans">Writer: ' . h($writer['name'] ?? '') . '</p>';
+echo writ_times($w);
 if ($w['kind'] === 'test') {
     echo '<p class="sans">This is a test. Auto-score: ' . h((string) $w['test_auto_score']) . '/' . h((string) $w['outof']) . '</p>';
 }

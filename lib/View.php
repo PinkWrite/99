@@ -79,7 +79,7 @@ final class View
             $dash = 'admin';
         } elseif (in_array($active, ['observer', 'owrits'], true) || $type === 'observer') {
             $dash = 'observer';
-        } elseif (in_array($active, ['editor', 'ewrits', 'tests', 'assign', 'myblocks', 'archives'], true)) {
+        } elseif (in_array($active, ['editor', 'ewrits', 'tests', 'assign', 'myblocks', 'archives', 'roll'], true)) {
             $dash = 'editor';
         } elseif ($active === 'dash' || $active === 'locker') {
             $dash = 'my';
@@ -159,6 +159,7 @@ final class View
         } elseif ($dash === 'editor') {
             echo '<li class="user">' . button('Memos', 'List memos', 'memos-editor.php', 'navDarkButton user ' . $is('memos')) . '</li>';
             echo '<li class="user">' . button('My Blocks', 'Blocks you edit', 'my-blocks.php', 'navDarkButton user ' . $is('myblocks')) . '</li>';
+            echo '<li class="user">' . button('Roll', 'Writers by student', 'roll.php', 'navDarkButton user ' . $is('roll')) . '</li>';
             echo '<li class="user">' . button('Writs', 'List writs', 'writs-editor.php', 'navDarkButton user ' . $is('ewrits')) . '</li>';
             echo '<li class="user">' . button('Assignments', 'Assigned writs', 'assignments.php', 'navDarkButton user ' . $is('assign')) . '</li>';
             echo '<li class="user">' . button('Tests', 'Compose and list tests', 'tests.php', 'navDarkButton user ' . $is('tests')) . '</li>';

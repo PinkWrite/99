@@ -35,6 +35,41 @@ function writ_work(?string $s, int $id): string
     return $w !== '' ? $w : 'task-' . $id;
 }
 
+function writ_when(?string $ts): string
+{
+    $ts = trim((string) $ts);
+    if ($ts === '' || str_starts_with($ts, '0000') || str_starts_with($ts, '1970-01-01')) {
+        return '';
+    }
+    return $ts;
+}
+
+/** Saved / submitted / edited times on a writ. Empty stamps are omitted. */
+function writ_times(array $w): string
+{
+    $pairs = [
+        'Opened' => 'draft_open_date',
+        'Saved' => 'draft_save_date',
+        'Submitted' => 'draft_submit_date',
+        'Edited' => 'edits_date',
+        'Viewed' => 'edits_viewed_date',
+        'Correction saved' => 'corrected_save_date',
+        'Correction submitted' => 'corrected_submit_date',
+        'Scored' => 'scoring_date',
+    ];
+    $bits = [];
+    foreach ($pairs as $label => $col) {
+        $t = writ_when($w[$col] ?? null);
+        if ($t !== '') {
+            $bits[] = $label . ' ' . $t;
+        }
+    }
+    if (!$bits) {
+        return '';
+    }
+    return '<p class="sans dk writ-times">' . h(implode(' · ', $bits)) . '</p>';
+}
+
 function clean_body(?string $s): string
 {
     $s = strip_tags((string) $s);

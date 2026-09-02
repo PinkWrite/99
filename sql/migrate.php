@@ -108,6 +108,20 @@ function pw99_migrate(App $app): string
         }
         $db->run('INSERT INTO schema_version (version, note) VALUES (5, ?)', ['account action log']);
         $notes[] = 'schema_version=5 account log';
+        $ver = 5;
+    }
+    if ($ver < 6) {
+        if ($db->tableExists('users') && !$db->columnExists('users', 'last_seen')) {
+            $db->pdo()->exec('ALTER TABLE users ADD COLUMN last_seen TIMESTAMP NULL DEFAULT NULL');
+        }
+        if ($db->tableExists('account_log') && $db->columnExists('users', 'last_seen')) {
+            $db->pdo()->exec("UPDATE users u SET last_seen = (
+                SELECT MAX(al.created_at) FROM account_log al
+                WHERE al.user_id = u.id AND al.action = 'login'
+            ) WHERE last_seen IS NULL");
+        }
+        $db->run('INSERT INTO schema_version (version, note) VALUES (6, ?)', ['users last_seen']);
+        $notes[] = 'schema_version=6 last_seen';
     }
     return $notes ? implode('; ', $notes) : 'schema current';
 }

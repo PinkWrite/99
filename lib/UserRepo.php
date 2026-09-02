@@ -118,6 +118,14 @@ final class UserRepo
         return $this->app->db->all('SELECT * FROM users WHERE type = ? ORDER BY name', [$type]);
     }
 
+    public function listByEditor(int $editorId): array
+    {
+        return $this->app->db->all(
+            'SELECT * FROM users WHERE type = \'writer\' AND editor_id = ? ORDER BY name',
+            [$editorId]
+        );
+    }
+
     public function listByFacility(?int $facilityId, ?string $type = null): array
     {
         if ($facilityId) {
