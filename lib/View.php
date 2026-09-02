@@ -96,7 +96,7 @@ final class View
     {
         $on = fn (string $d) => $dash === $d ? 'activedash' : '';
         echo '<div id="top_menu_nav"><div id="topnav"><ul class="topnav">';
-        echo '<li><h1><a class="dklink" href="' . h($this->app->url('')) . '">PinkWrite 99</a></h1></li>';
+        echo '<li><h1><a class="dklink" href="index.php">PinkWrite 99</a></h1></li>';
         echo '<li class="user">' . button('Logout', 'Exit from this login session', 'logout.php', 'navButton user') . '</li>';
         $type = $u['type'];
         if ($type === 'superintendent') {
@@ -114,7 +114,7 @@ final class View
         if ($type !== 'observer') {
             echo '<li class="user">' . button('Writer Dash', 'Writing workspace', 'writer-dash.php', 'navButton user ' . $on('writer')) . '</li>';
         }
-        echo '<li class="user">' . button('My Dash', 'Home', $this->app->url(''), 'navButton user ' . $on('my')) . '</li>';
+        echo '<li class="user">' . button('My Dash', 'Home', 'index.php', 'navButton user ' . $on('my')) . '</li>';
         echo '</ul></div></div>';
     }
 
@@ -130,6 +130,7 @@ final class View
         $noteLabel = $n > 0 ? "Notifications ({$n})" : 'Notifications';
         $type = $u['type'];
         $locker = match ($dash) {
+            'my', 'writer' => 'locker.php',
             'editor' => 'locker-editor.php',
             'observer' => 'locker-observer.php',
             'super' => 'locker-super.php',

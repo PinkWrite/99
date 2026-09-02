@@ -76,6 +76,26 @@ final class UserRepo
         $this->app->db->run('UPDATE users SET pass = NULL WHERE id = ?', [$id]);
     }
 
+    public function saveContact(int $id, string $name, string $email): void
+    {
+        $name = trim($name);
+        $email = strtolower(trim($email));
+        if ($name === '') {
+            throw new InvalidArgumentException('Name is required.');
+        }
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException('Enter a valid email address.');
+        }
+        $taken = $this->app->db->one('SELECT id FROM users WHERE email = ? AND id != ?', [$email, $id]);
+        if ($taken) {
+            throw new InvalidArgumentException('That email is already in use.');
+        }
+        $this->app->db->run('UPDATE users SET name = ?, email = ? WHERE id = ?', [$name, $email, $id]);
+        if (!empty($_SESSION['user_id']) && (int) $_SESSION['user_id'] === $id) {
+            $_SESSION['name'] = $name;
+        }
+    }
+
     public function savePrefs(int $id, array $prefs): void
     {
         $this->app->db->run('UPDATE users SET notify_prefs = ? WHERE id = ?', [json_enc($prefs), $id]);
