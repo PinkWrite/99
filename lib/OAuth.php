@@ -127,11 +127,13 @@ final class OAuth
         if (($u['status'] ?? '') !== 'active') {
             return ['ok' => false, 'error' => 'This account is not active.'];
         }
-        if (!empty($u['totp_enabled'])) {
-            $_SESSION['pending_2fa'] = (int) $u['id'];
+        $r = $this->app->auth->afterFactor($u, 'oauth');
+        if ($r === 'totp') {
             return ['ok' => true, 'need' => 'totp'];
         }
-        $this->app->auth->establish($u);
+        if ($r !== 'ok') {
+            return ['ok' => false, 'error' => 'This account is not active.'];
+        }
         return ['ok' => true];
     }
 

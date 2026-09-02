@@ -69,6 +69,25 @@ function pw99_migrate(App $app): string
         }
         $db->run('INSERT INTO schema_version (version, note) VALUES (3, ?)', ['observer comments on writs']);
         $notes[] = 'schema_version=3 comments';
+        $ver = 3;
+    }
+    if ($ver < 4) {
+        if (!$db->tableExists('totp_devices')) {
+            $db->pdo()->exec("CREATE TABLE totp_devices (
+              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+              user_id BIGINT UNSIGNED NOT NULL,
+              selector CHAR(16) NOT NULL,
+              token_hash CHAR(64) NOT NULL,
+              expires_at DATETIME NOT NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              last_used_at DATETIME DEFAULT NULL,
+              PRIMARY KEY (id),
+              UNIQUE KEY selector (selector),
+              KEY user_id (user_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+        $db->run('INSERT INTO schema_version (version, note) VALUES (4, ?)', ['remember this machine for totp']);
+        $notes[] = 'schema_version=4 totp devices';
     }
     return $notes ? implode('; ', $notes) : 'schema current';
 }

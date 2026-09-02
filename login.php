@@ -19,16 +19,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['passkey'])) {
         (string) $_POST['sig']
     );
     if ($u && $u['status'] === 'active') {
-        $app->auth->establish($u);
-        $app->redirect('');
+        $r = $app->auth->afterFactor($u, 'passkey');
+        if ($r === 'ok') {
+            $app->redirect('');
+        }
+        if ($r === 'totp') {
+            $needTotp = true;
+        }
+    } else {
+        $err = 'Passkey failed.';
     }
-    $err = 'Passkey failed.';
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['totp_code'])) {
-    if ($app->auth->finishTotp((string) $_POST['totp_code'])) {
+    if (!$app->csrf->check()) {
+        $err = 'Bad request.';
+        $needTotp = true;
+    } elseif ($app->auth->finishTotp((string) $_POST['totp_code'], isset($_POST['remember_machine']))) {
         $app->redirect('');
+    } else {
+        $err = 'That code did not match.';
+        $needTotp = true;
     }
-    $err = 'That code did not match.';
-    $needTotp = true;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     if (!$app->csrf->check()) {
         $err = 'Bad request.';
@@ -69,8 +79,12 @@ if ($err) {
 if ($needTotp) {
     echo '<h3 class="lt">Authenticator</h3>';
     echo '<form method="post">' . $app->csrf->field();
-    echo '<p class="sans">Code <input name="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
-    echo '<p><input type="submit" class="lt_button" value="Verify"></p></form>';
+    echo '<p class="sans">Code<br><input name="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
+    $via = $app->auth->totpVia();
+    if ($via === 'passkey' || $via === 'oauth') {
+        echo '<p class="sans"><label><input type="checkbox" name="remember_machine" value="1"> Remember this machine</label></p>';
+    }
+    echo '<p><input type="submit" class="set_gray" value="Verify"></p></form>';
 } else {
     echo '<h3 class="lt">Login Options</h3>';
     echo '<form method="post" action="login.php">' . $app->csrf->field();

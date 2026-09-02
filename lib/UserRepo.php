@@ -88,6 +88,9 @@ final class UserRepo
             $enabled ? 1 : 0,
             $id,
         ]);
+        if (!$enabled && $this->app->db->tableExists('totp_devices')) {
+            $this->app->db->run('DELETE FROM totp_devices WHERE user_id = ?', [$id]);
+        }
     }
 
     public function listByType(string $type): array
