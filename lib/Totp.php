@@ -18,6 +18,12 @@ final class Totp
             . '&algorithm=SHA1&digits=6&period=30';
     }
 
+    public function qrSvg(string $uri): string
+    {
+        require_once dirname(__DIR__) . '/lib/QrSvg.php';
+        return QrSvg::make($uri);
+    }
+
     public function verify(string $secret, string $code): bool
     {
         $code = preg_replace('/\s+/', '', $code) ?? '';

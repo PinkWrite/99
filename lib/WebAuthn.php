@@ -123,6 +123,23 @@ final class WebAuthn
         return $this->app->db->all('SELECT * FROM passkeys WHERE user_id = ? ORDER BY id', [$userId]);
     }
 
+    public function rename(int $id, int $userId, string $name): void
+    {
+        $name = trim($name);
+        if ($name === '') {
+            $name = 'Passkey';
+        }
+        if (function_exists('mb_substr')) {
+            $name = mb_substr($name, 0, 80);
+        } else {
+            $name = substr($name, 0, 80);
+        }
+        $this->app->db->run(
+            'UPDATE passkeys SET name = ? WHERE id = ? AND user_id = ?',
+            [$name, $id, $userId]
+        );
+    }
+
     public function delete(int $id, int $userId): void
     {
         $this->app->db->run('DELETE FROM passkeys WHERE id = ? AND user_id = ?', [$id, $userId]);

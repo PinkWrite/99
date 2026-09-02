@@ -19,6 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     } elseif (isset($_POST['id'], $_POST['spki'])) {
         $app->passkey->register($app->auth->id(), (string) $_POST['id'], (string) $_POST['spki'], (string) ($_POST['name'] ?? 'Passkey'));
         $app->redirect('security.php');
+    } elseif (isset($_POST['rename_pk'])) {
+        $app->passkey->rename((int) $_POST['rename_pk'], $app->auth->id(), (string) ($_POST['pk_name'] ?? ''));
     } elseif (isset($_POST['del_pk'])) {
         $pkId = (int) $_POST['del_pk'];
         $pks = $app->passkey->list($app->auth->id());
@@ -58,11 +60,12 @@ if (!empty($u['totp_enabled'])) {
 } elseif (!empty($_SESSION['totp_pending'])) {
     $secret = $_SESSION['totp_pending'];
     $uri = $app->totp->uri($secret, $u['username'], $app->title());
-    echo '<p class="sans">Add this account in your authenticator app, then enter a code.</p>';
-    echo '<p class="sans"><code>' . h($secret) . '</code></p>';
-    echo '<p class="dk sans"><small>' . h($uri) . '</small></p>';
+    echo '<p class="sans">Scan this with your authenticator app, or type the secret below.</p>';
+    echo '<div class="totp-qr">' . $app->totp->qrSvg($uri) . '</div>';
+    echo '<p class="sans totp-secret"><code>' . h($secret) . '</code></p>';
     echo '<form method="post">' . $app->csrf->field();
-    echo '<p>Code <input name="code" inputmode="numeric" required></p>';
+    echo '<p class="field sans"><label for="totp_code">Code</label>';
+    echo '<input name="code" id="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
     echo '<p><input type="submit" name="totp_confirm" class="lt_button" value="Confirm"></p></form>';
 } else {
     echo '<form method="post">' . $app->csrf->field() . '<input type="submit" name="totp_start" class="lt_button" value="Set up authenticator"></form>';
@@ -71,13 +74,20 @@ if (!empty($u['totp_enabled'])) {
 echo '<h2 class="lt">Passkeys</h2>';
 echo '<p class="sans dk">Works on https hosts. Platform or hardware key (YubiKey, etc.).</p>';
 echo '<p><button type="button" class="lt_button" id="pkadd">Add a passkey</button></p>';
-echo '<ul class="sans">';
-foreach ($app->passkey->list($app->auth->id()) as $pk) {
-    echo '<li>' . h($pk['name']) . ' · ' . h($pk['created_at']) . ' ';
-    echo post_button('Remove', 'Delete', 'security.php', 'del_pk', (string) $pk['id'], 'set_gray', $app->csrf->token());
-    echo '</li>';
+$pks = $app->passkey->list($app->auth->id());
+if ($pks) {
+    echo '<table class="id-link pk-list"><tbody>';
+    foreach ($pks as $pk) {
+        echo '<tr><td class="pk-name"><form method="post">' . $app->csrf->field();
+        echo '<input type="hidden" name="rename_pk" value="' . (int) $pk['id'] . '">';
+        echo '<input type="text" name="pk_name" value="' . h((string) $pk['name']) . '" maxlength="80" aria-label="Passkey name"> ';
+        echo '<input type="submit" class="lt_button" value="Save"></form></td>';
+        echo '<td class="sans dk pk-when">' . h((string) $pk['created_at']) . '</td><td>';
+        echo post_button('Remove', 'Delete', 'security.php', 'del_pk', (string) $pk['id'], 'set_gray', $app->csrf->token());
+        echo '</td></tr>';
+    }
+    echo '</tbody></table>';
 }
-echo '</ul>';
 echo '<script src="js/pw99.js"></script><script>document.getElementById("pkadd").onclick=function(){pwPasskeyRegister("passkey-create.php","security.php",' . json_encode($app->csrf->token()) . ');};</script>';
 
 $have = [];

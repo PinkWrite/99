@@ -79,7 +79,8 @@ if ($err) {
 if ($needTotp) {
     echo '<h3 class="lt">Authenticator</h3>';
     echo '<form method="post">' . $app->csrf->field();
-    echo '<p class="sans">Code<br><input name="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
+    echo '<p class="field sans"><label for="totp_code">Code</label>';
+    echo '<input name="totp_code" id="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
     $via = $app->auth->totpVia();
     if ($via === 'passkey' || $via === 'oauth') {
         echo '<p class="sans"><label><input type="checkbox" name="remember_machine" value="1"> Remember this machine</label></p>';

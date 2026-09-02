@@ -1385,10 +1385,12 @@ p.save-row {
 
 p.field {
   margin: 0.7em 0;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 p.field label {
   display: block;
   margin-bottom: 0.25em;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 p.field input[type="text"],
 p.field input[type="email"],
@@ -1534,6 +1536,46 @@ input.id-disconnect:hover {
 .pw-pass-fields.pw-off input[type="submit"] {
   opacity: 0.45;
   pointer-events: none;
+}
+
+.totp-qr {
+  display: inline-block;
+  background: #fff;
+  padding: 0.55em;
+  border-radius: 8px;
+  margin: 0.5em 0 0.8em;
+  line-height: 0;
+}
+.totp-qr svg {
+  display: block;
+  width: 10.5em;
+  height: 10.5em;
+}
+.totp-secret code {
+  font: 1.05em/1.5em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
+  letter-spacing: 0.06em;
+  color: #ddd;
+}
+
+table.pk-list td {
+  vertical-align: middle;
+}
+table.pk-list td.pk-name form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45em;
+  margin: 0;
+}
+table.pk-list td.pk-name input[type="text"] {
+  width: 12em;
+  max-width: 100%;
+  box-sizing: border-box;
+  font: 1em/1.4em Verdana, Arial, Helvetica, sans-serif;
+}
+table.pk-list td.pk-when {
+  white-space: nowrap;
+  padding-right: 1em;
 }
 
 
