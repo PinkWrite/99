@@ -1,18 +1,7 @@
 <?php
-
-// Require the configuration before any PHP code as the configuration controls error reporting
-require('./config.php');
-
-// Destroy the session
-$_SESSION = array(); // Destroy the variables
-session_destroy(); // Destroy the session itself
-setcookie(session_name(), null, 86401); // Set any _SESSION cookies to expire in Jan 1970
-
-// Restart the session
-session_start();
+declare(strict_types=1);
+$import = ['auth'];
+require __DIR__ . '/lib/boot.php';
+$app->auth->logout();
 $_SESSION['logout'] = true;
-// Redirect
-header("Location: in");
-exit(); // Quit the script
-
-?>
+$app->redirect('login.php');
