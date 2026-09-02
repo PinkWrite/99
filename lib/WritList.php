@@ -524,14 +524,14 @@ final class WritList
             echo '<input type="hidden" name="' . h((string) $name) . '" value="' . h((string) $value) . '">';
         }
         echo '</form>';
-        echo '<div style="display:inline;float:right"><table style="float:right" class="plain"><tbody><tr><td><span class="lo sans">&uarr;&darr;</span></td>';
+        echo '<div class="list-toolbar"><table class="plain"><tbody><tr><td><span class="lo sans">&uarr;&darr;</span></td>';
         foreach ($sorts as $key => $pair) {
             echo '<td>' . button($pair[0], $pair[1], $where . $sortGet . 's=' . $key . $searchSuffix, $cl[$key] ?? 'act_ltgray') . '</td>';
         }
         echo '<td><div class="search-input"><input type="text" name="r" placeholder="Search" form="' . h($formId) . '" id="' . h($boxId) . '" value="' . h($q) . '">';
         echo '<span data-clear-input onclick="searchClearReset(\'' . h($boxId) . '\',\'' . h($formId) . '\');" id="' . h($boxId) . '_clear">&times;</span></div></td><td>';
         echo '<label style="cursor:pointer"><svg width="28" height="28" xmlns="http://www.w3.org/2000/svg"><ellipse stroke="#bbb" stroke-width="3" ry="10" rx="10" cy="12" cx="12" fill="none"/><line stroke="#bbb" stroke-width="3" y2="27" x2="27" y1="18" x1="18" fill="none"/></svg>';
-        echo '<input type="submit" form="' . h($formId) . '" value="Search" hidden></label></td></tr></tbody></table></div><br><br>';
+        echo '<input type="submit" form="' . h($formId) . '" value="Search" hidden></label></td></tr></tbody></table></div>';
         echo '<script>
 if (typeof searchClearReset !== "function") {
   function searchClearReset(clearid, formid){document.getElementById(clearid).value="";document.getElementById(formid).submit();}
