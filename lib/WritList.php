@@ -563,21 +563,22 @@ if (typeof searchClearReset !== "function") {
     {
         $key = $mode === 'writer' ? 'writer_archive' : 'editor_archive';
         $return = preg_replace('/[?#].*$/', '', basename($whereAmI)) ?: ($mode === 'writer' ? 'writs.php' : 'editor.php');
-        echo '<table><tbody><tr><td><div onclick="showBulkActions()" style="cursor:pointer;display:inline;float:right"><button type="button" class="act_ltgray small" id="bulk_actions_btn">Archive actions &#9660;</button></div></td></tr></tbody></table>';
-        echo '<div id="bulk_actions_div" hidden><form id="bulk_actions" method="post" action="archive-act.php">';
+        echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="archive-act.php">';
         echo $this->app->csrf->field();
         echo '<input type="hidden" name="' . h($key) . '" value="' . $uid . '">';
         echo '<input type="hidden" name="return" value="' . h($return) . '">';
-        echo '<table style="float:right;width:auto"><tr>';
+        echo '<span id="bulk_actions_div" class="bulk-opts" hidden>';
         if ($status === 'archived') {
-            echo '<td>' . confirm_submit('bluksubmit', 'delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small') . '</td>';
-            echo '<td>' . confirm_submit('bluksubmit', 'restore', 'Confirm restore', 'restore', 'act_green small', 'act_green small') . '</td>';
+            echo confirm_submit('bluksubmit', 'delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small');
+            echo confirm_submit('bluksubmit', 'restore', 'Confirm restore', 'restore', 'act_green small', 'act_green small');
         } else {
-            echo '<td>' . confirm_submit('bluksubmit', 'archive all scored', 'Confirm archive all scored', 'archive all scored', 'act_blue small', 'act_blue small') . '</td>';
-            echo '<td>' . confirm_submit('bluksubmit', 'archive', 'Confirm archive', 'archive', 'act_dkgray small', 'act_dkgray small') . '</td>';
+            echo confirm_submit('bluksubmit', 'archive all scored', 'Confirm archive all scored', 'archive all scored', 'act_blue small', 'act_blue small');
+            echo confirm_submit('bluksubmit', 'archive', 'Confirm archive', 'archive', 'act_dkgray small', 'act_dkgray small');
         }
-        echo '<td><label style="display:inline;float:right"><small class="sans lt">Select all</small>&nbsp;<input type="checkbox" onclick="toggle(this)"></label></td>';
-        echo '</tr></table></form></div>';
+        echo '<label class="bulk-select-all"><small class="sans lt">Select all</small> <input type="checkbox" onclick="toggle(this)"></label>';
+        echo '</span>';
+        echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Archive actions &#9660;</button>';
+        echo '</form></div>';
     }
 
     private function bulkScript(): void
