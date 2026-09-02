@@ -23,8 +23,13 @@ final class View
         echo '<meta name="robots" content="noindex">';
         echo '<meta charset="utf-8">';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1" />';
-        echo '<link rel="stylesheet" href="css/styles.css" type="text/css" />';
+        $cssV = @filemtime(__DIR__ . '/../css/styles.css') ?: time();
+        $jsV = @filemtime(__DIR__ . '/../js/pw99.js') ?: time();
+        echo '<link rel="stylesheet" href="css/styles.css?v=' . (int) $cssV . '" type="text/css" />';
+        echo '<script src="js/pw99.js?v=' . (int) $jsV . '"></script>';
         echo '<meta http-equiv="Cache-Control" content="no-cache" />';
+        echo '<meta http-equiv="Pragma" content="no-cache" />';
+        echo '<meta http-equiv="Expires" content="0" />';
         echo '<title>' . h($title) . '</title></head><body><div id="wrap">';
         if ($u) {
             $this->topNav($u, $active, $dash);
@@ -88,7 +93,7 @@ final class View
         $type = $u['type'];
         if (in_array($type, ['superintendent', 'admin', 'supervisor'], true)) {
             if ($type === 'superintendent') {
-                echo '<li class="user">' . button('Super', 'Facilities', 'super.php', 'navButton user ' . $is('super')) . '</li>';
+                echo '<li class="user">' . button('Super Dash', 'Facilities', 'super.php', 'navButton user ' . $is('super')) . '</li>';
             }
             echo '<li class="user">' . button('Admin Dash', 'Admin', 'admin.php', 'navButton user ' . $is('admin')) . '</li>';
             echo '<li class="user">' . button('Editor Dash', 'Editor', 'editor.php', 'navButton user ' . $editorTop) . '</li>';
@@ -122,7 +127,11 @@ final class View
         echo '<li class="lt sans">' . h($greeting) . '</li>';
         echo '<li class="user">' . button('Locker', 'Open your locker', $locker, 'navDarkButton user ' . $is('locker')) . '</li>';
         echo '<li class="user">' . button($noteLabel, 'Notifications', 'notifications.php', 'navDarkButton user ' . $is('notify')) . '</li>';
-        if ($dash === 'observer') {
+        if (in_array($active, ['super', 'admin'], true)) {
+            // Super/Admin keep Locker and Notifications; their own tools live on the page.
+        } elseif ($dash === 'observer') {
+            echo '<li class="user">' . button('Binder', 'List memos', 'binder-observer.php', 'navDarkButton user ' . $is('binder')) . '</li>';
+            echo '<li class="user">' . button('Observees', 'View observed writers', 'observer.php', 'navDarkButton user ' . $is('observer')) . '</li>';
             echo '<li class="user">' . button('Writs', 'Writs', 'writs-observer.php', 'navDarkButton user ' . $is('owrits')) . '</li>';
         } elseif ($dash === 'editor') {
             echo '<li class="user">' . button('Binder', 'List memos', 'binder-editor.php', 'navDarkButton user ' . $is('binder')) . '</li>';
@@ -137,7 +146,7 @@ final class View
             echo '<li class="user">' . button('Blocks', 'View blocks', 'blocks.php', 'navDarkButton user ' . $is('blocks')) . '</li>';
             echo '<li class="user">' . button('Writs', 'View writs', 'writs.php', 'navDarkButton user ' . $is('writs')) . '</li>';
         }
-        $label = $dash === 'editor' ? 'Editor' : ($dash === 'observer' ? 'Observer' : 'Dash');
+        $label = $dash === 'editor' ? 'Editor' : ($dash === 'observer' ? 'Observer' : (in_array($active, ['super', 'admin'], true) ? ($active === 'super' ? 'Super' : 'Admin') : 'Dash'));
         echo '<li class="user lt sans">' . h($u['name']) . ' (' . h($label) . ')</li>';
         echo '</ul></div></div>';
     }

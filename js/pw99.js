@@ -125,4 +125,65 @@
     if (x.redirected) { location.href = x.url; return; }
     location.href = './';
   };
+
+  function pwConfirmMask() {
+    var m = document.getElementById('pw-confirm-mask');
+    if (m) return m;
+    m = document.createElement('div');
+    m.id = 'pw-confirm-mask';
+    m.setAttribute('title', 'Cancel');
+    document.body.appendChild(m);
+    m.addEventListener('click', pwConfirmClose);
+    return m;
+  }
+
+  function pwConfirmClose() {
+    var nodes = document.querySelectorAll('.pw-confirm-wrap.is-open');
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].classList.remove('is-open');
+      var go = nodes[i].querySelector('.pw-confirm-go');
+      var cancel = nodes[i].querySelector('.pw-confirm-cancel');
+      var yes = nodes[i].querySelector('.pw-confirm-yes');
+      if (go) go.hidden = false;
+      if (cancel) cancel.hidden = true;
+      if (yes) {
+        yes.hidden = true;
+        yes.disabled = true;
+      }
+    }
+    var m = document.getElementById('pw-confirm-mask');
+    if (m) m.style.display = 'none';
+  }
+
+  function pwConfirmOpen(wrap) {
+    if (!wrap) return;
+    pwConfirmClose();
+    pwConfirmMask().style.display = 'block';
+    wrap.classList.add('is-open');
+    var go = wrap.querySelector('.pw-confirm-go');
+    var cancel = wrap.querySelector('.pw-confirm-cancel');
+    var yes = wrap.querySelector('.pw-confirm-yes');
+    if (go) go.hidden = true;
+    if (cancel) cancel.hidden = false;
+    if (yes) {
+      yes.hidden = false;
+      yes.disabled = false;
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest ? e.target.closest('.pw-confirm-go') : null;
+    if (go) {
+      e.preventDefault();
+      pwConfirmOpen(go.closest('.pw-confirm-wrap'));
+      return;
+    }
+    if (e.target.closest && e.target.closest('.pw-confirm-cancel')) {
+      e.preventDefault();
+      pwConfirmClose();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' || e.keyCode === 27) pwConfirmClose();
+  });
 })();

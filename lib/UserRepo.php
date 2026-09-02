@@ -113,6 +113,24 @@ final class UserRepo
         );
     }
 
+    /** Writer ids this user observes; editors with an empty list get their own writers. */
+    public function observeeIds(array $u): array
+    {
+        $ids = [];
+        foreach (json_arr($u['observing_json'] ?? '[]') as $id) {
+            $id = (int) $id;
+            if ($id > 0) {
+                $ids[] = $id;
+            }
+        }
+        if (!$ids && $this->app->auth->atLeast('editor')) {
+            foreach ($this->writersForEditor($this->app->auth->id()) as $wr) {
+                $ids[] = (int) $wr['id'];
+            }
+        }
+        return array_values(array_unique($ids));
+    }
+
     public function blocksOf(array $user): array
     {
         $ids = json_arr($user['blocks_json'] ?? '[]');

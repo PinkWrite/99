@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         }
     }
 }
-$app->view->start('Superintendent', 'super');
+$app->view->start('Super Dash', 'super');
 echo '<h2 class="lt">Facilities</h2>';
 echo '<p class="sans dk">A Facility is a school. Blocks are classes inside a facility.</p>';
 if ($err) {
@@ -66,12 +66,14 @@ if (!empty($_SESSION['facility_id'])) {
 
 echo '<h2 class="lt">New Administrator</h2>';
 echo '<form method="post">' . $app->csrf->field();
-echo '<p class="sans">Facility <select name="facility_id">';
+echo '<p class="sans">Facility<br><select class="formselect" name="facility_id">';
 foreach ($app->facility->all() as $f) {
     echo '<option value="' . (int) $f['id'] . '">' . h($f['name']) . '</option>';
 }
 echo '</select></p>';
-echo '<p class="sans">Name <input name="name"> Username <input name="username" required></p>';
-echo '<p class="sans">Email <input type="email" name="email" required> Password <input type="password" name="pass" required></p>';
+echo '<p class="sans">Name<br><input name="name"></p>';
+echo '<p class="sans">Email<br><input type="email" name="email" required></p>';
+echo '<p class="sans">Username<br><input name="username" required></p>';
+echo '<p class="sans">Password<br><input type="password" name="pass" required></p>';
 echo '<p><input type="submit" name="new_admin" class="lt_button" value="Create admin"></p></form>';
 $app->view->end();

@@ -48,7 +48,7 @@ if ($msg) {
     echo '<p class="sans noticegreen">' . h($msg) . '</p>';
 }
 echo '<form method="post">' . $app->csrf->field();
-echo '<p class="sans">Type <select name="type"><option value="writer">Writer</option><option value="observer">Observer</option></select></p>';
+echo '<p class="sans">Type <select class="formselect" name="type"><option value="writer">Writer</option><option value="observer">Observer</option></select></p>';
 echo '<p class="sans">Name <input name="name" required> Username <input name="username" required></p>';
 echo '<p class="sans">Email <input type="email" name="email" required></p>';
 echo '<p class="sans">Password <input type="password" name="pass1" required> Confirm <input type="password" name="pass2" required></p>';

@@ -110,10 +110,10 @@ if (!$owner) {
     exit;
 }
 
-echo '<form id="editform" method="post">' . $app->csrf->field();
+echo '<form id="editform" method="post" onsubmit="offNavWarn();">' . $app->csrf->field();
 echo '<input type="hidden" name="writ_id" value="' . (int) $wid . '">';
 echo '<input type="hidden" name="user_form" value="' . (int) $uid . '">';
-echo '<p class="sans"><label>Block <select name="block" id="block" onchange="onNavWarn()">';
+echo '<p class="sans"><label>Block: <select class="formselect small" name="block" id="block" onchange="onNavWarn()">';
 echo '<option value="0">Main</option>';
 foreach ($blocks as $b) {
     $sel = ((int) $w['block_id'] === (int) $b['id']) ? ' selected' : '';
@@ -128,9 +128,9 @@ if ($w['instructions']) {
 if ($redraft && $w['edit_notes']) {
     echo '<h4 class="review">Redraft remarks</h4><section class="writcontent remarks">' . nl_text($w['edit_notes']) . '</section>';
 }
-echo '<p>' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
-echo '<button type="button" class="lt_button" title="Save (Ctrl + S)" onclick="pwAjaxForm(\'editform\',\'ajax/save-writ.php\',\'ajax_changes\');offNavWarn();">Save</button> ';
-echo '<span id="wordCount" class="wordCounter"></span> <span id="ajax_changes"></span>';
+echo '<p class="save-row">' . history_button($app->writ->hasHistory($w), 'history.php?w=' . $wid) . '</p>';
+echo '<p class="save-row"><button type="button" class="lt_button" title="Save (Ctrl + S)" onclick="pwAjaxForm(\'editform\',\'ajax/save-writ.php\',\'ajax_changes\');offNavWarn();">Save</button> ';
+echo '<span id="wordCount" class="wordCounter"></span> <span id="ajax_changes"></span></p>';
 
 if ($reviewed) {
     echo '<h4 class="review">Editor revision</h4><section class="writcontent revision">' . nl_text($w['edits']) . '</section>';
@@ -138,12 +138,12 @@ if ($reviewed) {
     echo '<p class="sans">Your correction</p>';
     echo '<textarea name="correction" id="writingArea" class="writingBox" rows="12" cols="82" spellcheck="false" onchange="onNavWarn()">' . h($w['correction']) . '</textarea>';
     echo '<input type="hidden" name="correction_wordcount" id="wordCountInput" value="0">';
-    echo '<p><input type="submit" name="submit_correction" class="lt_button" value="Submit correction"></p>';
+    echo '<p>' . confirm_submit('submit_correction', 'Submit final correction', 'Confirm') . '</p>';
 } else {
     echo '<textarea name="draft" id="writingArea" class="writingBox" rows="12" cols="82" spellcheck="false" autocapitalize="none" onchange="onNavWarn()" placeholder="Draft contents...">' . h($w['draft']) . '</textarea>';
     echo '<input type="hidden" name="draft_wordcount" id="wordCountInput" value="0">';
     echo '<input type="hidden" name="save_draft" value="1">';
-    echo '<p><input type="submit" name="submit_draft" class="lt_button" value="Submit for review"></p>';
+    echo '<p>' . confirm_submit('submit_draft', 'Submit draft', 'Confirm') . '</p>';
 }
 echo '<p class="sans">Notes<br><textarea name="notes" rows="4" cols="82" onchange="onNavWarn()">' . h($w['notes']) . '</textarea></p>';
 echo '</form>';

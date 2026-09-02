@@ -43,8 +43,11 @@ if ($msg) {
     echo '<p class="sans noticegreen">' . h($msg) . '</p>';
 }
 echo '<form method="post">' . $app->csrf->field();
-echo '<p class="sans">Type <select name="type"><option>editor</option><option>supervisor</option><option>observer</option><option>writer</option></select></p>';
-echo '<p class="sans">Name <input name="name"> Username <input name="username" required> Email <input type="email" name="email" required> Password <input type="password" name="pass" required></p>';
+echo '<p class="sans">Type<br><select class="formselect" name="type"><option>editor</option><option>supervisor</option><option>observer</option><option>writer</option></select></p>';
+echo '<p class="sans">Name<br><input name="name"></p>';
+echo '<p class="sans">Email<br><input type="email" name="email" required></p>';
+echo '<p class="sans">Username<br><input name="username" required></p>';
+echo '<p class="sans">Password<br><input type="password" name="pass" required></p>';
 echo '<p><input type="submit" name="create" class="lt_button" value="Create"></p></form>';
 echo '<table class="list"><tr><th>Name</th><th>Type</th><th>Status</th><th></th></tr>';
 foreach ($app->user->listByFacility($app->auth->facilityId()) as $row) {

@@ -7,7 +7,7 @@ if (!$app->auth->atLeast('supervisor')) {
     $app->redirect('');
 }
 $fid = $app->auth->facilityId();
-$app->view->start('Admin', 'admin');
+$app->view->start('Admin Dash', 'admin');
 echo '<h2 class="lt">Facility</h2>';
 if ($fid) {
     $f = $app->facility->find($fid);

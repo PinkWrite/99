@@ -50,12 +50,12 @@ echo '<form id="editform">' . $app->csrf->field();
 echo '<input type="hidden" name="note_id" value="' . $nid . '">';
 echo '<input type="hidden" name="user_id" value="' . $uid . '">';
 if ($app->auth->atLeast('editor')) {
-    echo '<p class="sans">Type <select name="type"><option value="memo"' . ($n['type'] === 'memo' ? ' selected' : '') . '>Memo</option>';
+    echo '<p class="sans">Type <select class="formselect small" name="type"><option value="memo"' . ($n['type'] === 'memo' ? ' selected' : '') . '>Memo</option>';
     echo '<option value="task"' . ($n['type'] === 'task' ? ' selected' : '') . '>Task</option></select></p>';
     echo '<p class="sans">For writer id <input name="editor_set_writer_id" value="' . h((string) $n['editor_set_writer_id']) . '"> block id <input name="editor_set_block" value="' . h((string) $n['editor_set_block']) . '"></p>';
 }
-echo '<button type="button" class="lt_button small" title="Save (Ctrl + S)" onclick="pwAjaxForm(\'editform\',\'ajax/save-note.php\',\'ajax_changes\');offNavWarn();">Save</button> ';
-echo '<span id="ajax_changes"></span>';
+echo '<p class="save-row"><button type="button" class="lt_button small" title="Save (Ctrl + S)" onclick="pwAjaxForm(\'editform\',\'ajax/save-note.php\',\'ajax_changes\');offNavWarn();">Save</button> ';
+echo '<span id="ajax_changes"></span></p>';
 echo '<p><textarea name="body" id="writingArea" class="writingBox" rows="16" cols="82" onchange="onNavWarn()">' . h($n['body']) . '</textarea></p>';
 echo '</form>';
 echo '<script src="js/pw99.js"></script><script>pwBindSave("editform","ajax/save-note.php","ajax_changes");</script>';

@@ -22,6 +22,12 @@ final class WritList
         $this->writTable($whereAmI, 'editor', $review, null, $eid);
     }
 
+    /** @param list<int> $writerIds */
+    public function renderObserver(string $whereAmI, array $writerIds): void
+    {
+        $this->writTable($whereAmI, 'observer', 'current', null, null, $writerIds);
+    }
+
     public function renderNotes(string $whereAmI): void
     {
         $uid = $this->app->auth->id();
@@ -196,10 +202,11 @@ final class WritList
         );
     }
 
-    private function writTable(string $whereAmI, string $mode, string $status, ?int $writerId, ?int $editorId): void
+    /** @param list<int> $writerIds */
+    private function writTable(string $whereAmI, string $mode, string $status, ?int $writerId, ?int $editorId, array $writerIds = []): void
     {
         $st = $this->listState($whereAmI, ['activity', 'creation', 'work', 'title', 'status'], 'activity');
-        $filterWriter = (int) ($_GET['u'] ?? 0);
+        $filterWriter = (int) ($_GET['u'] ?? $_GET['o'] ?? 0);
         $filterBlock = (int) ($_GET['v'] ?? 0);
         $blockCol = $this->writBlockCol();
         $where = [];
@@ -209,6 +216,26 @@ final class WritList
             $params[] = $writerId;
             $where[] = 'w.term_status = ?';
             $params[] = $status;
+            if ($filterBlock > 0) {
+                $where[] = "w.{$blockCol} = ?";
+                $params[] = $filterBlock;
+            }
+        } elseif ($mode === 'observer') {
+            if (!$writerIds) {
+                echo '<p class="lt sans">No writs</p>';
+                return;
+            }
+            $in = implode(',', array_fill(0, count($writerIds), '?'));
+            $where[] = "w.writer_id IN ({$in})";
+            foreach ($writerIds as $id) {
+                $params[] = (int) $id;
+            }
+            $where[] = 'w.term_status = ?';
+            $params[] = $status;
+            if ($filterWriter > 0) {
+                $where[] = 'w.writer_id = ?';
+                $params[] = $filterWriter;
+            }
             if ($filterBlock > 0) {
                 $where[] = "w.{$blockCol} = ?";
                 $params[] = $filterBlock;
@@ -244,7 +271,9 @@ final class WritList
              WHERE {$whereSql}
              ORDER BY {$order}",
             function (array $rows) use ($mode, $status, $blockCol) {
-                $this->bulkBar($mode, $status, $this->app->auth->id());
+                if ($mode !== 'observer') {
+                    $this->bulkBar($mode, $status, $this->app->auth->id());
+                }
                 if (!$rows) {
                     echo '<p class="lt sans">No writs</p>';
                     return;
@@ -267,7 +296,7 @@ final class WritList
                         ? '<small title="' . h((string) ($w['block_name'] ?? '')) . '">' . h((string) ($w['block_code'] ?? '')) . '</small>'
                         : 'Main';
                     echo '<tr class="' . $cc . '"><td>';
-                    echo $mode === 'writer' ? $this->writerAction($w) : $this->editorAction($w);
+                    echo $mode === 'writer' ? $this->writerAction($w) : ($mode === 'observer' ? $this->observerAction($w) : $this->editorAction($w));
                     echo '</td><td>' . h((string) $w['work']) . '</td><td>' . h((string) $w['title']) . '</td>';
                     if ($mode === 'writer') {
                         echo '<td>' . $block . '</td><td>' . h((string) $w['draft_status']) . '</td><td>' . h((string) $w['edits_status']) . '</td><td>' . $scoreHtml . '<small class="dk">/' . h((string) $outof) . '</small></td>';
@@ -278,7 +307,9 @@ final class WritList
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
                 echo '</tbody></table>';
-                $this->bulkScript();
+                if ($mode !== 'observer') {
+                    $this->bulkScript();
+                }
             },
             [
                 'activity' => ['Activity', 'Sort by most recent activity'],
@@ -287,7 +318,7 @@ final class WritList
                 'title' => ['Title', 'Sort by title'],
                 'status' => ['Status', 'Sort by status'],
             ],
-            $mode === 'editor' ? 'searchformeditorwrits' : 'searchform'
+            $mode === 'editor' ? 'searchformeditorwrits' : ($mode === 'observer' ? 'searchformobserverwrits' : 'searchform')
         );
     }
 
@@ -433,6 +464,12 @@ final class WritList
             return get_switch('View', 'See the history and results', 'writ.php', 'w', $id, 'set_writ_blue');
         }
         return '';
+    }
+
+    private function observerAction(array $w): string
+    {
+        $id = (string) $w['id'];
+        return get_switch('Open', 'Read this writ', 'writ.php', 'w', $id, 'set_writ_blue');
     }
 
     private function editorAction(array $w): string

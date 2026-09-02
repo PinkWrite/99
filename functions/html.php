@@ -44,6 +44,16 @@ function history_button(bool $hasHistory, string $href): string
     return '<button type="button" class="act_disabled" disabled title="No redraft history">no history</button>';
 }
 
+/** First click reveals Cancel + Confirm over a page-dimming overlay. */
+function confirm_submit(string $name, string $firstLabel, string $confirmLabel): string
+{
+    return '<span class="pw-confirm-wrap">'
+        . '<button type="button" class="dk_sub_button pw-confirm-go" data-pw-confirm="' . h($name) . '">' . h($firstLabel) . '</button>'
+        . '<button type="button" class="dk_sub_button pw-confirm-cancel" hidden>Cancel</button>'
+        . '<input type="submit" name="' . h($name) . '" value="' . h($confirmLabel) . '" id="' . h($name) . '" class="ln_button pw-confirm-yes" hidden disabled>'
+        . '</span>';
+}
+
 function nl_text(?string $s): string
 {
     return nl2br(h($s), false);

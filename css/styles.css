@@ -29,9 +29,10 @@ hr.review {
 }
 
 /* Outer #333 shows as a 0.5em frame on all four sides.
-   Short pages: inner column fills the window so the footer sits
-   just above that bottom frame. Tall pages: column grows and the
-   footer scrolls off with the same 0.5em gap under it. */
+   Inner #wrap is a slightly lighter page so Admin/Super/empty
+   views still read as a page, not a blank slab. Short pages: the
+   footer sits just above that bottom frame. Tall pages: the
+   footer travels with the same inner padding under the descenders. */
 div#wrap {
   box-sizing: border-box;
   margin: 0.5em;
@@ -39,12 +40,14 @@ div#wrap {
   min-height: calc(100dvh - 1em);
   display: flex;
   flex-direction: column;
+  background-color: #3a3a3a;
 }
 
 div.page {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  background-color: #3a3a3a;
 }
 
 div.content {
@@ -54,13 +57,19 @@ div.content {
 div.footer {
   flex: 0 0 auto;
   margin-top: auto;
+  padding: 0.5em;
+}
+
+div.footer p {
+  margin: 0;
 }
 
 /* Top Nav */
 div#top_menu_nav {
   overflow: hidden;
   top: 0;
-  height: 2em;
+  min-height: 2em;
+  height: auto;
   width: 100%;
   padding: 0.2em;
 }
@@ -130,7 +139,8 @@ div#topnav ul li a:hover {
 div.dash_menu_nav {
   overflow: hidden;
   top: 0;
-  height: 2em;
+  min-height: 2em;
+  height: auto;
   width: 100%;
   padding: 0.2em;
   margin: 0.5em 0;
@@ -289,7 +299,7 @@ text-decoration:none;
 }
 
 /* Defaults */
-input, textarea {
+input, textarea, select {
   background:#555;
   color: #ccc;
   font: 16px/36px "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
@@ -668,6 +678,7 @@ background:#f71771;
 }
 
 /* Other inputs */
+select,
 .formselect {
   cursor: pointer;
   background-color: #555;
@@ -686,6 +697,12 @@ background:#f71771;
   -webkit-appearance:none; /* Safari and Chrome */
   appearance:none;
   background: url(da_16.png) no-repeat right #555;
+}
+
+select option,
+.formselect option {
+  background: #555;
+  color: #ccc;
 }
 
 span.small,
@@ -1313,4 +1330,40 @@ button.act_disabled, button.act_disabled:hover {
   cursor: default;
 }
 span.noticehide { font-weight: bold; }
+
+/* Save row sits above the writing body with a normal paragraph gap. */
+p.save-row {
+  margin: 0.4em 0 1em;
+}
+
+/* Double-opt-in: first click greys the page; Cancel takes the first
+   button's place; Confirm floats to its right, above the overlay. */
+#pw-confirm-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.58);
+  z-index: 80;
+  cursor: pointer;
+}
+
+.pw-confirm-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  z-index: 1;
+}
+
+.pw-confirm-wrap.is-open {
+  z-index: 90;
+}
+
+.pw-confirm-wrap .pw-confirm-yes {
+  margin-left: 0.6em;
+}
+
+.pw-confirm-wrap .pw-confirm-cancel {
+  margin-right: 0;
+}
+
 

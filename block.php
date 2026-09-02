@@ -23,7 +23,7 @@ $app->view->start('Block', 'blocks', 'editor');
 echo '<form method="post">' . $app->csrf->field();
 echo '<input type="hidden" name="b" value="' . $bid . '">';
 echo '<p class="sans">Name <input name="name" value="' . h($b['name']) . '"> Code <input name="code" value="' . h($b['code']) . '"></p>';
-echo '<p class="sans">Status <select name="status"><option value="open"' . ($b['status'] === 'open' ? ' selected' : '') . '>open</option>';
+echo '<p class="sans">Status <select class="formselect small" name="status"><option value="open"' . ($b['status'] === 'open' ? ' selected' : '') . '>open</option>';
 echo '<option value="closed"' . ($b['status'] === 'closed' ? ' selected' : '') . '>closed</option></select></p>';
 echo '<p><input type="submit" class="lt_button" value="Save"></p></form>';
 $app->view->end();
