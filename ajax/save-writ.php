@@ -16,9 +16,11 @@ if (!$w || (int) $w['writer_id'] !== $app->auth->id()) {
     $app->json(['ok' => false, 'error' => 'not found'], 404);
 }
 if (!empty($_POST['save_draft']) || isset($_POST['draft'])) {
+    $title = writ_title($_POST['title'] ?? '');
+    $work = writ_work($_POST['work'] ?? '', $wid);
     $app->writ->saveDraft($wid, $app->auth->id(), [
-        'title' => clean_title($_POST['title'] ?? ''),
-        'work' => clean_title($_POST['work'] ?? ''),
+        'title' => $title,
+        'work' => $work,
         'block_id' => (int) ($_POST['block'] ?? 0),
         'notes' => clean_body($_POST['notes'] ?? ''),
         'draft' => clean_body($_POST['draft'] ?? ''),
@@ -33,4 +35,4 @@ if (isset($_POST['correction'])) {
         'correction_wordcount' => wordcount($_POST['correction'] ?? ''),
     ]);
 }
-$app->json(['ok' => true, 'msg' => 'Saved']);
+$app->json(['ok' => true, 'msg' => 'Saved', 'title' => writ_title($_POST['title'] ?? $w['title'] ?? ''), 'work' => writ_work($_POST['work'] ?? $w['work'] ?? '', $wid)]);

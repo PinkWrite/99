@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_writ']) && $app->
     $id = $app->writ->create([
         'writer_id' => $uid,
         'facility_id' => $app->auth->facilityId(),
-        'title' => 'Untitled',
+        'title' => '',
         'work' => '',
     ]);
     $app->redirect('writ.php?w=' . $id);
@@ -20,8 +20,8 @@ $w = $wid ? $app->writ->find($wid) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $w && $app->csrf->check() && isset($_POST['submit_draft'])) {
     $app->writ->saveDraft($wid, $uid, [
-        'title' => clean_title($_POST['title'] ?? ''),
-        'work' => clean_title($_POST['work'] ?? ''),
+        'title' => writ_title($_POST['title'] ?? ''),
+        'work' => writ_work($_POST['work'] ?? '', $wid),
         'block_id' => (int) ($_POST['block'] ?? 0),
         'notes' => clean_body($_POST['notes'] ?? ''),
         'draft' => clean_body($_POST['draft'] ?? ''),
@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $w && $app->csrf->check() && isset(
         'writing_time' => (int) ($_POST['writing_time'] ?? 0),
     ]);
     $app->writ->submitDraft($wid, $uid);
-    $app->notify->toEditorOf($uid, 'new_writ', 'Writ submitted: ' . clean_title($_POST['title'] ?? ''), 'review.php?w=' . $wid);
-    $app->notify->toObserversOf($uid, 'new_writ', 'Writ submitted: ' . clean_title($_POST['title'] ?? ''), 'writ.php?w=' . $wid);
+    $app->notify->toEditorOf($uid, 'new_writ', 'Writ submitted: ' . writ_title($_POST['title'] ?? ''), 'review.php?w=' . $wid);
+    $app->notify->toObserversOf($uid, 'new_writ', 'Writ submitted: ' . writ_title($_POST['title'] ?? ''), 'writ.php?w=' . $wid);
     $app->redirect('writ.php?w=' . $wid);
 }
 
@@ -120,8 +120,9 @@ foreach ($blocks as $b) {
     echo '<option value="' . (int) $b['id'] . '"' . $sel . '>' . h($app->block->named($b)) . '</option>';
 }
 echo '</select></label></p>';
-echo '<p class="sans">Work<br><input name="work" id="work" class="readBox" maxlength="122" value="' . h($w['work']) . '" onchange="onNavWarn()"></p>';
-echo '<p class="sans">Title<br><input name="title" id="title" class="writingBox" maxlength="122" required value="' . h($w['title']) . '" onchange="onNavWarn()"></p>';
+echo '<p class="sans">Work<br><input name="work" id="work" class="readBox" maxlength="122" value="' . h((string) $w['work']) . '" placeholder="' . (int) $wid . '" onchange="onNavWarn()"></p>';
+$titleShow = ((string) $w['title'] === 'Untitled') ? '' : (string) $w['title'];
+echo '<p class="sans">Title<br><input name="title" id="title" class="writingBox" maxlength="122" value="' . h($titleShow) . '" placeholder="Untitled" onchange="onNavWarn()"></p>';
 if ($w['instructions']) {
     echo '<h4 class="review">Instructions</h4><section class="writcontent remarks">' . nl_text($w['instructions']) . '</section>';
 }

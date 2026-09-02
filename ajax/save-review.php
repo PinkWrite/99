@@ -17,8 +17,8 @@ if (!$w) {
 $score = $_POST['score'] ?? '';
 $app->writ->saveEdits($wid, [
     'block_id' => (int) ($_POST['block'] ?? $w['block_id']),
-    'title' => clean_title($_POST['title'] ?? $w['title']),
-    'work' => clean_title($_POST['work'] ?? $w['work']),
+    'title' => writ_title($_POST['title'] ?? $w['title'] ?? ''),
+    'work' => writ_work($_POST['work'] ?? $w['work'] ?? '', $wid),
     'notes' => clean_body($_POST['notes'] ?? $w['notes']),
     'edits' => clean_body($_POST['edits'] ?? ''),
     'edits_wordcount' => wordcount($_POST['edits'] ?? ''),

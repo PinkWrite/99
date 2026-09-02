@@ -21,6 +21,20 @@ function clean_title(?string $s, int $max = 122): string
     return substr($s, 0, $max);
 }
 
+/** Blank title stores as Untitled. The form stays empty; this is the list/DB name. */
+function writ_title(?string $s): string
+{
+    $t = clean_title($s);
+    return $t !== '' ? $t : 'Untitled';
+}
+
+/** Blank work stores as the SQL id so the list always has a work name. */
+function writ_work(?string $s, int $id): string
+{
+    $w = clean_title($s);
+    return $w !== '' ? $w : (string) $id;
+}
+
 function clean_body(?string $s): string
 {
     $s = strip_tags((string) $s);

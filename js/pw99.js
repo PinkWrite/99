@@ -49,6 +49,9 @@
           box.innerHTML = '<span class="noticegreen noticehide sans">' + (j.msg || 'Saved') + '</span>';
           if (j.source && form.source) form.source.value = j.source;
           if (j.id && form.test_id) form.test_id.value = j.id;
+          if (j.work != null && form.work && !String(form.work.value || '').trim()) {
+            form.work.value = j.work;
+          }
         } else {
           box.innerHTML = '<span class="noticered sans">' + (j.error || 'Save failed') + '</span>';
         }
