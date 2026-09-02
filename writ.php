@@ -151,8 +151,12 @@ foreach ($blocks as $b) {
     echo '<option value="' . (int) $b['id'] . '"' . $sel . '>' . h($app->block->named($b)) . '</option>';
 }
 echo '</select></label></p>';
-echo '<p class="sans">Work<br><input name="work" id="work" class="readBox" maxlength="122" value="' . h((string) $w['work']) . '" placeholder="' . (int) $wid . '" onchange="onNavWarn()"></p>';
-$titleShow = ((string) $w['title'] === 'Untitled') ? '' : (string) $w['title'];
+$workShow = (string) $w['work'];
+if ($workShow === '' || $workShow === 'task-' . $wid) {
+    $workShow = '';
+}
+echo '<p class="sans">Work<br><input name="work" id="work" class="readBox" maxlength="122" value="' . h($workShow) . '" placeholder="task-' . (int) $wid . '" onchange="onNavWarn()"></p>';
+$titleShow = ((string) $w['title'] === 'Untitled' || (string) $w['title'] === '') ? '' : (string) $w['title'];
 echo '<p class="sans">Title<br><input name="title" id="title" class="writingBox" maxlength="122" value="' . h($titleShow) . '" placeholder="Untitled" onchange="onNavWarn()"></p>';
 if ($w['instructions']) {
     echo '<h4 class="review">Instructions</h4><section class="writcontent remarks">' . nl_text($w['instructions']) . '</section>';

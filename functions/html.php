@@ -75,12 +75,19 @@ function history_button(bool $hasHistory, string $href): string
 }
 
 /** First click reveals Cancel + Confirm over a page-dimming overlay. */
-function confirm_submit(string $name, string $firstLabel, string $confirmLabel): string
-{
+function confirm_submit(
+    string $name,
+    string $firstLabel,
+    string $confirmLabel,
+    ?string $value = null,
+    string $goClass = 'dk_sub_button',
+    string $yesClass = 'ln_button'
+): string {
+    $val = $value ?? $confirmLabel;
     return '<span class="pw-confirm-wrap">'
-        . '<button type="button" class="dk_sub_button pw-confirm-go" data-pw-confirm="' . h($name) . '">' . h($firstLabel) . '</button>'
-        . '<button type="button" class="dk_sub_button pw-confirm-cancel" hidden>Cancel</button>'
-        . '<input type="submit" name="' . h($name) . '" value="' . h($confirmLabel) . '" id="' . h($name) . '" class="ln_button pw-confirm-yes" hidden disabled>'
+        . '<button type="button" class="' . h($goClass) . ' pw-confirm-go">' . h($firstLabel) . '</button>'
+        . '<button type="button" class="' . h($goClass) . ' pw-confirm-cancel" hidden>Cancel</button>'
+        . '<button type="submit" name="' . h($name) . '" value="' . h($val) . '" class="' . h($yesClass) . ' pw-confirm-yes" hidden disabled>' . h($confirmLabel) . '</button>'
         . '</span>';
 }
 

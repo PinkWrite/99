@@ -40,7 +40,14 @@ final class WritRepo
                 $row['outof'] ?? 100,
             ]
         );
-        return (int) $this->app->db->lastId();
+        $id = (int) $this->app->db->lastId();
+        if (trim((string) ($row['work'] ?? '')) === '') {
+            $this->app->db->run('UPDATE writs SET work = ? WHERE id = ?', ['task-' . $id, $id]);
+        }
+        if (trim((string) ($row['title'] ?? '')) === '') {
+            $this->app->db->run('UPDATE writs SET title = ? WHERE id = ?', ['Untitled', $id]);
+        }
+        return $id;
     }
 
     public function forWriter(int $writerId, string $term = 'current'): array

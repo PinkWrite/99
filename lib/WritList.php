@@ -283,9 +283,9 @@ final class WritList
              LEFT JOIN blocks b ON b.id = w.{$blockCol}
              WHERE {$whereSql}
              ORDER BY {$order}",
-            function (array $rows) use ($mode, $status, $blockCol) {
+            function (array $rows) use ($mode, $status, $blockCol, $whereAmI) {
                 if ($mode !== 'observer') {
-                    $this->bulkBar($mode, $status, $this->app->auth->id());
+                    $this->bulkBar($mode, $status, $this->app->auth->id(), $whereAmI);
                 }
                 if (!$rows) {
                     echo '<p class="lt sans">No writs</p>';
@@ -310,7 +310,7 @@ final class WritList
                         : 'Main';
                     echo '<tr class="' . $cc . '"><td>';
                     echo $mode === 'writer' ? $this->writerAction($w) : ($mode === 'observer' ? $this->observerAction($w) : $this->editorAction($w));
-                    echo '</td><td>' . h((string) $w['work']) . '</td><td>' . h((string) $w['title']) . '</td>';
+                    echo '</td><td>' . h(writ_work($w['work'] ?? '', (int) $w['id'])) . '</td><td>' . h(writ_title($w['title'] ?? '')) . '</td>';
                     if ($mode === 'writer') {
                         echo '<td>' . $block . '</td><td>' . h((string) $w['draft_status']) . '</td><td>' . h((string) $w['edits_status']) . '</td><td>' . $scoreHtml . '<small class="dk">/' . h((string) $outof) . '</small></td>';
                     } else {
@@ -559,20 +559,22 @@ if (typeof searchClearReset !== "function") {
         echo '</tr></table></div></div>';
     }
 
-    private function bulkBar(string $mode, string $status, int $uid): void
+    private function bulkBar(string $mode, string $status, int $uid, string $whereAmI = ''): void
     {
         $key = $mode === 'writer' ? 'writer_archive' : 'editor_archive';
+        $return = preg_replace('/[?#].*$/', '', basename($whereAmI)) ?: ($mode === 'writer' ? 'writs.php' : 'editor.php');
         echo '<table><tbody><tr><td><div onclick="showBulkActions()" style="cursor:pointer;display:inline;float:right"><button type="button" class="act_ltgray small" id="bulk_actions_btn">Archive actions &#9660;</button></div></td></tr></tbody></table>';
         echo '<div id="bulk_actions_div" hidden><form id="bulk_actions" method="post" action="archive-act.php">';
         echo $this->app->csrf->field();
-        echo '<input type="hidden" name="' . h($key) . '" value="' . $uid . '"><br>';
+        echo '<input type="hidden" name="' . h($key) . '" value="' . $uid . '">';
+        echo '<input type="hidden" name="return" value="' . h($return) . '">';
         echo '<table style="float:right;width:auto"><tr>';
         if ($status === 'archived') {
-            echo '<td><input type="checkbox" name="checksubmit" value="delete" id="checksubmit"> <b><input type="submit" class="act_red small" name="bluksubmit" value="delete"></b></td>';
-            echo '<td><b><input type="submit" class="act_green small" name="bluksubmit" value="restore"></b></td>';
+            echo '<td>' . confirm_submit('bluksubmit', 'delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small') . '</td>';
+            echo '<td>' . confirm_submit('bluksubmit', 'restore', 'Confirm restore', 'restore', 'act_green small', 'act_green small') . '</td>';
         } else {
-            echo '<td><input type="checkbox" name="checksubmit" value="archive_selected" id="checksubmit"> <b><input type="submit" class="act_blue small" name="bluksubmit" value="archive all scored"></b></td>';
-            echo '<td><b><input type="submit" class="act_dkgray small" name="bluksubmit" value="archive"></b></td>';
+            echo '<td>' . confirm_submit('bluksubmit', 'archive all scored', 'Confirm archive all scored', 'archive all scored', 'act_blue small', 'act_blue small') . '</td>';
+            echo '<td>' . confirm_submit('bluksubmit', 'archive', 'Confirm archive', 'archive', 'act_dkgray small', 'act_dkgray small') . '</td>';
         }
         echo '<td><label style="display:inline;float:right"><small class="sans lt">Select all</small>&nbsp;<input type="checkbox" onclick="toggle(this)"></label></td>';
         echo '</tr></table></form></div>';
@@ -594,8 +596,6 @@ function showBulkActions(){
 function toggle(source){
   var cb = document.querySelectorAll("table.list.writ td.bulk_check input[type=checkbox]");
   for (var i = 0; i < cb.length; i++) cb[i].checked = source.checked;
-  var s = document.getElementById("checksubmit");
-  if (s) s.checked = false;
 }
 </script>';
     }
