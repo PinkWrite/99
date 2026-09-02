@@ -1361,6 +1361,9 @@ table.list.writ.bulk-open td.bulk_check input[type="checkbox"] {
   align-items: center;
   min-height: 2.2em;
   margin: 0 0 0.6em;
+  overflow: visible;
+  position: relative;
+  z-index: 2;
 }
 table.list.writ,
 table.list.roll {
@@ -1405,8 +1408,9 @@ p.save-row {
   margin: 0.4em 0 1em;
 }
 
-/* Double-opt-in: first click greys the page; Cancel takes the first
-   button's place; Confirm floats to its right, above the overlay. */
+/* Double-opt-in: first click greys the page; the go button keeps its
+   slot so nothing else shifts. Cancel floats directly above it;
+   Confirm sits to the right of Cancel, above the overlay. */
 #pw-confirm-mask {
   display: none;
   position: fixed;
@@ -1425,6 +1429,29 @@ p.save-row {
 
 .pw-confirm-wrap.is-open {
   z-index: 90;
+}
+
+.pw-confirm-wrap.is-open .pw-confirm-go {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.pw-confirm-wrap.is-open .pw-confirm-cancel,
+.pw-confirm-wrap.is-open .pw-confirm-yes {
+  position: absolute;
+  bottom: calc(100% + 0.4em);
+  display: inline-block !important;
+  white-space: nowrap;
+}
+
+.pw-confirm-wrap.is-open .pw-confirm-cancel {
+  left: 0;
+  margin: 0;
+}
+
+.pw-confirm-wrap.is-open .pw-confirm-yes {
+  left: 100%;
+  margin: 0 0 0 0.6em;
 }
 
 .pw-confirm-wrap .pw-confirm-yes {

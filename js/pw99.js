@@ -214,10 +214,8 @@
     var nodes = document.querySelectorAll('.pw-confirm-wrap.is-open');
     for (var i = 0; i < nodes.length; i++) {
       nodes[i].classList.remove('is-open');
-      var go = nodes[i].querySelector('.pw-confirm-go');
       var cancel = nodes[i].querySelector('.pw-confirm-cancel');
       var yes = nodes[i].querySelector('.pw-confirm-yes');
-      if (go) go.hidden = false;
       if (cancel) cancel.hidden = true;
       if (yes) {
         yes.hidden = true;
@@ -233,10 +231,8 @@
     pwConfirmClose();
     pwConfirmMask().style.display = 'block';
     wrap.classList.add('is-open');
-    var go = wrap.querySelector('.pw-confirm-go');
     var cancel = wrap.querySelector('.pw-confirm-cancel');
     var yes = wrap.querySelector('.pw-confirm-yes');
-    if (go) go.hidden = true;
     if (cancel) cancel.hidden = false;
     if (yes) {
       yes.hidden = false;
