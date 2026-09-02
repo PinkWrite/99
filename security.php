@@ -74,7 +74,7 @@ if (!empty($u['totp_enabled'])) {
 }
 
 echo '<h2 class="lt">Passkeys</h2>';
-echo '<p class="sans dk">Works on https hosts. Platform or hardware key (YubiKey, etc.).</p>';
+echo '<p class="sans dk">Works over https; platform (Apple, Google, etc) or hardware key (YubiKey, etc).</p>';
 echo '<p><button type="button" class="lt_button" id="pkadd">Add a passkey</button></p>';
 $pks = $app->passkey->list($app->auth->id());
 if ($pks) {
