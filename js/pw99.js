@@ -152,20 +152,42 @@
   };
 
   window.pwPkEdit = function (btn) {
-    var form = btn.form;
+    var form = btn.closest ? btn.closest('.pk-row') : btn.form;
     if (!form) return;
+    var rows = document.querySelectorAll('.pk-row.is-editing');
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] !== form) pwPkClose(rows[i]);
+    }
+    pwPkOpen(form);
+  };
+
+  function pwPkOpen(form) {
+    form.classList.add('is-editing');
     var label = form.querySelector('.pk-label');
-    var input = form.querySelector('input[name="pk_name"]');
+    var input = form.querySelector('.pk-input');
+    var edit = form.querySelector('.pk-edit');
     var save = form.querySelector('.pk-save');
     if (label) label.hidden = true;
+    if (edit) edit.hidden = true;
+    if (save) save.hidden = false;
     if (input) {
       input.hidden = false;
       input.focus();
       input.select();
     }
-    btn.hidden = true;
-    if (save) save.hidden = false;
-  };
+  }
+
+  function pwPkClose(form) {
+    form.classList.remove('is-editing');
+    var label = form.querySelector('.pk-label');
+    var input = form.querySelector('.pk-input');
+    var edit = form.querySelector('.pk-edit');
+    var save = form.querySelector('.pk-save');
+    if (label) label.hidden = false;
+    if (input) input.hidden = true;
+    if (edit) edit.hidden = false;
+    if (save) save.hidden = true;
+  }
 
   function pwConfirmMask() {
     var m = document.getElementById('pw-confirm-mask');

@@ -76,16 +76,16 @@ echo '<p class="sans dk">Works on https hosts. Platform or hardware key (YubiKey
 echo '<p><button type="button" class="lt_button" id="pkadd">Add a passkey</button></p>';
 $pks = $app->passkey->list($app->auth->id());
 if ($pks) {
-    echo '<table class="id-link pk-list"><tbody>';
+    echo '<table class="id-link pk-list"><colgroup><col class="pk-col-name"><col class="pk-col-when"><col class="pk-col-rm"></colgroup><tbody>';
     foreach ($pks as $pk) {
-        echo '<tr><td class="pk-name"><form method="post">' . $app->csrf->field();
+        echo '<tr><td class="pk-name"><form method="post" class="pk-row">' . $app->csrf->field();
         echo '<input type="hidden" name="rename_pk" value="' . (int) $pk['id'] . '">';
-        echo '<span class="pk-label sans">' . h((string) $pk['name']) . '</span>';
-        echo '<input type="text" name="pk_name" value="' . h((string) $pk['name']) . '" maxlength="80" hidden aria-label="Passkey name"> ';
-        echo '<button type="button" class="lt_button small pk-edit" onclick="pwPkEdit(this)">Edit</button>';
-        echo '<input type="submit" class="lt_button small pk-save" value="Save" hidden>';
+        echo '<span class="pk-who"><span class="pk-label sans">' . h((string) $pk['name']) . '</span>';
+        echo '<input type="text" class="pk-input" name="pk_name" value="' . h((string) $pk['name']) . '" maxlength="80" hidden aria-label="Passkey name"></span>';
+        echo '<span class="pk-act"><button type="button" class="lt_button small pk-edit" onclick="pwPkEdit(this)">Edit</button>';
+        echo '<input type="submit" class="lt_button small pk-save" value="Save" hidden></span>';
         echo '</form></td>';
-        echo '<td class="sans dk pk-when">' . h((string) $pk['created_at']) . '</td><td>';
+        echo '<td class="sans dk pk-when">' . h((string) $pk['created_at']) . '</td><td class="pk-rm">';
         echo post_button('Remove', 'Delete', 'security.php', 'del_pk', (string) $pk['id'], 'set_gray small', $app->csrf->token());
         echo '</td></tr>';
     }
