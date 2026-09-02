@@ -1654,7 +1654,7 @@ table.pk-list td.pk-rm {
 }
 table.pk-list form.pk-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 4.6em;
+  grid-template-columns: minmax(0, 1fr) 4.6em 1.6em;
   align-items: center;
   column-gap: 0.45em;
   margin: 0;
@@ -1696,6 +1696,29 @@ table.pk-list .pk-input[hidden],
 table.pk-list .pk-edit[hidden],
 table.pk-list .pk-save[hidden] {
   display: none !important;
+}
+table.pk-list .pk-cancel {
+  width: 1.5em;
+  height: 1.5em;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid #888;
+  background: transparent;
+  color: #ccc;
+  font: 700 1em/1 Verdana, Arial, Helvetica, sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  box-sizing: border-box;
+}
+table.pk-list .pk-row.is-editing .pk-cancel {
+  visibility: visible;
+}
+table.pk-list .pk-cancel:hover {
+  border-color: #f71771;
+  color: #f71771;
 }
 
 .totp-code-line {

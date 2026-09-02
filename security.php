@@ -86,6 +86,7 @@ if ($pks) {
         echo '<input type="text" class="pk-input" name="pk_name" value="' . h((string) $pk['name']) . '" maxlength="80" hidden aria-label="Passkey name"></span>';
         echo '<span class="pk-act"><button type="button" class="lt_button small pk-edit" onclick="pwPkEdit(this)">Edit</button>';
         echo '<input type="submit" class="lt_button small pk-save" value="Save" hidden></span>';
+        echo '<button type="button" class="pk-cancel" onclick="pwPkCancel(this)" title="Cancel" aria-label="Cancel edit">×</button>';
         echo '</form></td>';
         echo '<td class="sans dk pk-when">' . h((string) $pk['created_at']) . '</td><td class="pk-rm">';
         echo post_button('Remove', 'Delete', 'security.php', 'del_pk', (string) $pk['id'], 'set_gray small', $app->csrf->token());

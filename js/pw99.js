@@ -171,6 +171,7 @@
     if (edit) edit.hidden = true;
     if (save) save.hidden = false;
     if (input) {
+      input.setAttribute('data-orig', input.value);
       input.hidden = false;
       input.focus();
       input.select();
@@ -188,6 +189,15 @@
     if (edit) edit.hidden = false;
     if (save) save.hidden = true;
   }
+
+  window.pwPkCancel = function (btn) {
+    var form = btn.closest ? btn.closest('.pk-row') : btn.form;
+    if (!form) return;
+    var input = form.querySelector('.pk-input');
+    var orig = input ? input.getAttribute('data-orig') : null;
+    if (input && orig !== null) input.value = orig;
+    pwPkClose(form);
+  };
 
   function pwConfirmMask() {
     var m = document.getElementById('pw-confirm-mask');
