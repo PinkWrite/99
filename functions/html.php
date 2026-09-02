@@ -13,6 +13,29 @@ function pw99_asset_v(string $abs): string
     return is_string($h) && $h !== '' ? substr($h, 0, 10) : (string) time();
 }
 
+/** Original geometric marks (passkey, G) plus nominative GitHub/Apple silhouettes for login buttons. */
+function brand_icon(string $which): string
+{
+    $svg = match ($which) {
+        'passkey' => '<svg class="id-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.2" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.2" cy="12" r="1.1" fill="currentColor"/><path fill="currentColor" d="M11.6 11.15h9.2v1.7h-2.05V16h-1.9v-3.15h-1.4V16h-1.9v-3.15h-1.95z"/></svg>',
+        'google' => '<svg class="id-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" d="M17.6 12.2A5.7 5.7 0 1 1 16 8.3"/><path fill="currentColor" d="M11.4 11.1h7.3v2.05H13.5v3.2h-2.1z"/></svg>',
+        'github' => '<svg class="id-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.71.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.11 2.94.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.9-1.32 2.74-1.05 2.74-1.05.55 1.4.21 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.58 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.8 0 .27.18.59.69.49A10.05 10.05 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"/></svg>',
+        'apple' => '<svg class="id-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.2 7.1c.8-1 1.3-2.3 1.2-3.7-1.1.1-2.4.8-3.2 1.8-.7.8-1.4 2.1-1.2 3.3 1.2.1 2.4-.5 3.2-1.4zm3.7 6.2c-.1 2.6 2.2 3.5 2.3 3.5-.1.4-.5 1.5-1.2 2.8-.7 1.2-1.4 2.4-2.6 2.4-1.1.1-1.5-.7-2.9-.7s-1.8.7-2.9.7c-1.2 0-2.1-1.3-2.8-2.5-1.5-2.6-2.6-7.3-.9-10.5.8-1.6 2.3-2.7 4-2.7 1.2 0 2.3.8 3 .8.7 0 2-.9 3.4-.8 1.4.1 2.6.8 3.3 2-2.9 1.7-2.4 6.1.3 7z"/></svg>',
+        'check' => '<svg class="id-svg id-check-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5 10 17.5 19 6.5"/></svg>',
+        default => '',
+    };
+    return '<span class="id-ico">' . $svg . '</span>';
+}
+
+function id_login_button(string $kind, string $label, string $href = '', string $attrs = ''): string
+{
+    $inner = brand_icon($kind) . '<span class="id-lab">' . h($label) . '</span>';
+    if ($href !== '') {
+        return '<a class="id-btn" href="' . h($href) . '"' . ($attrs !== '' ? ' ' . $attrs : '') . '>' . $inner . '</a>';
+    }
+    return '<button type="button" class="id-btn"' . ($attrs !== '' ? ' ' . $attrs : '') . '>' . $inner . '</button>';
+}
+
 /** Same shape as the original set_button: <a><button class> so CSS on button.* applies. */
 function button(string $text, string $title, string $href, string $class = 'navButton'): string
 {

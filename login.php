@@ -72,20 +72,19 @@ if ($needTotp) {
     echo '<p class="sans">Code <input name="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
     echo '<p><input type="submit" class="lt_button" value="Verify"></p></form>';
 } else {
+    echo '<h3 class="lt">Login Options</h3>';
     echo '<form method="post" action="login.php">' . $app->csrf->field();
     echo '<p class="sans">Username<br><input name="username" required autocomplete="username"></p>';
     echo '<p class="sans">Password<br><input type="password" name="pass" required autocomplete="current-password"></p>';
     echo '<p><input type="submit" class="lt_button" value="Log in"> ';
     echo '<a class="dk sans" href="forgot.php">Forgot password?</a></p></form>';
-    echo '<p><button type="button" class="set_gray" id="pkbtn">Sign in with a passkey</button></p>';
-    echo '<p class="sans dk">Authenticator and passkeys stay available after Google, Apple, or GitHub.</p>';
-    echo '<p>';
-    foreach (['google' => 'Google', 'apple' => 'Apple', 'github' => 'GitHub'] as $p => $lab) {
-        if ($app->oauth->enabled($p)) {
-            echo '<a class="lt_button" href="oauth.php?p=' . $p . '">' . h($lab) . '</a> ';
-        }
-    }
-    echo '</p>';
+    echo '<p class="sans dk login-or">OR</p>';
+    echo '<div class="login-id">';
+    echo id_login_button('passkey', 'Passkey', '', 'id="pkbtn"');
+    echo id_login_button('google', 'Google', 'oauth.php?p=google');
+    echo id_login_button('github', 'GitHub', 'oauth.php?p=github');
+    echo id_login_button('apple', 'Apple', 'oauth.php?p=apple');
+    echo '</div>';
     echo '<script src="js/pw99.js"></script><script>document.getElementById("pkbtn").onclick=function(){pwPasskeyLogin("passkey-options.php");};</script>';
 }
 $app->view->end();

@@ -27,6 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
 }
 
 $app->view->start('Security', 'locker');
+if (!empty($_SESSION['oauth_err'])) {
+    echo '<p class="sans noticered">' . h((string) $_SESSION['oauth_err']) . '</p>';
+    unset($_SESSION['oauth_err']);
+}
 echo '<h2 class="lt">Authenticator (TOTP)</h2>';
 if (!empty($u['totp_enabled'])) {
     echo '<p class="sans noticegreen">Authenticator is on.</p>';
@@ -57,17 +61,23 @@ echo '</ul>';
 echo '<script src="js/pw99.js"></script><script>document.getElementById("pkadd").onclick=function(){pwPasskeyRegister("passkey-create.php","security.php",' . json_encode($app->csrf->token()) . ');};</script>';
 
 echo '<h2 class="lt">Linked logins</h2>';
-echo '<p class="sans dk">Google, Apple, and GitHub can create an account or attach to this one. Authenticator and passkeys still apply.</p>';
 $have = [];
 foreach ($app->oauth->list($app->auth->id()) as $row) {
     $have[$row['provider']] = $row;
-    echo '<p class="sans">' . h($row['provider']) . ' · ' . h((string) $row['email']) . ' ';
-    echo post_button('Unlink', 'Unlink', 'security.php', 'unlink_oauth', (string) $row['provider'], 'set_gray', $app->csrf->token());
-    echo '</p>';
 }
-foreach (['google' => 'Google', 'apple' => 'Apple', 'github' => 'GitHub'] as $p => $lab) {
-    if (!isset($have[$p]) && $app->oauth->enabled($p)) {
-        echo '<p><a class="lt_button" href="oauth.php?p=' . $p . '&link=1">Link ' . h($lab) . '</a></p>';
+echo '<table class="id-link"><tbody>';
+foreach (['google' => 'Google', 'github' => 'GitHub', 'apple' => 'Apple'] as $p => $lab) {
+    $on = isset($have[$p]);
+    echo '<tr><td class="id-who">' . brand_icon($p) . '<span class="id-lab">' . h($lab) . '</span></td>';
+    echo '<td class="id-mark">';
+    echo $on ? brand_icon('check') : '&nbsp;';
+    echo '</td><td class="id-act">';
+    if ($on) {
+        echo post_button('Disconnect', 'Stop using this login', 'security.php', 'unlink_oauth', $p, 'id-disconnect', $app->csrf->token());
+    } else {
+        echo '<a class="id-connect" href="oauth.php?p=' . h($p) . '&link=1">Connect</a>';
     }
+    echo '</td></tr>';
 }
+echo '</tbody></table>';
 $app->view->end();

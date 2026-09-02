@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unlock']) && $app->cs
 }
 $app->view->start('Failed logins', 'admin', 'admin');
 echo '<h2 class="lt">Failed logins</h2>';
+echo '<p class="sans dk">After six failed tries from one IP, login is blocked for one hour, then opens again on its own. Unlock is only needed to let them in sooner.</p>';
 echo '<table class="list"><tr><th>When</th><th>IP</th><th>Usernames</th><th></th></tr>';
 foreach ($app->clickathon->recentFails() as $r) {
     echo '<tr><td>' . h($r['time_stamp']) . '</td><td>' . h($r['ip']) . '</td><td>' . h($r['username_list']) . '</td><td>';

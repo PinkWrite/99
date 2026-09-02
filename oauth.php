@@ -12,10 +12,10 @@ if (isset($_GET['code'], $_GET['state'])) {
         $app->redirect('login.php');
     }
     if (!empty($r['ok'])) {
-        $app->redirect($link || $app->auth->user() ? 'security.php' : '');
+        $app->redirect(!empty($r['link']) ? 'security.php' : '');
     }
     $_SESSION['oauth_err'] = $r['error'] ?? 'Sign-in failed.';
-    $app->redirect('login.php');
+    $app->redirect($app->auth->user() ? 'security.php' : 'login.php');
 }
 
 if (in_array($p, ['google', 'apple', 'github'], true) && $app->oauth->enabled($p)) {
@@ -23,4 +23,9 @@ if (in_array($p, ['google', 'apple', 'github'], true) && $app->oauth->enabled($p
     exit;
 }
 
-$app->redirect('login.php');
+if (in_array($p, ['google', 'apple', 'github'], true) && !$app->oauth->enabled($p)) {
+    $_SESSION['oauth_err'] = 'That sign-in is not set up on this site.';
+    $app->redirect($link ? 'security.php' : 'login.php');
+}
+
+$app->redirect($link ? 'security.php' : 'login.php');

@@ -90,7 +90,7 @@ final class OAuth
                     [$uid, $p, $profile['sub'], $profile['email']]
                 );
             }
-            return ['ok' => true];
+            return ['ok' => true, 'link' => true];
         }
         $u = null;
         if ($row) {
