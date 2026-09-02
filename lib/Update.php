@@ -24,14 +24,28 @@ final class Update
     private function pull(string $root): string
     {
         $repo = (string) ($this->app->config['github'] ?? 'https://github.com/PinkWrite/99.git');
-        $branch = (string) ($this->app->config['github_branch'] ?? 'master');
+        $branch = $this->stream();
         if (is_dir($root . '/.git')) {
-            $cmd = 'git -C ' . escapeshellarg($root) . ' fetch origin 2>&1'
-                . ' && git -C ' . escapeshellarg($root) . ' reset --hard origin/' . escapeshellarg($branch) . ' 2>&1';
+            $git = 'git -C ' . escapeshellarg($root);
             $out = [];
             $code = 0;
-            exec($cmd, $out, $code);
-            return 'git: ' . implode("\n", $out) . " (exit {$code})";
+            exec($git . ' fetch origin 2>&1', $out, $code);
+            $verify = [];
+            $vcode = 0;
+            exec($git . ' rev-parse --verify ' . escapeshellarg('origin/' . $branch) . ' 2>&1', $verify, $vcode);
+            if ($vcode !== 0 && $branch === 'main') {
+                $branch = 'master';
+                $out[] = 'stream main is not on origin; using master';
+            }
+            $out2 = [];
+            $code2 = 0;
+            exec(
+                $git . ' checkout -B ' . escapeshellarg($branch) . ' ' . escapeshellarg('origin/' . $branch)
+                . ' 2>&1 && ' . $git . ' reset --hard ' . escapeshellarg('origin/' . $branch) . ' 2>&1',
+                $out2,
+                $code2
+            );
+            return 'git [' . $branch . ']: ' . implode("\n", array_merge($out, $out2)) . " (exit {$code2})";
         }
         $tmp = sys_get_temp_dir() . '/pw99-update-' . getmypid();
         $cmd = 'git clone --depth 1 --branch ' . escapeshellarg($branch) . ' '
@@ -39,12 +53,29 @@ final class Update
         $out = [];
         $code = 0;
         exec($cmd, $out, $code);
+        if ($code !== 0 && $branch === 'main') {
+            $branch = 'master';
+            $cmd = 'git clone --depth 1 --branch ' . escapeshellarg($branch) . ' '
+                . escapeshellarg($repo) . ' ' . escapeshellarg($tmp) . ' 2>&1';
+            $out = [];
+            exec($cmd, $out, $code);
+        }
         if ($code !== 0) {
             return 'clone failed: ' . implode("\n", $out);
         }
         $this->copyTree($tmp, $root);
         $this->rmDir($tmp);
-        return 'cloned master over files (config.php kept)';
+        return 'cloned ' . $branch . ' over files (config.php kept)';
+    }
+
+    /** SysAdmin stream in config.php. github_branch is the old name. */
+    private function stream(): string
+    {
+        $s = trim((string) ($this->app->config['stream'] ?? $this->app->config['github_branch'] ?? 'master'));
+        if (!preg_match('/^[A-Za-z0-9._\/-]+$/', $s)) {
+            return 'master';
+        }
+        return $s;
     }
 
     private function copyTree(string $from, string $to): void

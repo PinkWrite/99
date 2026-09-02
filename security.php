@@ -20,9 +20,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         $app->passkey->register($app->auth->id(), (string) $_POST['id'], (string) $_POST['spki'], (string) ($_POST['name'] ?? 'Passkey'));
         $app->redirect('security.php');
     } elseif (isset($_POST['del_pk'])) {
-        $app->passkey->delete((int) $_POST['del_pk'], $app->auth->id());
+        $pkId = (int) $_POST['del_pk'];
+        $pks = $app->passkey->list($app->auth->id());
+        $oauths = $app->oauth->list($app->auth->id());
+        if (empty($u['pass']) && count($pks) < 2 && $oauths === []) {
+            // keep at least one way in
+        } else {
+            $app->passkey->delete($pkId, $app->auth->id());
+        }
     } elseif (isset($_POST['unlink_oauth'])) {
-        $app->oauth->unlink($app->auth->id(), (string) $_POST['unlink_oauth']);
+        $pks = $app->passkey->list($app->auth->id());
+        $oauths = $app->oauth->list($app->auth->id());
+        if (empty($u['pass']) && $pks === [] && count($oauths) < 2) {
+            // keep at least one way in
+        } else {
+            $app->oauth->unlink($app->auth->id(), (string) $_POST['unlink_oauth']);
+        }
+    } elseif (isset($_POST['disable_password'])) {
+        $pks = $app->passkey->list($app->auth->id());
+        $oauths = $app->oauth->list($app->auth->id());
+        if ($pks !== [] && $oauths !== []) {
+            $app->user->clearPassword($app->auth->id());
+            $u = $app->user->find($app->auth->id()) ?? $u;
+        }
     }
 }
 
@@ -60,24 +80,45 @@ foreach ($app->passkey->list($app->auth->id()) as $pk) {
 echo '</ul>';
 echo '<script src="js/pw99.js"></script><script>document.getElementById("pkadd").onclick=function(){pwPasskeyRegister("passkey-create.php","security.php",' . json_encode($app->csrf->token()) . ');};</script>';
 
-echo '<h2 class="lt">Linked logins</h2>';
 $have = [];
 foreach ($app->oauth->list($app->auth->id()) as $row) {
     $have[$row['provider']] = $row;
 }
-echo '<table class="id-link"><tbody>';
+$linkRows = '';
 foreach (['google' => 'Google', 'github' => 'GitHub', 'apple' => 'Apple'] as $p => $lab) {
     $on = isset($have[$p]);
-    echo '<tr><td class="id-who">' . brand_icon($p) . '<span class="id-lab">' . h($lab) . '</span></td>';
-    echo '<td class="id-mark">';
-    echo $on ? brand_icon('check') : '&nbsp;';
-    echo '</td><td class="id-act">';
-    if ($on) {
-        echo post_button('Disconnect', 'Stop using this login', 'security.php', 'unlink_oauth', $p, 'id-disconnect', $app->csrf->token());
-    } else {
-        echo '<a class="id-connect" href="oauth.php?p=' . h($p) . '&link=1">Connect</a>';
+    if (!$on && !$app->oauth->enabled($p)) {
+        continue;
     }
-    echo '</td></tr>';
+    $linkRows .= '<tr><td class="id-who">' . brand_icon($p) . '<span class="id-lab">' . h($lab) . '</span></td>';
+    $linkRows .= '<td class="id-mark">' . ($on ? brand_icon('check') : '&nbsp;') . '</td><td class="id-act">';
+    if ($on) {
+        $linkRows .= post_button('Disconnect', 'Stop using this login', 'security.php', 'unlink_oauth', $p, 'id-disconnect', $app->csrf->token());
+    } else {
+        $linkRows .= '<a class="id-connect" href="oauth.php?p=' . h($p) . '&link=1">Connect</a>';
+    }
+    $linkRows .= '</td></tr>';
 }
-echo '</tbody></table>';
+if ($linkRows !== '') {
+    echo '<h2 class="lt">Linked logins</h2>';
+    echo '<table class="id-link"><tbody>' . $linkRows . '</tbody></table>';
+}
+$pksNow = $app->passkey->list($app->auth->id());
+$oauthNow = $app->oauth->list($app->auth->id());
+if ($pksNow !== [] && $oauthNow !== []) {
+    echo '<form method="post" id="nopwform" class="sans">' . $app->csrf->field();
+    echo '<p><label><input type="checkbox" name="disable_password" id="disable_password" value="1"'
+        . (empty($u['pass']) ? ' checked' : '') . '> Disable password login</label></p>';
+    echo '</form>';
+    echo '<script>
+(function(){
+  var cb = document.getElementById("disable_password");
+  if (!cb) return;
+  cb.addEventListener("change", function () {
+    if (cb.checked) cb.form.submit();
+    else window.location = "password.php";
+  });
+})();
+</script>';
+}
 $app->view->end();

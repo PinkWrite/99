@@ -20,6 +20,19 @@ final class OAuth
         return !empty($c['id']) && !empty($c['secret']);
     }
 
+    /** @return array<string,string> provider => label, only those with keys */
+    public function providers(): array
+    {
+        $all = ['google' => 'Google', 'github' => 'GitHub', 'apple' => 'Apple'];
+        $out = [];
+        foreach ($all as $p => $lab) {
+            if ($this->enabled($p)) {
+                $out[$p] = $lab;
+            }
+        }
+        return $out;
+    }
+
     public function start(string $provider, bool $link): string
     {
         $state = bin2hex(random_bytes(16));

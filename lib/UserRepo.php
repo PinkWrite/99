@@ -71,6 +71,11 @@ final class UserRepo
         ]);
     }
 
+    public function clearPassword(int $id): void
+    {
+        $this->app->db->run('UPDATE users SET pass = NULL WHERE id = ?', [$id]);
+    }
+
     public function savePrefs(int $id, array $prefs): void
     {
         $this->app->db->run('UPDATE users SET notify_prefs = ? WHERE id = ?', [json_enc($prefs), $id]);

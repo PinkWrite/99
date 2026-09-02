@@ -42,10 +42,23 @@ return [
     ],
 
     'github' => 'https://github.com/PinkWrite/99.git',
-    'github_branch' => 'master',
 
-    // SysAdmin OAuth. Empty id = that provider is off.
+    // Update stream: Git branch pulled by bin/pw99-update. SysAdmin-only.
+    // Never change this from the web app. Edit this file.
+    //   main       — published default for new installs
+    //   developer  — in-progress work
+    //   master     — older published name; still valid
+    'stream' => 'main',
+
+    // SysAdmin OAuth. Empty id or secret = that provider is off (button hidden).
+    // Not stored in the database. Not editable in the app, even by a Superintendent.
     // Callback URL for all three: https://{host}/oauth.php
+    // Google:  https://console.cloud.google.com/apis/credentials
+    //          https://developers.google.com/identity/protocols/oauth2/web-server
+    // GitHub:  https://github.com/settings/developers
+    //          https://docs.github.com/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app
+    // Apple:   https://developer.apple.com/account/resources/identifiers/list/serviceId
+    //          https://developer.apple.com/sign-in-with-apple/get-started/
     'oauth' => [
         'google' => ['id' => '', 'secret' => ''],
         'apple'  => ['id' => '', 'secret' => ''], // Apple secret is the JWT you generate from the .p8 key

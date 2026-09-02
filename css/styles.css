@@ -1530,4 +1530,10 @@ input.id-disconnect:hover {
   color: #ccc;
 }
 
+.pw-pass-fields.pw-off input[type="password"],
+.pw-pass-fields.pw-off input[type="submit"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 

@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
                 'smtp_secure' => 'tls',
             ],
             'github' => 'https://github.com/PinkWrite/99.git',
-            'github_branch' => 'master',
+            'stream' => 'main',
             'oauth' => [
                 'google' => ['id' => '', 'secret' => ''],
                 'apple'  => ['id' => '', 'secret' => ''],
@@ -121,6 +121,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
         }
         $c['mail']['from'] = $from;
         $c['mail']['from_name'] = $c['site_title'];
+        $c['stream'] = 'main';
+        $c['oauth'] = [
+            'google' => [
+                'id' => trim((string) ($_POST['oauth_google_id'] ?? '')),
+                'secret' => trim((string) ($_POST['oauth_google_secret'] ?? '')),
+            ],
+            'github' => [
+                'id' => trim((string) ($_POST['oauth_github_id'] ?? '')),
+                'secret' => trim((string) ($_POST['oauth_github_secret'] ?? '')),
+            ],
+            'apple' => [
+                'id' => trim((string) ($_POST['oauth_apple_id'] ?? '')),
+                'secret' => trim((string) ($_POST['oauth_apple_secret'] ?? '')),
+            ],
+        ];
         $dump = "<?php\nreturn " . var_export($c, true) . ";\n";
         if (file_put_contents(__DIR__ . '/config.php', $dump) === false) {
             $errors[] = 'Could not write config.php — check folder permissions.';
@@ -197,6 +212,17 @@ if ($alreadyInstalled && !$notice) {
         echo '<p><input name="host" placeholder="write.pink/99" value="' . h((string) ($app->config['host'] ?? '')) . '" required></p>';
         echo '<p>Site title <input name="site_title" value="' . h((string) ($app->config['site_title'] ?? 'PinkWrite 99')) . '"></p>';
         echo '<p>Mail from <input name="mail_from" placeholder="noreply@write.pink" value="' . h((string) ($app->config['mail']['from'] ?? '')) . '"> (SMTP later in config)</p>';
+        echo '<h3 class="sans">Sign-in keys (optional)</h3>';
+        echo '<p>Leave a pair blank to hide that button. Keys are written to <code>config.php</code> only — not the database, and not editable in the app later. SysAdmin can add or change them in the config file. Callback for all three: <code>https://</code><em>host</em><code>/oauth.php</code></p>';
+        echo '<p>Google client ID<br><input name="oauth_google_id" autocomplete="off"></p>';
+        echo '<p>Google client secret<br><input type="password" name="oauth_google_secret" autocomplete="off"></p>';
+        echo '<p class="dk"><a href="https://console.cloud.google.com/apis/credentials">Get Google keys</a> · <a href="https://developers.google.com/identity/protocols/oauth2/web-server">instructions</a></p>';
+        echo '<p>GitHub client ID<br><input name="oauth_github_id" autocomplete="off"></p>';
+        echo '<p>GitHub client secret<br><input type="password" name="oauth_github_secret" autocomplete="off"></p>';
+        echo '<p class="dk"><a href="https://github.com/settings/developers">Get GitHub keys</a> · <a href="https://docs.github.com/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app">instructions</a></p>';
+        echo '<p>Apple Services ID<br><input name="oauth_apple_id" autocomplete="off"></p>';
+        echo '<p>Apple secret (JWT from the .p8 key)<br><input type="password" name="oauth_apple_secret" autocomplete="off"></p>';
+        echo '<p class="dk"><a href="https://developer.apple.com/account/resources/identifiers/list/serviceId">Apple identifiers</a> · <a href="https://developer.apple.com/sign-in-with-apple/get-started/">instructions</a></p>';
     }
     echo '<h3 class="sans">First Superintendent</h3>';
     echo '<p>Name <input name="name" required> Username <input name="username" required></p>';

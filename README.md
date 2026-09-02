@@ -12,14 +12,26 @@ PHP 8 + MariaDB (InnoDB) + PDO. Object pages import only the modules they use (`
 3. Open `install.php`. Database host should be `127.0.0.1` (TCP), not `localhost` (Unix socket).
 4. Host setting is **scheme-less**: `write.pink`, `99.example.org`, or `example.org/99`. The app always uses `https://`.
 5. That creates a **Superintendent**. Create a Facility, then an Administrator.
-6. Mail, SMTP password, and host live in `config.php` — SysAdmin work, not the in-app Admin.
+6. Mail, SMTP password, host, OAuth keys, and the update **stream** live in `config.php` — SysAdmin work, not the in-app Admin. Superintendents cannot change those from the web.
 
 Walk-in Superintendent recovery: set `allow_create_super` to `true` in config, open `install.php`, then set it `false` again.
 
 ## Update
 - CLI: `php bin/update.php` or `bash bin/pw99-update`
 - Admin / Superintendent locker: **Update app**
-- Pulls GitHub `master`, never overwrites `config.php`, runs SQL migrations.
+- Pulls the GitHub branch named in `config.php` as `stream` (never overwrites `config.php`), then runs SQL migrations.
+- If `stream` is missing, older `github_branch` still works. If `stream` is `main` and that branch is not on origin, the updater uses `master`.
+
+## Streams
+`stream` is SysAdmin-only. Edit `config.php`. There is no in-app control.
+
+| stream | What it is |
+|---|---|
+| `main` | Default for new installs. Published line. |
+| `developer` | In-progress work. Point a box here to follow that branch. |
+| `master` | Older published name. Existing boxes keep working on it until the SysAdmin changes `stream`. |
+
+This classroom box can stay on `master` through the next update, then set `'stream' => 'developer'` in `config.php` to follow the developer branch from then on.
 
 ## Migrating an old dump
 The mysqli-era tree and `sql/legacy-lift.sql` live on the [legacy](https://github.com/PinkWrite/99/tree/legacy) branch. Read that README. Import the dump into an empty database, then `php bin/update.php` on master (same lift in PHP).

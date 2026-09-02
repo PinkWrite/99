@@ -98,7 +98,7 @@ return [
         'smtp_secure' => 'tls',
     ],
     'github' => 'https://github.com/PinkWrite/99.git',
-    'github_branch' => 'master',
+    'stream' => 'main',
     'oauth' => [
         'google' => ['id' => '', 'secret' => ''],
         'apple'  => ['id' => '', 'secret' => ''],
