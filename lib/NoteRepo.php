@@ -130,6 +130,9 @@ final class NoteRepo
 
     public function memosForDash(int $writerId, array $blockIds, int $limit = 5): array
     {
+        if (!$this->app->db || !$this->app->db->columnExists('notes', 'type')) {
+            return [];
+        }
         $limit = max(1, min(50, $limit));
         $sql = "SELECT * FROM notes WHERE type IN ('memo','task') AND status = 'live'
             AND (editor_set_writer_id = ? OR (editor_set_writer_id = 0 AND editor_set_block = 0)";

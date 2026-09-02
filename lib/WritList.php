@@ -201,6 +201,7 @@ final class WritList
         $st = $this->listState($whereAmI, ['activity', 'creation', 'work', 'title', 'status'], 'activity');
         $filterWriter = (int) ($_GET['u'] ?? 0);
         $filterBlock = (int) ($_GET['v'] ?? 0);
+        $blockCol = $this->writBlockCol();
         $where = [];
         $params = [];
         if ($mode === 'writer') {
@@ -209,14 +210,15 @@ final class WritList
             $where[] = 'w.term_status = ?';
             $params[] = $status;
             if ($filterBlock > 0) {
-                $where[] = 'w.block_id = ?';
+                $where[] = "w.{$blockCol} = ?";
                 $params[] = $filterBlock;
             }
         } else {
             $where[] = 'w.review_status = ?';
             $params[] = $status;
+            $editorCol = $this->userEditorCol();
             if ($editorId) {
-                $where[] = 'u.editor_id = ?';
+                $where[] = "u.{$editorCol} = ?";
                 $params[] = $editorId;
             }
             if ($filterWriter > 0) {
@@ -224,7 +226,7 @@ final class WritList
                 $params[] = $filterWriter;
             }
             if ($filterBlock > 0) {
-                $where[] = 'w.block_id = ?';
+                $where[] = "w.{$blockCol} = ?";
                 $params[] = $filterBlock;
             }
         }
@@ -238,10 +240,10 @@ final class WritList
             "SELECT w.*, u.name AS writer_name, b.name AS block_name, b.code AS block_code
              FROM writs w
              LEFT JOIN users u ON u.id = w.writer_id
-             LEFT JOIN blocks b ON b.id = w.block_id
+             LEFT JOIN blocks b ON b.id = w.{$blockCol}
              WHERE {$whereSql}
              ORDER BY {$order}",
-            function (array $rows) use ($mode, $status) {
+            function (array $rows) use ($mode, $status, $blockCol) {
                 $this->bulkBar($mode, $status, $this->app->auth->id());
                 if (!$rows) {
                     echo '<p class="lt sans">No writs</p>';
@@ -261,7 +263,7 @@ final class WritList
                     $scoreHtml = ($score !== null && $outof !== null && (int) $score > (int) $outof)
                         ? '<span class="noticegreen">' . h((string) $score) . '</span>'
                         : h((string) $score);
-                    $block = ((int) ($w['block_id'] ?? 0) !== 0)
+                    $block = ((int) ($w[$blockCol] ?? $w['block_id'] ?? $w['block'] ?? 0) !== 0)
                         ? '<small title="' . h((string) ($w['block_name'] ?? '')) . '">' . h((string) ($w['block_code'] ?? '')) . '</small>'
                         : 'Main';
                     echo '<tr class="' . $cc . '"><td>';
@@ -353,7 +355,12 @@ final class WritList
      */
     private function printList(array $st, string $countSql, array $params, string $selectSql, callable $body, array $sorts, string $formId, bool $keepEmpty = false): void
     {
-        $total = (int) $this->app->db->val($countSql, $params);
+        try {
+            $total = (int) $this->app->db->val($countSql, $params);
+        } catch (Throwable $e) {
+            echo '<p class="sans noticered">List query failed: ' . h($e->getMessage()) . '</p>';
+            return;
+        }
         if ($total === 0 && $st['q'] === '' && !$keepEmpty) {
             echo '<p class="lt sans"><b>Nothing yet</b></p>';
             return;
@@ -364,11 +371,26 @@ final class WritList
             $page = $pages;
         }
         $off = ($page - 1) * $st['per'];
-        $rows = $this->app->db->all($selectSql . " LIMIT {$st['per']} OFFSET {$off}", $params);
+        try {
+            $rows = $this->app->db->all($selectSql . " LIMIT {$st['per']} OFFSET {$off}", $params);
+        } catch (Throwable $e) {
+            echo '<p class="sans noticered">List query failed: ' . h($e->getMessage()) . '</p>';
+            return;
+        }
         $this->pager($st['where'], $st['sortGet'], $st['sortSuffix'], $st['searchSuffix'], $page, $pages);
         $this->toolbar($st['where'], $st['sortGet'], $st['searchSuffix'], $st['classes'], $st['q'], $formId, $sorts);
         $body($rows);
         $this->pager($st['where'], $st['sortGet'], $st['sortSuffix'], $st['searchSuffix'], $page, $pages);
+    }
+
+    private function writBlockCol(): string
+    {
+        return $this->app->db && $this->app->db->columnExists('writs', 'block_id') ? 'block_id' : 'block';
+    }
+
+    private function userEditorCol(): string
+    {
+        return $this->app->db && $this->app->db->columnExists('users', 'editor_id') ? 'editor_id' : 'editor';
     }
 
     private function orderSql(string $sort): string

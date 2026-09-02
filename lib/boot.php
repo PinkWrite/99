@@ -7,6 +7,29 @@
  */
 declare(strict_types=1);
 
+if (!function_exists('pw99_fail')) {
+    function pw99_fail(Throwable $e): void
+    {
+        if (PHP_SAPI === 'cli') {
+            fwrite(STDERR, 'PinkWrite 99: ' . $e->getMessage() . "\n" . $e->getFile() . ':' . $e->getLine() . "\n" . $e->getTraceAsString() . "\n");
+            exit(1);
+        }
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: text/html; charset=utf-8');
+        }
+        echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>PinkWrite 99</title></head><body>';
+        echo '<pre style="white-space:pre-wrap;font:14px/1.4 monospace;max-width:70em">';
+        echo "PinkWrite 99 could not run this page.\n\n";
+        echo htmlspecialchars($e->getMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), "\n\n";
+        echo htmlspecialchars($e->getFile() . ':' . $e->getLine(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), "\n\n";
+        echo htmlspecialchars($e->getTraceAsString(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        echo "</pre></body></html>";
+        exit(1);
+    }
+    set_exception_handler('pw99_fail');
+}
+
 if (!isset($import) || !is_array($import)) {
     $import = [];
 }
@@ -49,7 +72,7 @@ try {
         $app->bootError = $e->getMessage();
         return;
     }
-    throw $e;
+    pw99_fail($e);
 }
 
 if (!is_array($config)) {
@@ -84,6 +107,7 @@ if (!empty($config['db']['name'])) {
         header('Content-Type: text/plain; charset=utf-8');
         echo "Database connection failed. The SysAdmin needs to check config.php.\n";
         echo "Use 127.0.0.1 (TCP), not localhost (Unix socket).\n";
+        echo $e->getMessage(), "\n";
         exit;
     }
 }
@@ -96,5 +120,5 @@ try {
         $app->bootError = $e->getMessage();
         return;
     }
-    throw $e;
+    pw99_fail($e);
 }

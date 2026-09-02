@@ -14,6 +14,7 @@ $uid = $app->auth->id();
 $app->view->start('Dash for ' . $u['name'], 'dash', 'writer');
 echo '<p class="sans dk">Typing and Editing for Learners and Teachers.</p>';
 
+try {
 echo post_button('New note +', 'Start a new note', 'note.php', 'new_note', (string) $uid, 'newNoteButton', $app->csrf->token());
 echo '<br>';
 $pins = $app->note->pinnedFor($uid, 10);
@@ -64,4 +65,7 @@ echo '<br><br>';
 
 echo post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'set_gray', $app->csrf->token());
 $app->writlist->renderWriter('index.php');
+} catch (Throwable $e) {
+    echo '<p class="sans noticered">Dashboard list failed: ' . h($e->getMessage()) . '</p>';
+}
 $app->view->end();

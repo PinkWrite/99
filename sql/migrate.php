@@ -22,6 +22,10 @@ function pw99_migrate(App $app): string
     if ($promo !== '') {
         $notes[] = $promo;
     }
+    $cols = pw99_ensure_rewrite_columns($db);
+    if ($cols !== '') {
+        $notes[] = $cols;
+    }
     $soft = pw99_soften_legacy_notnull($db);
     if ($soft !== '') {
         $notes[] = $soft;
@@ -231,3 +235,90 @@ function pw99_soften_legacy_notnull(Db $db): string
     }
     return $did ? 'legacy not-null ' . implode(',', $did) : '';
 }
+
+/** Columns the rewrite needs. Runs every update so a leftover mysqli dump cannot 500 the home page. */
+function pw99_ensure_rewrite_columns(Db $db): string
+{
+    if (!$db->tableExists('users')) {
+        return '';
+    }
+    $pdo = $db->pdo();
+    $did = [];
+    $adds = [
+        'users' => [
+            'facility_id' => "ADD COLUMN facility_id BIGINT UNSIGNED DEFAULT NULL",
+            'groups_json' => "ADD COLUMN groups_json JSON NULL",
+            'blocks_json' => "ADD COLUMN blocks_json JSON NULL",
+            'observing_json' => "ADD COLUMN observing_json JSON NULL",
+            'editor_id' => "ADD COLUMN editor_id BIGINT UNSIGNED DEFAULT NULL",
+            'totp_secret' => "ADD COLUMN totp_secret VARCHAR(64) DEFAULT NULL",
+            'totp_enabled' => "ADD COLUMN totp_enabled TINYINT(1) NOT NULL DEFAULT 0",
+            'notify_prefs' => "ADD COLUMN notify_prefs JSON NULL",
+        ],
+        'writs' => [
+            'facility_id' => "ADD COLUMN facility_id BIGINT UNSIGNED DEFAULT NULL",
+            'block_id' => "ADD COLUMN block_id BIGINT UNSIGNED DEFAULT 0",
+            'kind' => "ADD COLUMN kind ENUM('writ','assignment','test') NOT NULL DEFAULT 'writ'",
+            'memo_id' => "ADD COLUMN memo_id BIGINT UNSIGNED DEFAULT NULL",
+            'test_id' => "ADD COLUMN test_id BIGINT UNSIGNED DEFAULT NULL",
+            'drafts' => "ADD COLUMN drafts JSON NULL",
+            'redrafts' => "ADD COLUMN redrafts JSON NULL",
+            'writing_time' => "ADD COLUMN writing_time INT UNSIGNED DEFAULT 0",
+            'test_answers' => "ADD COLUMN test_answers JSON DEFAULT NULL",
+            'test_auto_score' => "ADD COLUMN test_auto_score INT UNSIGNED DEFAULT NULL",
+        ],
+        'notes' => [
+            'type' => "ADD COLUMN type ENUM('note','memo','task') NOT NULL DEFAULT 'note'",
+            'status' => "ADD COLUMN status ENUM('live','draft','archived') NOT NULL DEFAULT 'live'",
+            'seen_writer' => "ADD COLUMN seen_writer ENUM('new','read','archived') NOT NULL DEFAULT 'new'",
+            'seen_observer' => "ADD COLUMN seen_observer ENUM('new','read','archived') NOT NULL DEFAULT 'new'",
+            'writing_time' => "ADD COLUMN writing_time INT UNSIGNED DEFAULT 0",
+        ],
+        'blocks' => [
+            'facility_id' => "ADD COLUMN facility_id BIGINT UNSIGNED DEFAULT NULL",
+            'group_id' => "ADD COLUMN group_id BIGINT UNSIGNED DEFAULT 0",
+        ],
+    ];
+    foreach ($adds as $table => $cols) {
+        if (!$db->tableExists($table)) {
+            continue;
+        }
+        foreach ($cols as $name => $frag) {
+            if ($db->columnExists($table, $name)) {
+                continue;
+            }
+            try {
+                $pdo->exec("ALTER TABLE `{$table}` {$frag}");
+                $did[] = $table . '.' . $name;
+            } catch (PDOException $e) {
+            }
+        }
+    }
+    if ($db->columnExists('writs', 'block') && $db->columnExists('writs', 'block_id')) {
+        try {
+            $pdo->exec('UPDATE writs SET block_id = `block` WHERE (block_id = 0 OR block_id IS NULL) AND `block` > 0');
+        } catch (PDOException $e) {
+        }
+    }
+    if ($db->columnExists('users', 'editor') && $db->columnExists('users', 'editor_id')) {
+        try {
+            $pdo->exec('UPDATE users SET editor_id = editor WHERE editor_id IS NULL');
+        } catch (PDOException $e) {
+        }
+    }
+    if ($db->columnExists('users', 'blocks') && $db->columnExists('users', 'blocks_json')) {
+        try {
+            $pdo->exec("UPDATE users SET blocks_json = IFNULL(blocks, '[]') WHERE blocks_json IS NULL");
+        } catch (PDOException $e) {
+        }
+    }
+    if ($db->tableExists('writs')) {
+        try {
+            $pdo->exec("UPDATE writs SET drafts = JSON_ARRAY() WHERE drafts IS NULL OR drafts = 'null'");
+            $pdo->exec("UPDATE writs SET redrafts = JSON_ARRAY() WHERE redrafts IS NULL OR redrafts = 'null'");
+        } catch (PDOException $e) {
+        }
+    }
+    return $did ? 'added ' . implode(',', $did) : '';
+}
+
