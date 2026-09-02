@@ -3,14 +3,14 @@ declare(strict_types=1);
 $import = ['auth', 'csrf', 'view', 'html', 'update'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
-if (!$app->auth->atLeast('admin')) {
+if (!$app->auth->is('superintendent')) {
     $app->redirect('');
 }
 $log = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     $log = $app->update->run(isset($_POST['pull']));
 }
-$app->view->start('Update', 'locker');
+$app->view->start('Update', 'locker', 'super');
 echo '<h2 class="lt">Update</h2>';
 echo '<p class="sans dk">Pulls GitHub master (config file is never overwritten) then runs SQL migrations — including the one-time lift of a legacy dump.</p>';
 echo '<p class="sans">CLI: <code>php bin/update.php</code> or <code>bash bin/pw99-update</code></p>';

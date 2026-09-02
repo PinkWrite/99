@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
 [, $which] = inkmail_serf('inkmail', ['which']);
 [, $domains] = inkmail_serf('inkmail', ['showdomains']);
 
-$app->view->start('Mail (Superintendent)', 'locker');
+$app->view->start('Mail (Superintendent)', 'locker', 'super');
 echo '<h2 class="lt">inkMail</h2>';
 echo '<p class="sans dk">Postfix-Maddy agnostic control plane. Roundcube stays webmail. Uses 99 styling in this locker; the Go panel lives at po.emailURI.</p>';
 if ($flash !== '') {

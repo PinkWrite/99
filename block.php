@@ -3,13 +3,13 @@ declare(strict_types=1);
 $import = ['auth', 'csrf', 'view', 'html', 'text', 'block'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
-if (!$app->auth->atLeast('editor')) {
+if (!$app->auth->atLeast('supervisor')) {
     $app->redirect('');
 }
 $bid = (int) ($_GET['b'] ?? $_POST['b'] ?? 0);
 $b = $app->block->find($bid);
 if (!$b) {
-    $app->redirect('blocks.php');
+    $app->redirect('blocks-editor.php');
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     $app->block->save($bid, [
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     ]);
     $b = $app->block->find($bid);
 }
-$app->view->start('Block', 'blocks', 'editor');
+$app->view->start('Block', 'blocks', 'admin');
 echo '<form method="post">' . $app->csrf->field();
 echo '<input type="hidden" name="b" value="' . $bid . '">';
 echo '<p class="sans">Name <input name="name" value="' . h($b['name']) . '"> Code <input name="code" value="' . h($b['code']) . '"></p>';

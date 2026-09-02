@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     }
 }
 
-$app->view->start('Password', 'locker');
+$app->view->start('Password', 'locker', 'my');
 echo '<h2 class="lt">Password</h2>';
 if ($err) {
     echo '<p class="sans noticered">' . h($err) . '</p>';

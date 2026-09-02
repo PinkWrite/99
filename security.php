@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     }
 }
 
-$app->view->start('Security', 'locker');
+$app->view->start('Security', 'locker', 'my');
 if (!empty($_SESSION['oauth_err'])) {
     echo '<p class="sans noticered">' . h((string) $_SESSION['oauth_err']) . '</p>';
     unset($_SESSION['oauth_err']);

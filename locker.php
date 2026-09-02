@@ -4,11 +4,7 @@ $import = ['auth', 'csrf', 'view', 'html', 'user'];
 require __DIR__ . '/lib/boot.php';
 $u = $app->auth->requireUser();
 $uid = $app->auth->id();
-$err = $msg = '';
-$dash = (string) ($_SESSION['pw_dash'] ?? 'my');
-if (!in_array($dash, ['my', 'writer'], true)) {
-    $dash = 'my';
-}
+$err = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST['save_contact'])) {
     try {
@@ -21,8 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST
 }
 
 $u = $app->user->find($uid) ?? $u;
-$app->view->start('Locker', 'locker', $dash);
-echo '<h2 class="lt">Locker</h2>';
+$app->view->start('My Locker', 'locker', 'my');
+echo '<h2 class="lt">My Locker</h2>';
 if ($err) {
     echo '<p class="sans noticered">' . h($err) . '</p>';
 }
@@ -34,7 +30,4 @@ echo '<p><input type="submit" class="lt_button" value="Save"></p></form>';
 echo '<p>' . button('Password', 'Change password', 'password.php', 'set_gray') . '</p>';
 echo '<p>' . button('Security', '2FA and passkeys', 'security.php', 'set_gray') . '</p>';
 echo '<p>' . button('Notification settings', 'In-app and email', 'notify-settings.php', 'set_gray') . '</p>';
-if ($dash === 'writer') {
-    echo '<p>' . button('Archives', 'Archives', 'archives.php', 'set_gray') . '</p>';
-}
 $app->view->end();

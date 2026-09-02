@@ -3,8 +3,8 @@ declare(strict_types=1);
 $import = ['auth', 'csrf', 'view', 'html', 'text', 'user', 'mail', 'notify'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
-if (!$app->auth->atLeast('editor')) {
-    $app->redirect('');
+if (!$app->auth->atLeast('supervisor')) {
+    $app->redirect('editor.php');
 }
 $err = $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
@@ -32,14 +32,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
             'pass' => password_hash($p1, PASSWORD_DEFAULT),
             'editor_id' => $app->auth->is('editor') ? $app->auth->id() : null,
         ]);
-        $app->notify->send($app->auth->id(), $type === 'observer' ? 'new_observer' : 'new_writer', $name . ' registered', 'enrollment.php');
+        $app->notify->send($app->auth->id(), $type === 'observer' ? 'new_observer' : 'new_writer', $name . ' registered', $type === 'observer' ? 'observers.php' : 'enrollment.php');
         if ($app->mail->enabled()) {
             $app->mail->send($em, 'Welcome to ' . $app->title(), "Your username is {$un}. Sign in at " . $app->url('login.php') . "\n");
         }
         $msg = ucfirst($type) . ' created.';
     }
 }
-$app->view->start('Register', 'roll', 'editor');
+$kind = (($_POST['type'] ?? $_GET['type'] ?? 'writer') === 'observer') ? 'observer' : 'writer';
+$app->view->start('Register', $kind === 'observer' ? 'observers' : 'writers', 'admin');
 echo '<h2 class="lt">Register</h2>';
 if ($err) {
     echo '<p class="sans noticered">' . h($err) . '</p>';
@@ -48,9 +49,13 @@ if ($msg) {
     echo '<p class="sans noticegreen">' . h($msg) . '</p>';
 }
 echo '<form method="post">' . $app->csrf->field();
-echo '<p class="sans">Type <select class="formselect" name="type"><option value="writer">Writer</option><option value="observer">Observer</option></select></p>';
-echo '<p class="sans">Name <input name="name" required> Username <input name="username" required></p>';
-echo '<p class="sans">Email <input type="email" name="email" required></p>';
-echo '<p class="sans">Password <input type="password" name="pass1" required> Confirm <input type="password" name="pass2" required></p>';
+echo '<p class="sans">Type<br><select class="formselect" name="type">';
+echo '<option value="writer"' . ($kind === 'writer' ? ' selected' : '') . '>Writer</option>';
+echo '<option value="observer"' . ($kind === 'observer' ? ' selected' : '') . '>Observer</option></select></p>';
+echo '<p class="sans">Name<br><input name="name" required></p>';
+echo '<p class="sans">Username<br><input name="username" required></p>';
+echo '<p class="sans">Email<br><input type="email" name="email" required></p>';
+echo '<p class="sans">Password<br><input type="password" name="pass1" required></p>';
+echo '<p class="sans">Confirm<br><input type="password" name="pass2" required></p>';
 echo '<p><input type="submit" class="lt_button" value="Register"></p></form>';
 $app->view->end();

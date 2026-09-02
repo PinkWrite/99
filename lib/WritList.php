@@ -181,12 +181,12 @@ final class WritList
             "SELECT b.*, u.name AS editor_name FROM blocks b LEFT JOIN users u ON u.id = b.editor_id WHERE " . implode(' AND ', $where) . " ORDER BY {$order}",
             function (array $rows) use ($st, $me) {
                 echo '<table class="list sans lt"><tbody>';
-                echo '<tr><th>Name</th><th>Code</th><th>Editor</th><th><div style="display:inline;float:right">Writs</div></th><th><div style="display:inline;float:right">Roll</div></th><th><div style="display:inline;float:right">Memos</div></th></tr>';
+                echo '<tr><th>Name</th><th>Code</th><th>Editor</th><th><div style="display:inline;float:right">Writs</div></th><th><div style="display:inline;float:right">Writers</div></th><th><div style="display:inline;float:right">Memos</div></th></tr>';
                 if ($st['q'] === '') {
                     echo '<tr><td><a class="listed_note" href="writs-editor.php?v=0"><b>Main</b></a></td><td></td>';
                     echo '<td>' . h((string) ($me['name'] ?? '')) . '</td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in your main Block', 'writs-editor.php', 'v', '0', 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . button('Roll', 'List writers in Main block', 'enrollment.php', 'editNoteButton') . '</div></td>';
+                    echo '<td><div style="display:inline;float:right">' . button('Writers', 'List writers in Main block', 'enrollment.php', 'editNoteButton') . '</div></td>';
                     echo '<td><div style="display:inline;float:right">' . button('Block notes', 'List memos for this block', 'memos-editor.php', 'editNoteButton') . '</div></td>';
                     echo '</tr>';
                 }
@@ -198,7 +198,7 @@ final class WritList
                     echo '<td><a class="listed_note" href="block.php?b=' . $id . '">' . h((string) $b['code']) . '</a></td>';
                     echo '<td>' . h((string) ($b['editor_name'] ?? '')) . '</td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in this Block', 'writs-editor.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
-                    echo '<td><div style="display:inline;float:right">' . button('Roll', 'List writers', 'enrollment.php', 'editNoteButton') . '</div></td>';
+                    echo '<td><div style="display:inline;float:right">' . button('Writers', 'List writers', 'enrollment.php', 'editNoteButton') . '</div></td>';
                     echo '<td><div style="display:inline;float:right">' . get_switch('Block notes', 'List memos for this block', 'memos-editor.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';

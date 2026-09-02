@@ -3,20 +3,19 @@ declare(strict_types=1);
 $import = ['auth', 'csrf', 'view', 'html', 'user', 'block'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
-if (!$app->auth->atLeast('editor')) {
-    $app->redirect('');
+if (!$app->auth->atLeast('supervisor')) {
+    $app->redirect('editor.php');
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check() && isset($_POST['u'])) {
     $ids = array_map('intval', (array) ($_POST['blocks'] ?? []));
     $app->user->setBlocks((int) $_POST['u'], $ids);
 }
-$eid = $app->auth->is('editor') ? $app->auth->id() : 0;
-$writers = $eid ? $app->user->writersForEditor($eid) : $app->user->listByFacility($app->auth->facilityId(), 'writer');
-$blocks = $eid ? $app->block->forEditor($eid, false) : $app->block->forFacility($app->auth->facilityId(), false);
-$app->view->start('Roll', 'roll', 'editor');
-echo '<h2 class="lt">Roll</h2>';
+$writers = $app->user->listByFacility($app->auth->facilityId(), 'writer');
+$blocks = $app->block->forFacility($app->auth->facilityId(), false);
+$app->view->start('Writers', 'writers', 'admin');
+echo '<h2 class="lt">Writers</h2>';
 echo '<p class="sans dk">Writers and the blocks they belong to.</p>';
-echo '<p>' . button('Register', 'New writer', 'register.php', 'newNoteButton') . '</p>';
+echo '<p>' . button('New writer +', 'Register a writer', 'register.php?type=writer', 'newNoteButton') . '</p>';
 echo '<table class="list roll lt sans"><tr><th>Name</th><th>Username</th><th>Blocks</th><th></th></tr>';
 $cc = 'lr';
 foreach ($writers as $w) {

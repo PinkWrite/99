@@ -7,7 +7,7 @@ if ($app->auth->is('observer')) {
     $app->redirect('observer.php');
 }
 $u = $app->auth->user();
-$app->view->start('Archives', 'locker', 'writer');
+$app->view->start('Archives', 'archives', 'writer');
 echo '<h2 class="lt">Archives</h2>';
 $app->writlist->renderWriter('archives.php', 'archived');
 $app->view->end();

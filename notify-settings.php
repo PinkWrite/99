@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     $saved = true;
 }
 
-$app->view->start('Notification settings', 'locker');
+$app->view->start('Notification settings', 'locker', 'my');
 echo '<h2 class="lt">Notifications</h2>';
 echo '<p class="sans dk">In-app notices sit in the Notifications menu until acknowledged. Email requires SysAdmin mail in config.</p>';
 if (!empty($saved)) {

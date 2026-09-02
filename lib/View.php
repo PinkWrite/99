@@ -75,16 +75,18 @@ final class View
         $type = (string) ($u['type'] ?? '');
         if (in_array($active, ['super', 'facilities', 'admins'], true)) {
             $dash = 'super';
-        } elseif (in_array($active, ['admin', 'staffing'], true)) {
+        } elseif (in_array($active, ['admin', 'staffing', 'editors', 'observers', 'writers'], true)) {
             $dash = 'admin';
         } elseif (in_array($active, ['observer', 'owrits'], true) || $type === 'observer') {
             $dash = 'observer';
-        } elseif (in_array($active, ['editor', 'ewrits', 'roll', 'tests', 'assign'], true)) {
+        } elseif (in_array($active, ['editor', 'ewrits', 'tests', 'assign'], true)) {
             $dash = 'editor';
-        } elseif ($active === 'dash') {
+        } elseif ($active === 'dash' || $active === 'locker') {
             $dash = 'my';
-        } elseif (in_array($active, ['writs', 'notes', 'blocks', 'memos', 'locker'], true)) {
+        } elseif (in_array($active, ['writs', 'notes', 'memos'], true)) {
             $dash = $type === 'observer' ? 'observer' : 'writer';
+        } elseif ($active === 'blocks') {
+            $dash = $type === 'writer' ? 'writer' : 'admin';
         } else {
             $dash = 'my';
         }
@@ -128,38 +130,44 @@ final class View
             $n = 0;
         }
         $noteLabel = $n > 0 ? "Notifications ({$n})" : 'Notifications';
-        $type = $u['type'];
-        $locker = match ($dash) {
-            'my', 'writer' => 'locker.php',
-            'editor' => 'locker-editor.php',
-            'observer' => 'locker-observer.php',
-            'super' => 'locker-super.php',
-            'admin' => 'locker-admin.php',
-            default => $this->lockerFor($type),
-        };
+        if ($dash === 'super') {
+            $lockerLabel = 'Super Locker';
+            $lockerHref = 'locker-super.php';
+        } elseif ($dash === 'admin') {
+            $lockerLabel = 'Admin Locker';
+            $lockerHref = 'locker-admin.php';
+        } else {
+            $lockerLabel = 'My Locker';
+            $lockerHref = 'locker.php';
+        }
         echo '<div class="dash_menu_nav"><div class="dashnav"><ul class="dashnav">';
         echo '<li class="lt sans">' . h($greeting) . '</li>';
-        echo '<li class="user">' . button('Locker', 'Open your locker', $locker, 'navDarkButton user ' . $is('locker')) . '</li>';
+        echo '<li class="user">' . button($lockerLabel, $lockerLabel, $lockerHref, 'navDarkButton user ' . $is('locker')) . '</li>';
         echo '<li class="user">' . button($noteLabel, 'Notifications', 'notifications.php', 'navDarkButton user ' . $is('notify')) . '</li>';
         if ($dash === 'super') {
             echo '<li class="user">' . button('Administrators', 'Manage administrators', 'administrators.php', 'navDarkButton user ' . $is('admins')) . '</li>';
             echo '<li class="user">' . button('Facilities', 'Schools', 'facilities.php', 'navDarkButton user ' . $is('facilities')) . '</li>';
+        } elseif ($dash === 'admin') {
+            echo '<li class="user">' . button('Blocks', 'Manage blocks', 'blocks-editor.php', 'navDarkButton user ' . $is('blocks')) . '</li>';
+            echo '<li class="user">' . button('Editors', 'Manage editors', 'editors.php', 'navDarkButton user ' . $is('editors')) . '</li>';
+            echo '<li class="user">' . button('Observers', 'Manage observers', 'observers.php', 'navDarkButton user ' . $is('observers')) . '</li>';
+            echo '<li class="user">' . button('Writers', 'Enrollment and blocks', 'enrollment.php', 'navDarkButton user ' . $is('writers')) . '</li>';
         } elseif ($dash === 'observer') {
             echo '<li class="user">' . button('Memos', 'List memos', 'memos-observer.php', 'navDarkButton user ' . $is('memos')) . '</li>';
             echo '<li class="user">' . button('Observees', 'View observed writers', 'observer.php', 'navDarkButton user ' . $is('observer')) . '</li>';
             echo '<li class="user">' . button('Writs', 'Writs', 'writs-observer.php', 'navDarkButton user ' . $is('owrits')) . '</li>';
         } elseif ($dash === 'editor') {
             echo '<li class="user">' . button('Memos', 'List memos', 'memos-editor.php', 'navDarkButton user ' . $is('memos')) . '</li>';
-            echo '<li class="user">' . button('Roll', 'List writers', 'enrollment.php', 'navDarkButton user ' . $is('roll')) . '</li>';
-            echo '<li class="user">' . button('Blocks', 'List blocks', 'blocks-editor.php', 'navDarkButton user ' . $is('blocks')) . '</li>';
             echo '<li class="user">' . button('Writs', 'List writs', 'writs-editor.php', 'navDarkButton user ' . $is('ewrits')) . '</li>';
             echo '<li class="user">' . button('Assignments', 'Assigned writs', 'assignments.php', 'navDarkButton user ' . $is('assign')) . '</li>';
             echo '<li class="user">' . button('Tests', 'Compose and list tests', 'tests.php', 'navDarkButton user ' . $is('tests')) . '</li>';
+            echo '<li class="user">' . button('Archives', 'Editor archives', 'archives-editor.php', 'navDarkButton user ' . $is('archives')) . '</li>';
         } elseif ($dash === 'writer') {
             echo '<li class="user">' . button('Memos', 'View memos & tasks', 'memos.php', 'navDarkButton user ' . $is('memos')) . '</li>';
             echo '<li class="user">' . button('Notes', 'View notes', 'notes.php', 'navDarkButton user ' . $is('notes')) . '</li>';
             echo '<li class="user">' . button('Blocks', 'View blocks', 'blocks.php', 'navDarkButton user ' . $is('blocks')) . '</li>';
             echo '<li class="user">' . button('Writs', 'View writs', 'writs.php', 'navDarkButton user ' . $is('writs')) . '</li>';
+            echo '<li class="user">' . button('Archives', 'Archives', 'archives.php', 'navDarkButton user ' . $is('archives')) . '</li>';
         }
         $label = match ($dash) {
             'editor' => 'Editor',
@@ -171,17 +179,6 @@ final class View
         };
         echo '<li class="user lt sans">' . h($u['name']) . ' (' . h($label) . ')</li>';
         echo '</ul></div></div>';
-    }
-
-    private function lockerFor(string $type): string
-    {
-        return match ($type) {
-            'superintendent' => 'locker-super.php',
-            'admin', 'supervisor' => 'locker-admin.php',
-            'editor' => 'locker-editor.php',
-            'observer' => 'locker-observer.php',
-            default => 'locker.php',
-        };
     }
 
     public function flash(?string $html): void
