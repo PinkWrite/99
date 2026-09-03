@@ -80,7 +80,7 @@ final class View
         $type = (string) ($u['type'] ?? '');
         if (in_array($active, ['super', 'facilities', 'admins'], true)) {
             $dash = 'super';
-        } elseif (in_array($active, ['admin', 'staffing', 'editors', 'observers', 'writers'], true)) {
+        } elseif (in_array($active, ['admin', 'editors', 'observers', 'writers'], true)) {
             $dash = 'admin';
         } elseif (in_array($active, ['observer', 'owrits'], true) || $type === 'observer') {
             $dash = 'observer';

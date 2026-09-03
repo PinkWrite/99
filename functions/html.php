@@ -79,10 +79,15 @@ function pw99_blocks_return(?string $raw = null): string
     return 'blocks-editor.php';
 }
 
-/** Active/dormant editors list the admin came from. */
-function pw99_editors_return(?string $raw = null): string
+/** Active/dormant people list the staff came from. */
+function pw99_people_return(string $type, ?string $raw = null): string
 {
-    $allow = ['editors.php', 'editors-dormant.php'];
+    $allow = match ($type) {
+        'observer' => ['observers.php', 'observers-dormant.php'],
+        'writer' => ['enrollment.php', 'writers-dormant.php'],
+        'admin' => ['administrators.php', 'admins-dormant.php'],
+        default => ['editors.php', 'editors-dormant.php'],
+    };
     foreach ([$raw, $_POST['return'] ?? '', $_GET['return'] ?? '', $_SERVER['HTTP_REFERER'] ?? ''] as $c) {
         if (!is_string($c) || $c === '') {
             continue;
@@ -92,7 +97,29 @@ function pw99_editors_return(?string $raw = null): string
             return $base;
         }
     }
-    return 'editors.php';
+    return $allow[0];
+}
+
+/** Active/dormant editors list the admin came from. */
+function pw99_editors_return(?string $raw = null): string
+{
+    return pw99_people_return('editor', $raw);
+}
+
+/** Open/closed facilities list the superintendent came from. */
+function pw99_facilities_return(?string $raw = null): string
+{
+    $allow = ['facilities.php', 'facilities-closed.php'];
+    foreach ([$raw, $_POST['return'] ?? '', $_GET['return'] ?? '', $_SERVER['HTTP_REFERER'] ?? ''] as $c) {
+        if (!is_string($c) || $c === '') {
+            continue;
+        }
+        $base = basename((string) (parse_url($c, PHP_URL_PATH) ?: $c));
+        if (in_array($base, $allow, true)) {
+            return $base;
+        }
+    }
+    return 'facilities.php';
 }
 
 function pw99_set_theme_cookie(string $id): void

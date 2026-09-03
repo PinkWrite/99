@@ -38,4 +38,19 @@ final class FacilityRepo
     {
         $this->app->db->run('UPDATE facilities SET name = ?, code = ? WHERE id = ?', [$name, $code, $id]);
     }
+
+    public function delete(int $id): void
+    {
+        $db = $this->app->db;
+        if ($db->tableExists('blocks') && $db->columnExists('blocks', 'facility_id')) {
+            $db->run('UPDATE blocks SET facility_id = NULL WHERE facility_id = ?', [$id]);
+        }
+        if ($db->tableExists('tests') && $db->columnExists('tests', 'facility_id')) {
+            $db->run('UPDATE tests SET facility_id = NULL WHERE facility_id = ?', [$id]);
+        }
+        if ($db->tableExists('writs') && $db->columnExists('writs', 'facility_id')) {
+            $db->run('UPDATE writs SET facility_id = NULL WHERE facility_id = ?', [$id]);
+        }
+        $db->run('DELETE FROM facilities WHERE id = ?', [$id]);
+    }
 }

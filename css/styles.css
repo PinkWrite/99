@@ -1420,6 +1420,10 @@ table.list.bulk {
   gap: 0.3em;
   cursor: pointer;
 }
+#pw-theme-keep {
+  width: auto;
+  min-width: 7em;
+}
 button.act_disabled, button.act_disabled:hover,
 input.act_disabled, input.act_disabled:hover,
 input.act_disabled:disabled {

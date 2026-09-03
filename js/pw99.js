@@ -367,7 +367,7 @@
       if (keep) {
         var same = id === saved;
         keep.disabled = same;
-        keep.className = same ? 'act_disabled' : 'act_green';
+        keep.className = same ? 'set_writ_disabled' : 'act_green';
       }
     }
     form.addEventListener('change', apply);

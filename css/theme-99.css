@@ -1,7 +1,8 @@
 /* @theme 99
-   Original 99: same charcoal #333 for frame and page. Accent stays #f71771. */
+   Original 99 page #333 with a slightly darker frame around the edges.
+   Accent stays #f71771. */
 :root {
-  --pw-frame: #333;
+  --pw-frame: #2c2c2c;
   --pw-page: #333;
   --pw-fg: #ddd;
   --pw-muted: #aaa;

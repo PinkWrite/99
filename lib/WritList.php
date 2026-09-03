@@ -256,40 +256,75 @@ final class WritList
 
     public function renderAdminEditors(string $whereAmI, string $status): void
     {
+        $this->renderAdminPeople($whereAmI, 'editor', $status);
+    }
+
+    public function renderAdminPeople(string $whereAmI, string $type, string $status): void
+    {
         $dormant = $status === 'dormant';
         $st = $this->listState($whereAmI, ['creation', 'name'], 'creation');
-        $where = ["u.type = 'editor'", 'u.status = ?'];
-        $params = [$dormant ? 'dormant' : 'active'];
+        $where = ['u.type = ?', 'u.status = ?'];
+        $params = [$type, $dormant ? 'dormant' : 'active'];
         $fid = $this->app->auth->facilityId();
-        if ($fid) {
+        if ($type !== 'admin' && $fid) {
             $where[] = 'u.facility_id = ?';
             $params[] = $fid;
         }
         $this->appendSearch($where, $params, $st['q'], ['u.name', 'u.username', 'u.email']);
         $created = $this->app->db->columnExists('users', 'created_at') ? 'u.created_at DESC, u.id DESC' : 'u.id DESC';
         $order = $st['sort'] === 'name' ? 'u.name ASC' : $created;
-        $return = $dormant ? 'editors-dormant.php' : 'editors.php';
+        $pages = match ($type) {
+            'observer' => ['observers.php', 'observers-dormant.php'],
+            'writer' => ['enrollment.php', 'writers-dormant.php'],
+            'admin' => ['administrators.php', 'admins-dormant.php'],
+            default => ['editors.php', 'editors-dormant.php'],
+        };
+        $return = $dormant ? $pages[1] : $pages[0];
+        $noun = match ($type) {
+            'observer' => 'observers',
+            'writer' => 'writers',
+            'admin' => 'administrators',
+            default => 'editors',
+        };
+        $blocks = [];
+        $facilities = [];
+        if ($type === 'writer') {
+            $this->app->need('block');
+            $blocks = $this->app->block->forFacility($fid, false);
+        }
+        if ($type === 'admin') {
+            $this->app->need('facility');
+            $facilities = $this->app->facility->all();
+        }
         $this->printList(
             $st,
             'SELECT COUNT(*) FROM users u WHERE ' . implode(' AND ', $where),
             $params,
             'SELECT u.* FROM users u WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
-            function (array $rows) use ($dormant, $return) {
-                echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="editor-act.php">';
+            function (array $rows) use ($dormant, $return, $type, $noun, $blocks, $facilities) {
+                echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="staff-act.php">';
                 echo $this->app->csrf->field();
+                echo '<input type="hidden" name="type" value="' . h($type) . '">';
                 echo '<input type="hidden" name="return" value="' . h($return) . '">';
                 echo '<span id="bulk_actions_div" class="bulk-opts" hidden>';
                 if ($dormant) {
-                    echo confirm_submit('editorsubmit', 'Delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small');
-                    echo confirm_submit('editorsubmit', 'Activate', 'Confirm activate', 'activate', 'act_green small', 'act_green small');
+                    echo confirm_submit('staffsubmit', 'Delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small');
+                    echo confirm_submit('staffsubmit', 'Activate', 'Confirm activate', 'activate', 'act_green small', 'act_green small');
                 } else {
-                    echo confirm_submit('editorsubmit', 'Dormant', 'Confirm dormant', 'dormant', 'act_blue small', 'act_blue small');
+                    echo confirm_submit('staffsubmit', 'Shutter', 'Confirm shutter', 'dormant', 'act_blue small', 'act_blue small');
                 }
                 echo '<label class="bulk-select-all"><small class="sans lt">Select all</small> <input type="checkbox" onclick="toggle(this)"></label>';
                 echo '</span>';
                 echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Actions &#9660;</button>';
                 echo '</form></div>';
-                echo '<table class="list bulk roll lt sans"><tbody><tr><th>Name</th><th>Username</th><th>Email</th><th></th><th class="bulk_check"></th></tr>';
+                $extra = ($type === 'writer' || $type === 'admin') ? 1 : 0;
+                echo '<table class="list bulk roll lt sans"><tbody><tr><th>Name</th><th>Username</th><th>Email</th>';
+                if ($type === 'writer') {
+                    echo '<th>Blocks</th>';
+                } elseif ($type === 'admin') {
+                    echo '<th>Facilities</th>';
+                }
+                echo '<th></th><th class="bulk_check"></th></tr>';
                 $cc = 'lr';
                 foreach ($rows as $row) {
                     $id = (int) $row['id'];
@@ -297,13 +332,33 @@ final class WritList
                     echo '<td><a class="listed_note" href="account.php?u=' . $id . '"><b>' . h((string) $row['name']) . '</b></a></td>';
                     echo '<td>' . h((string) $row['username']) . '</td>';
                     echo '<td>' . h((string) $row['email']) . '</td>';
+                    if ($type === 'writer') {
+                        echo '<td><form method="post">' . $this->app->csrf->field();
+                        echo '<input type="hidden" name="u" value="' . $id . '">';
+                        $have = array_map('intval', json_arr($row['blocks_json'] ?? '[]'));
+                        foreach ($blocks as $b) {
+                            $ck = in_array((int) $b['id'], $have, true) ? ' checked' : '';
+                            echo '<label><input type="checkbox" name="blocks[]" value="' . (int) $b['id'] . '"' . $ck . '> ' . h((string) ($b['code'] ?: $b['name'])) . '</label> ';
+                        }
+                        echo '<input type="submit" class="lt_button small" value="Save"></form></td>';
+                    } elseif ($type === 'admin') {
+                        echo '<td><form method="post">' . $this->app->csrf->field();
+                        echo '<input type="hidden" name="u" value="' . $id . '">';
+                        $have = (int) ($row['facility_id'] ?? 0);
+                        foreach ($facilities as $f) {
+                            $ck = $have === (int) $f['id'] ? ' checked' : '';
+                            echo '<label><input type="checkbox" name="facilities[]" value="' . (int) $f['id'] . '"' . $ck . '> ' . h((string) $f['name']) . '</label> ';
+                        }
+                        echo '<input type="submit" name="save_admin_facilities" class="lt_button small" value="Save"></form></td>';
+                    }
                     echo '<td>' . button('Edit', 'Edit account', 'account.php?u=' . $id, 'editNoteButton') . '</td>';
                     echo '<td class="bulk_check"><input type="checkbox" form="bulk_actions" name="bulk_' . $id . '" value="' . $id . '"></td>';
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
+                $cols = 5 + $extra;
                 if (!$rows) {
-                    echo '<tr class="lr"><td colspan="5" class="lt sans">' . ($dormant ? 'No dormant editors.' : 'No active editors.') . '</td></tr>';
+                    echo '<tr class="lr"><td colspan="' . $cols . '" class="lt sans">' . ($dormant ? 'No dormant ' . $noun . '.' : 'No active ' . $noun . '.') . '</td></tr>';
                 }
                 echo '</tbody></table>';
             },
@@ -311,7 +366,68 @@ final class WritList
                 'creation' => ['Creation', 'Sort by order of creation'],
                 'name' => ['Name', 'Sort by name'],
             ],
-            $dormant ? 'searchformeditorsdormant' : 'searchformeditors',
+            'searchform' . $type . ($dormant ? 'dormant' : 'active'),
+            true
+        );
+    }
+
+    public function renderSuperFacilities(string $whereAmI, string $listStatus = 'open'): void
+    {
+        $closed = $listStatus === 'closed';
+        $st = $this->listState($whereAmI, ['creation', 'name', 'code'], 'creation');
+        $where = [$closed ? "f.status = 'closed'" : "f.status = 'open'"];
+        $params = [];
+        $this->appendSearch($where, $params, $st['q'], ['f.name', 'f.code']);
+        $order = match ($st['sort']) {
+            'name' => 'f.name ASC',
+            'code' => 'f.code ASC',
+            default => 'f.id DESC',
+        };
+        $return = $closed ? 'facilities-closed.php' : 'facilities.php';
+        $this->printList(
+            $st,
+            'SELECT COUNT(*) FROM facilities f WHERE ' . implode(' AND ', $where),
+            $params,
+            'SELECT f.* FROM facilities f WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
+            function (array $rows) use ($closed, $return) {
+                echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="facility-act.php">';
+                echo $this->app->csrf->field();
+                echo '<input type="hidden" name="return" value="' . h($return) . '">';
+                echo '<span id="bulk_actions_div" class="bulk-opts" hidden>';
+                if ($closed) {
+                    echo confirm_submit('facilitysubmit', 'Delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small');
+                    echo confirm_submit('facilitysubmit', 'Open', 'Confirm open', 'open', 'act_green small', 'act_green small');
+                } else {
+                    echo confirm_submit('facilitysubmit', 'Close', 'Confirm close', 'close', 'act_blue small', 'act_blue small');
+                }
+                echo '<label class="bulk-select-all"><small class="sans lt">Select all</small> <input type="checkbox" onclick="toggle(this)"></label>';
+                echo '</span>';
+                echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Actions &#9660;</button>';
+                echo '</form></div>';
+                echo '<table class="list bulk roll lt sans"><tbody><tr><th>Name</th><th>Code</th><th>Status</th><th></th><th class="bulk_check"></th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $f) {
+                    $id = (int) $f['id'];
+                    echo '<tr class="' . $cc . '">';
+                    echo '<td><a class="listed_note" href="facility.php?f=' . $id . '"><b>' . h((string) $f['name']) . '</b></a></td>';
+                    echo '<td>' . h((string) ($f['code'] ?? '')) . '</td>';
+                    echo '<td>' . h((string) $f['status']) . '</td>';
+                    echo '<td>' . button('Edit', 'Edit this facility', 'facility.php?f=' . $id, 'editNoteButton') . '</td>';
+                    echo '<td class="bulk_check"><input type="checkbox" form="bulk_actions" name="bulk_' . $id . '" value="' . $id . '"></td>';
+                    echo '</tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
+                }
+                if (!$rows) {
+                    echo '<tr class="lr"><td colspan="5" class="lt sans">' . ($closed ? 'No closed facilities.' : 'No open facilities.') . '</td></tr>';
+                }
+                echo '</tbody></table>';
+            },
+            [
+                'creation' => ['Creation', 'Sort by order of creation'],
+                'name' => ['Name', 'Sort by name'],
+                'code' => ['Code', 'Sort by code'],
+            ],
+            $closed ? 'searchformfacilitiesclosed' : 'searchformfacilities',
             true
         );
     }

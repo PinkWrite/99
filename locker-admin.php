@@ -9,5 +9,4 @@ if (!$app->auth->atLeast('supervisor')) {
 $app->view->start('Admin Locker', 'locker', 'admin');
 echo '<h2 class="lt">Admin Locker</h2>';
 echo '<p>' . button('Failed logins', 'Clickathon', 'login-fails.php', 'set_gray') . '</p>';
-echo '<p>' . button('Staffing', 'Users', 'staffing.php', 'set_gray') . '</p>';
 $app->view->end();
