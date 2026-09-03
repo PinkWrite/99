@@ -83,9 +83,10 @@ function confirm_submit(
     string $yesClass = 'ln_button'
 ): string {
     $val = $value ?? $confirmLabel;
+    $cancelClass = preg_match('/\bsmall\b/', $goClass) ? 'act_ltgray small' : 'dk_sub_button';
     return '<span class="pw-confirm-wrap">'
         . '<button type="button" class="' . h($goClass) . ' pw-confirm-go">' . h($firstLabel) . '</button>'
-        . '<button type="button" class="' . h($goClass) . ' pw-confirm-cancel" hidden>Cancel</button>'
+        . '<button type="button" class="' . h($cancelClass) . ' pw-confirm-cancel" hidden>Cancel</button>'
         . '<button type="submit" name="' . h($name) . '" value="' . h($val) . '" class="' . h($yesClass) . ' pw-confirm-yes" hidden disabled>' . h($confirmLabel) . '</button>'
         . '</span>';
 }

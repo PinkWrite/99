@@ -210,18 +210,54 @@
     return m;
   }
 
+  var pwConfirmOpenWrap = null;
+
+  function pwConfirmClearPos(el) {
+    if (!el) return;
+    el.style.top = '';
+    el.style.left = '';
+  }
+
+  function pwConfirmPlace(wrap) {
+    if (!wrap) return;
+    var go = wrap.querySelector('.pw-confirm-go');
+    var cancel = wrap.querySelector('.pw-confirm-cancel');
+    var yes = wrap.querySelector('.pw-confirm-yes');
+    if (!go || !cancel || !yes) return;
+    var r = go.getBoundingClientRect();
+    var gap = 8;
+    var ch = cancel.offsetHeight || r.height;
+    var top = r.top - gap - ch;
+    if (top < 8) top = r.bottom + gap;
+    cancel.style.top = top + 'px';
+    cancel.style.left = r.left + 'px';
+    var cr = cancel.getBoundingClientRect();
+    var yesLeft = cr.right + gap;
+    var yesW = yes.offsetWidth || r.width;
+    if (yesLeft + yesW > window.innerWidth - 8) {
+      yesLeft = Math.max(8, window.innerWidth - 8 - yesW);
+    }
+    yes.style.top = cr.top + 'px';
+    yes.style.left = yesLeft + 'px';
+  }
+
   function pwConfirmClose() {
     var nodes = document.querySelectorAll('.pw-confirm-wrap.is-open');
     for (var i = 0; i < nodes.length; i++) {
       nodes[i].classList.remove('is-open');
       var cancel = nodes[i].querySelector('.pw-confirm-cancel');
       var yes = nodes[i].querySelector('.pw-confirm-yes');
-      if (cancel) cancel.hidden = true;
+      if (cancel) {
+        cancel.hidden = true;
+        pwConfirmClearPos(cancel);
+      }
       if (yes) {
         yes.hidden = true;
         yes.disabled = true;
+        pwConfirmClearPos(yes);
       }
     }
+    pwConfirmOpenWrap = null;
     var m = document.getElementById('pw-confirm-mask');
     if (m) m.style.display = 'none';
   }
@@ -238,6 +274,8 @@
       yes.hidden = false;
       yes.disabled = false;
     }
+    pwConfirmOpenWrap = wrap;
+    pwConfirmPlace(wrap);
   }
 
   document.addEventListener('click', function (e) {
@@ -254,5 +292,11 @@
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' || e.keyCode === 27) pwConfirmClose();
+  });
+  window.addEventListener('scroll', function () {
+    if (pwConfirmOpenWrap) pwConfirmPlace(pwConfirmOpenWrap);
+  }, true);
+  window.addEventListener('resize', function () {
+    if (pwConfirmOpenWrap) pwConfirmPlace(pwConfirmOpenWrap);
   });
 })();
