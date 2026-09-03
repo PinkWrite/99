@@ -1,0 +1,19 @@
+/* @theme Pink Dust
+   Original 99 charcoal with the sheet's dusty-rose #3d2c30 (deleted-text wash)
+   lifted into page chrome. Accent stays #f71771. */
+:root {
+  --pw-frame: #33282c;
+  --pw-page: #3d2c30;
+  --pw-fg: #ddd;
+  --pw-muted: #aaa;
+  --pw-head: #888;
+  --pw-lt: #999;
+  --pw-dk: #777;
+  --pw-row-a: #463338;
+  --pw-row-b: #352428;
+  --pw-row-hover: #5a3845;
+  --pw-input: #4a3a40;
+  --pw-input-fg: #ccc;
+  --pw-line: #5a444c;
+  --pw-note: #aaa;
+}

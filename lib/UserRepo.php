@@ -207,6 +207,36 @@ final class UserRepo
         $this->app->db->run('UPDATE users SET status = ? WHERE id = ?', [$status, $id]);
     }
 
+    public function delete(int $id): void
+    {
+        $db = $this->app->db;
+        if ($db->columnExists('users', 'editor_id')) {
+            $db->run('UPDATE users SET editor_id = NULL WHERE editor_id = ?', [$id]);
+        }
+        if ($db->tableExists('blocks') && $db->columnExists('blocks', 'editor_id')) {
+            $db->run('UPDATE blocks SET editor_id = 0 WHERE editor_id = ?', [$id]);
+        }
+        if ($db->tableExists('tests') && $db->columnExists('tests', 'editor_id')) {
+            $db->run('UPDATE tests SET editor_id = 0 WHERE editor_id = ?', [$id]);
+        }
+        if ($db->tableExists('writs')) {
+            $db->run('DELETE FROM writs WHERE writer_id = ?', [$id]);
+        }
+        if ($db->tableExists('notes')) {
+            $db->run('DELETE FROM notes WHERE writer_id = ?', [$id]);
+        }
+        if ($db->tableExists('password_resets')) {
+            $db->run('DELETE FROM password_resets WHERE user_id = ?', [$id]);
+        }
+        if ($db->tableExists('totp_devices')) {
+            $db->run('DELETE FROM totp_devices WHERE user_id = ?', [$id]);
+        }
+        if ($db->tableExists('notifications')) {
+            $db->run('DELETE FROM notifications WHERE user_id = ?', [$id]);
+        }
+        $db->run('DELETE FROM users WHERE id = ?', [$id]);
+    }
+
     public function setFacility(int $id, ?int $facilityId): void
     {
         $this->app->db->run('UPDATE users SET facility_id = ? WHERE id = ?', [$facilityId, $id]);

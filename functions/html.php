@@ -28,7 +28,7 @@ function pw99_themes(): array
         $found[$id] = $name;
     }
     $out = [];
-    foreach (['theme-dusk-desk', 'theme-twilight-write', 'theme-city', 'theme-light-write'] as $id) {
+    foreach (['theme-dusk-desk', 'theme-twilight-write', 'theme-city-night', 'theme-cream-write', 'theme-pink-dust'] as $id) {
         if (isset($found[$id])) {
             $out[$id] = $found[$id];
             unset($found[$id]);
@@ -51,6 +51,11 @@ function pw99_theme_id(?array $user): string
     if ($want === '' && !empty($_COOKIE['pw_theme'])) {
         $want = preg_replace('/[^a-z0-9\-]/', '', (string) $_COOKIE['pw_theme']) ?? '';
     }
+    $want = match ($want) {
+        'theme-city' => 'theme-city-night',
+        'theme-light-write' => 'theme-cream-write',
+        default => $want,
+    };
     $def = 'theme-dusk-desk';
     if ($want !== '' && in_array($want, $ids, true)) {
         return $want;
@@ -72,6 +77,22 @@ function pw99_blocks_return(?string $raw = null): string
         }
     }
     return 'blocks-editor.php';
+}
+
+/** Active/dormant editors list the admin came from. */
+function pw99_editors_return(?string $raw = null): string
+{
+    $allow = ['editors.php', 'editors-dormant.php'];
+    foreach ([$raw, $_POST['return'] ?? '', $_GET['return'] ?? '', $_SERVER['HTTP_REFERER'] ?? ''] as $c) {
+        if (!is_string($c) || $c === '') {
+            continue;
+        }
+        $base = basename((string) (parse_url($c, PHP_URL_PATH) ?: $c));
+        if (in_array($base, $allow, true)) {
+            return $base;
+        }
+    }
+    return 'editors.php';
 }
 
 function pw99_set_theme_cookie(string $id): void
