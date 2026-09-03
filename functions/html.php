@@ -28,7 +28,7 @@ function pw99_themes(): array
         $found[$id] = $name;
     }
     $out = [];
-    foreach (['theme-dusk-desk', 'theme-twilight-write', 'theme-city-night', 'theme-cream-write', 'theme-pink-dust'] as $id) {
+    foreach (['theme-dusk-desk', 'theme-twilight-write', 'theme-city-night', 'theme-cream-write', 'theme-pink-dust', 'theme-99'] as $id) {
         if (isset($found[$id])) {
             $out[$id] = $found[$id];
             unset($found[$id]);
@@ -42,25 +42,25 @@ function pw99_themes(): array
 
 function pw99_theme_id(?array $user): string
 {
-    $ids = array_keys(pw99_themes());
     $want = '';
     if ($user) {
         $p = json_arr($user['notify_prefs'] ?? []);
         $want = (string) ($p['theme'] ?? '');
     }
     if ($want === '' && !empty($_COOKIE['pw_theme'])) {
-        $want = preg_replace('/[^a-z0-9\-]/', '', (string) $_COOKIE['pw_theme']) ?? '';
+        $want = (string) $_COOKIE['pw_theme'];
     }
-    $want = match ($want) {
-        'theme-city' => 'theme-city-night',
-        'theme-light-write' => 'theme-cream-write',
-        default => $want,
-    };
+    $want = preg_replace('/[^a-z0-9\-]/', '', $want) ?? '';
+    $dir = dirname(__DIR__) . '/css';
     $def = 'theme-dusk-desk';
-    if ($want !== '' && in_array($want, $ids, true)) {
+    if ($want !== '' && str_starts_with($want, 'theme-') && is_file($dir . '/' . $want . '.css')) {
         return $want;
     }
-    return in_array($def, $ids, true) ? $def : (string) ($ids[0] ?? $def);
+    if (is_file($dir . '/' . $def . '.css')) {
+        return $def;
+    }
+    $ids = array_keys(pw99_themes());
+    return (string) ($ids[0] ?? $def);
 }
 
 /** Open/closed blocks list the editor came from. */

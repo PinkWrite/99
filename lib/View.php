@@ -29,7 +29,7 @@ final class View
         $theme = pw99_theme_id($u);
         $themeFile = __DIR__ . '/../css/' . $theme . '.css';
         if (is_file($themeFile)) {
-            echo '<link rel="stylesheet" href="css/' . h($theme) . '.css?v=' . h(pw99_asset_v($themeFile)) . '" type="text/css" />';
+            echo '<link rel="stylesheet" id="pw-theme-css" href="css/' . h($theme) . '.css?v=' . h(pw99_asset_v($themeFile)) . '" type="text/css" />';
         }
         echo '<script src="js/pw99.js?v=' . h($jsV) . '"></script>';
         echo '<meta http-equiv="Cache-Control" content="no-cache" />';

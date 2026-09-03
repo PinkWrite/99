@@ -190,4 +190,17 @@ final class NoteRepo
         $sql .= ") ORDER BY save_date DESC LIMIT {$limit}";
         return $this->app->db->all($sql, $params);
     }
+
+    public function deleteOwned(int $id, int $editorId): bool
+    {
+        $n = $this->find($id);
+        if (!$n || (int) ($n['editor_id'] ?? 0) !== $editorId) {
+            return false;
+        }
+        if (!in_array((string) ($n['type'] ?? ''), ['memo', 'task'], true)) {
+            return false;
+        }
+        $this->app->db->run('DELETE FROM notes WHERE id = ? AND editor_id = ?', [$id, $editorId]);
+        return true;
+    }
 }

@@ -19,4 +19,34 @@ if (isset($_POST['undash'])) {
     $app->note->pin((int) $_POST['undash'], $uid, false);
     $app->redirect('');
 }
+if (isset($_POST['memosubmit'])) {
+    if (!$app->auth->atLeast('editor')) {
+        $app->redirect('');
+    }
+    $bid = (int) ($_POST['b'] ?? 0);
+    $back = $bid > 0 ? 'memos-editor.php?b=' . $bid : 'memos-editor.php';
+    $op = (string) $_POST['memosubmit'];
+    if ($op !== 'delete') {
+        $app->view->setFlash('Nothing was changed. Confirm the action if asked.', false);
+        $app->redirect($back);
+    }
+    $ids = [];
+    foreach ($_POST as $k => $v) {
+        if (str_starts_with((string) $k, 'bulk_') && filter_var($v, FILTER_VALIDATE_INT)) {
+            $ids[] = (int) $v;
+        }
+    }
+    if ($ids === []) {
+        $app->view->setFlash('Select at least one memo.', false);
+        $app->redirect($back);
+    }
+    $ok = 0;
+    foreach ($ids as $id) {
+        if ($app->note->deleteOwned($id, $uid)) {
+            $ok++;
+        }
+    }
+    $app->view->setFlash($ok === 1 ? 'Memo deleted.' : $ok . ' memos deleted.', false);
+    $app->redirect($back);
+}
 $app->redirect('');

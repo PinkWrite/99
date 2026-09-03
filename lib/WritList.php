@@ -316,6 +316,68 @@ final class WritList
         );
     }
 
+    public function renderEditorMemos(string $whereAmI): void
+    {
+        $uid = $this->app->auth->id();
+        $bid = (int) ($_GET['b'] ?? 0);
+        $st = $this->listState($whereAmI, ['when', 'title'], 'when');
+        $where = ['n.editor_id = ?', "n.type IN ('memo','task')", "n.status = 'live'"];
+        $params = [$uid];
+        if ($bid > 0) {
+            $where[] = 'n.editor_set_block = ?';
+            $params[] = $bid;
+        }
+        $this->appendSearch($where, $params, $st['q'], ['n.body', 'n.type']);
+        $order = $st['sort'] === 'title'
+            ? 'n.body ASC, n.save_date DESC'
+            : 'n.save_date DESC';
+        $this->printList(
+            $st,
+            'SELECT COUNT(*) FROM notes n WHERE ' . implode(' AND ', $where),
+            $params,
+            'SELECT n.* FROM notes n WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
+            function (array $rows) use ($bid) {
+                echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="note-act.php">';
+                echo $this->app->csrf->field();
+                echo '<input type="hidden" name="return" value="memos-editor.php">';
+                if ($bid > 0) {
+                    echo '<input type="hidden" name="b" value="' . $bid . '">';
+                }
+                echo '<span id="bulk_actions_div" class="bulk-opts" hidden>';
+                echo confirm_submit('memosubmit', 'Delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small');
+                echo '<label class="bulk-select-all"><small class="sans lt">Select all</small> <input type="checkbox" onclick="toggle(this)"></label>';
+                echo '</span>';
+                echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Actions &#9660;</button>';
+                echo '</form></div>';
+                echo '<table class="list bulk lt sans"><tbody><tr><th>Type</th><th>When</th><th>Title</th><th>Preview</th><th></th><th></th><th class="bulk_check"></th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $n) {
+                    $id = (int) $n['id'];
+                    echo '<tr class="' . $cc . '">';
+                    echo '<td>' . h((string) $n['type']) . '</td>';
+                    echo '<td>' . h((string) $n['save_date']) . '</td>';
+                    echo '<td>' . h(note_heading($n['body'] ?? '')) . '</td>';
+                    echo '<td>' . h(substr((string) $n['body'], 0, 80)) . '</td>';
+                    echo '<td>' . get_switch('Open', 'Open', 'note.php', 'n', (string) $id, 'editNoteButton') . '</td>';
+                    echo '<td>' . button('Assign', 'Assignment', 'assignment.php?m=' . $id, 'editNoteButton') . '</td>';
+                    echo '<td class="bulk_check"><input type="checkbox" form="bulk_actions" name="bulk_' . $id . '" value="' . $id . '"></td>';
+                    echo '</tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
+                }
+                if (!$rows) {
+                    echo '<tr class="lr"><td colspan="7" class="lt sans">No memos.</td></tr>';
+                }
+                echo '</tbody></table>';
+            },
+            [
+                'when' => ['When', 'Sort by when saved'],
+                'title' => ['Title', 'Sort by title'],
+            ],
+            'searchformeditormemos',
+            true
+        );
+    }
+
     /** @param list<int> $writerIds */
     private function writTable(string $whereAmI, string $mode, string $status, ?int $writerId, ?int $editorId, array $writerIds = []): void
     {

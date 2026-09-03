@@ -1420,7 +1420,9 @@ table.list.bulk {
   gap: 0.3em;
   cursor: pointer;
 }
-button.act_disabled, button.act_disabled:hover {
+button.act_disabled, button.act_disabled:hover,
+input.act_disabled, input.act_disabled:hover,
+input.act_disabled:disabled {
   color: #888;
   background-color: #3c3c3c;
   cursor: default;
