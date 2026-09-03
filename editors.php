@@ -52,14 +52,16 @@ echo '<p class="sans">Email<br><input type="email" name="email" required></p>';
 echo '<p class="sans">Username<br><input name="username" required></p>';
 echo '<p class="sans">Password<br><input type="password" name="pass" required></p>';
 echo '<p><input type="submit" name="create" class="lt_button" value="Create editor"></p></form>';
-echo '<table class="list"><tr><th>Name</th><th>Username</th><th>Email</th><th>Status</th><th></th></tr>';
+echo '<table class="list roll lt sans"><tr><th>Name</th><th>Username</th><th>Email</th><th>Status</th><th></th></tr>';
+$cc = 'lr';
 foreach ($app->user->listByFacility($fid, 'editor') as $row) {
-    echo '<tr><td>' . h($row['name']) . '</td><td>' . h($row['username']) . '</td><td>' . h($row['email']) . '</td><td>' . h($row['status']) . '</td><td>';
+    echo '<tr class="' . $cc . '"><td>' . h($row['name']) . '</td><td>' . h($row['username']) . '</td><td>' . h($row['email']) . '</td><td>' . h($row['status']) . '</td><td>';
     echo '<form method="post" style="display:inline">' . $app->csrf->field();
     echo '<input type="hidden" name="u" value="' . (int) $row['id'] . '">';
     echo '<input type="hidden" name="status" value="' . ($row['status'] === 'active' ? 'dormant' : 'active') . '">';
-    echo '<input type="submit" class="set_gray" value="' . ($row['status'] === 'active' ? 'Dormant' : 'Activate') . '"></form> ';
+    echo '<input type="submit" class="editNoteButton" value="' . ($row['status'] === 'active' ? 'Dormant' : 'Activate') . '"></form> ';
     echo button('Edit', 'Edit account', 'account.php?u=' . (int) $row['id'], 'editNoteButton') . '</td></tr>';
+    $cc = $cc === 'lr' ? 'dr' : 'lr';
 }
 echo '</table>';
 $app->view->end();

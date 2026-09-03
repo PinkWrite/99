@@ -218,44 +218,60 @@
     el.style.left = '';
   }
 
+  function pwConfirmEls(wrap) {
+    return {
+      go: wrap.querySelector('.pw-confirm-go'),
+      cancel: wrap._pwCancel || wrap.querySelector('.pw-confirm-cancel'),
+      yes: wrap._pwYes || wrap.querySelector('.pw-confirm-yes')
+    };
+  }
+
   function pwConfirmPlace(wrap) {
     if (!wrap) return;
-    var go = wrap.querySelector('.pw-confirm-go');
-    var cancel = wrap.querySelector('.pw-confirm-cancel');
-    var yes = wrap.querySelector('.pw-confirm-yes');
-    if (!go || !cancel || !yes) return;
-    var r = go.getBoundingClientRect();
+    var els = pwConfirmEls(wrap);
+    if (!els.go || !els.cancel || !els.yes) return;
+    var r = els.go.getBoundingClientRect();
     var gap = 8;
-    var ch = cancel.offsetHeight || r.height;
+    var ch = els.cancel.offsetHeight || r.height;
     var top = r.top - gap - ch;
     if (top < 8) top = r.bottom + gap;
-    cancel.style.top = top + 'px';
-    cancel.style.left = r.left + 'px';
-    var cr = cancel.getBoundingClientRect();
+    els.cancel.style.top = top + 'px';
+    els.cancel.style.left = r.left + 'px';
+    var cr = els.cancel.getBoundingClientRect();
     var yesLeft = cr.right + gap;
-    var yesW = yes.offsetWidth || r.width;
+    var yesW = els.yes.offsetWidth || r.width;
     if (yesLeft + yesW > window.innerWidth - 8) {
       yesLeft = Math.max(8, window.innerWidth - 8 - yesW);
     }
-    yes.style.top = cr.top + 'px';
-    yes.style.left = yesLeft + 'px';
+    els.yes.style.top = cr.top + 'px';
+    els.yes.style.left = yesLeft + 'px';
+  }
+
+  function pwConfirmPark(wrap, el) {
+    if (!el || !wrap) return;
+    el.classList.remove('pw-confirm-float');
+    el.hidden = true;
+    pwConfirmClearPos(el);
+    if (el.parentNode !== wrap) wrap.appendChild(el);
   }
 
   function pwConfirmClose() {
     var nodes = document.querySelectorAll('.pw-confirm-wrap.is-open');
     for (var i = 0; i < nodes.length; i++) {
-      nodes[i].classList.remove('is-open');
-      var cancel = nodes[i].querySelector('.pw-confirm-cancel');
-      var yes = nodes[i].querySelector('.pw-confirm-yes');
-      if (cancel) {
-        cancel.hidden = true;
-        pwConfirmClearPos(cancel);
+      var wrap = nodes[i];
+      wrap.classList.remove('is-open');
+      var els = pwConfirmEls(wrap);
+      pwConfirmPark(wrap, els.cancel);
+      if (els.yes) {
+        els.yes.disabled = true;
+        if (els.yes.getAttribute('data-pw-form')) {
+          els.yes.removeAttribute('form');
+          els.yes.removeAttribute('data-pw-form');
+        }
       }
-      if (yes) {
-        yes.hidden = true;
-        yes.disabled = true;
-        pwConfirmClearPos(yes);
-      }
+      pwConfirmPark(wrap, els.yes);
+      wrap._pwCancel = null;
+      wrap._pwYes = null;
     }
     pwConfirmOpenWrap = null;
     var m = document.getElementById('pw-confirm-mask');
@@ -269,11 +285,25 @@
     wrap.classList.add('is-open');
     var cancel = wrap.querySelector('.pw-confirm-cancel');
     var yes = wrap.querySelector('.pw-confirm-yes');
-    if (cancel) cancel.hidden = false;
+    var form = wrap.closest('form');
+    if (form && yes) {
+      if (!form.id) form.id = 'pw-confirm-form-' + String(Date.now());
+      yes.setAttribute('form', form.id);
+      yes.setAttribute('data-pw-form', '1');
+    }
+    if (cancel) {
+      cancel.classList.add('pw-confirm-float');
+      cancel.hidden = false;
+      document.body.appendChild(cancel);
+    }
     if (yes) {
+      yes.classList.add('pw-confirm-float');
       yes.hidden = false;
       yes.disabled = false;
+      document.body.appendChild(yes);
     }
+    wrap._pwCancel = cancel;
+    wrap._pwYes = yes;
     pwConfirmOpenWrap = wrap;
     pwConfirmPlace(wrap);
   }

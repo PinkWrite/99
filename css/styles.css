@@ -1195,6 +1195,10 @@ table.list tr.lr {
 table.list tr.dr {
   background-color: #313131;
 }
+table.list tr.lr:hover,
+table.list tr.dr:hover {
+  background-color: #4a4a4a;
+}
 table.list tr.hr {
   background-color: #222;
   font-style: italic;
@@ -1425,14 +1429,17 @@ p.save-row {
   vertical-align: middle;
 }
 
-.pw-confirm-wrap.is-open .pw-confirm-cancel,
-.pw-confirm-wrap.is-open .pw-confirm-yes {
+button.pw-confirm-float {
   position: fixed;
-  z-index: 91;
+  z-index: 100;
   display: inline-block !important;
   white-space: nowrap;
   margin: 0;
   pointer-events: auto;
+}
+
+button.pw-confirm-yes.pw-confirm-float {
+  border: 2px solid #ccc;
 }
 
 .pw-confirm-row {
