@@ -141,7 +141,7 @@
     fd.set('sig', bufToB64u(cred.response.signature));
     var x = await fetch('login.php', { method: 'POST', body: fd, credentials: 'same-origin' });
     if (x.redirected) { location.href = x.url; return; }
-    location.href = './';
+    location.href = 'login.php';
   };
 
   window.pwDrawTotpQr = function (elId) {
@@ -367,7 +367,7 @@
       if (keep) {
         var same = id === saved;
         keep.disabled = same;
-        keep.className = same ? 'set_writ_disabled' : 'act_green';
+        keep.className = same ? 'set_writ_disabled' : 'set_writ_green';
       }
     }
     form.addEventListener('change', apply);

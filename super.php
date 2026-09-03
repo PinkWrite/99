@@ -12,7 +12,7 @@ echo '<h2 class="lt">Super Dash</h2>';
 echo '<p class="sans dk">Pinned notes. Facilities and administrators are on the sub-dash.</p>';
 $pins = $app->note->pinnedFor($app->auth->id(), 25);
 if (!$pins) {
-    echo '<p class="sans dk">No pinned notes.</p>';
+    echo empty_list();
 } else {
     $cc = 'lr';
     echo '<table class="list lt notes sans">';

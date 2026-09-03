@@ -7,6 +7,7 @@ $app->auth->requireUser();
 $allow = [
     'archives-editor.php', 'archives.php', 'editor.php', 'writs.php',
     'writs-editor.php', 'writer-dash.php', 'writer.php', 'index.php',
+    'assignments.php',
 ];
 $backFrom = static function (?string $raw) use ($allow): string {
     $path = parse_url((string) $raw, PHP_URL_PATH);

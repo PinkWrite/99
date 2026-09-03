@@ -11,7 +11,7 @@ $ids = $app->user->observeeIds($u);
 $app->view->start('Observer Dash for ' . $u['name'], 'observer', 'observer');
 echo '<h2 class="lt">Observees</h2>';
 if (!$ids) {
-    echo '<p class="lt sans">No observees yet.</p>';
+    echo empty_list();
 } else {
     echo '<table class="list lt sans"><tbody>';
     $cc = 'lr';

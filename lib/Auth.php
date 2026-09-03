@@ -170,6 +170,34 @@ final class Auth
         return (string) ($_SESSION['pending_2fa_via'] ?? 'password');
     }
 
+    /** Remember-this-machine is for accounts that already have a passkey or linked login. */
+    public function pendingCanRemember(): bool
+    {
+        return $this->userCanRemember((int) ($_SESSION['pending_2fa'] ?? 0));
+    }
+
+    public function userCanRemember(int $userId): bool
+    {
+        if ($userId < 1 || !$this->app->db) {
+            return false;
+        }
+        try {
+            $this->app->need('passkey');
+            if ($this->app->passkey->list($userId) !== []) {
+                return true;
+            }
+        } catch (Throwable $e) {
+        }
+        try {
+            $this->app->need('oauth');
+            if ($this->app->oauth->list($userId) !== []) {
+                return true;
+            }
+        } catch (Throwable $e) {
+        }
+        return false;
+    }
+
     public function finishTotp(string $code, bool $remember = false): bool
     {
         $id = (int) ($_SESSION['pending_2fa'] ?? 0);
@@ -188,7 +216,7 @@ final class Auth
         unset($_SESSION['pending_2fa'], $_SESSION['pending_2fa_via']);
         $this->establish($u);
         $this->logAccount((int) $u['id'], 'login', $via . '+authenticator');
-        if ($remember && ($via === 'passkey' || $via === 'oauth')) {
+        if ($remember && $this->userCanRemember((int) $u['id'])) {
             $this->rememberDevice((int) $u['id']);
         }
         return true;

@@ -6,6 +6,12 @@ function h(?string $s): string
     return htmlspecialchars((string) $s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** Empty-table copy: no table, no sort row — just this. */
+function empty_list(): string
+{
+    return '<p class="lt sans"><b>Nothing yet</b></p>';
+}
+
 /** Cache-bust query for a static file: content hash, so a stale sheet cannot survive a CSS edit. */
 function pw99_asset_v(string $abs): string
 {

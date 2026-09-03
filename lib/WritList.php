@@ -55,10 +55,6 @@ final class WritList
             $params,
             "SELECT n.* FROM notes n WHERE " . implode(' AND ', $where) . " ORDER BY {$order}",
             function (array $rows) {
-                if (!$rows) {
-                    echo '<p class="lt sans">No notes</p>';
-                    return;
-                }
                 $cc = 'lr';
                 echo '<table class="list lt notes sans"><tbody>';
                 foreach ($rows as $n) {
@@ -250,7 +246,7 @@ final class WritList
                 'code' => ['Code', 'Sort by code'],
             ],
             $admin ? ($closed ? 'searchformadminblocksclosed' : 'searchformadminblocks') : 'searchformeditorblocks',
-            true
+            !$admin
         );
     }
 
@@ -280,12 +276,6 @@ final class WritList
             default => ['editors.php', 'editors-dormant.php'],
         };
         $return = $dormant ? $pages[1] : $pages[0];
-        $noun = match ($type) {
-            'observer' => 'observers',
-            'writer' => 'writers',
-            'admin' => 'administrators',
-            default => 'editors',
-        };
         $blocks = [];
         $facilities = [];
         if ($type === 'writer') {
@@ -301,7 +291,7 @@ final class WritList
             'SELECT COUNT(*) FROM users u WHERE ' . implode(' AND ', $where),
             $params,
             'SELECT u.* FROM users u WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
-            function (array $rows) use ($dormant, $return, $type, $noun, $blocks, $facilities) {
+            function (array $rows) use ($dormant, $return, $type, $blocks, $facilities) {
                 echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="staff-act.php">';
                 echo $this->app->csrf->field();
                 echo '<input type="hidden" name="type" value="' . h($type) . '">';
@@ -317,7 +307,6 @@ final class WritList
                 echo '</span>';
                 echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Actions &#9660;</button>';
                 echo '</form></div>';
-                $extra = ($type === 'writer' || $type === 'admin') ? 1 : 0;
                 echo '<table class="list bulk roll lt sans"><tbody><tr><th>Name</th><th>Username</th><th>Email</th>';
                 if ($type === 'writer') {
                     echo '<th>Blocks</th>';
@@ -356,18 +345,13 @@ final class WritList
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
-                $cols = 5 + $extra;
-                if (!$rows) {
-                    echo '<tr class="lr"><td colspan="' . $cols . '" class="lt sans">' . ($dormant ? 'No dormant ' . $noun . '.' : 'No active ' . $noun . '.') . '</td></tr>';
-                }
                 echo '</tbody></table>';
             },
             [
                 'creation' => ['Creation', 'Sort by order of creation'],
                 'name' => ['Name', 'Sort by name'],
             ],
-            'searchform' . $type . ($dormant ? 'dormant' : 'active'),
-            true
+            'searchform' . $type . ($dormant ? 'dormant' : 'active')
         );
     }
 
@@ -417,9 +401,6 @@ final class WritList
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
-                if (!$rows) {
-                    echo '<tr class="lr"><td colspan="5" class="lt sans">' . ($closed ? 'No closed facilities.' : 'No open facilities.') . '</td></tr>';
-                }
                 echo '</tbody></table>';
             },
             [
@@ -427,8 +408,7 @@ final class WritList
                 'name' => ['Name', 'Sort by name'],
                 'code' => ['Code', 'Sort by code'],
             ],
-            $closed ? 'searchformfacilitiesclosed' : 'searchformfacilities',
-            true
+            $closed ? 'searchformfacilitiesclosed' : 'searchformfacilities'
         );
     }
 
@@ -480,8 +460,46 @@ final class WritList
                     echo '</tr>';
                     $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
-                if (!$rows) {
-                    echo '<tr class="lr"><td colspan="7" class="lt sans">No memos.</td></tr>';
+                echo '</tbody></table>';
+            },
+            [
+                'when' => ['When', 'Sort by when saved'],
+                'title' => ['Title', 'Sort by title'],
+            ],
+            'searchformeditormemos'
+        );
+    }
+
+    public function renderWriterMemos(string $whereAmI): void
+    {
+        $uid = $this->app->auth->id();
+        $bid = (int) ($_GET['b'] ?? 0);
+        $st = $this->listState($whereAmI, ['when', 'title'], 'when');
+        $where = ["n.type = 'memo'", "n.status = 'live'", '(n.editor_set_writer_id = ? OR n.writer_id = ?)'];
+        $params = [$uid, $uid];
+        if ($bid > 0) {
+            $where[] = 'n.editor_set_block = ?';
+            $params[] = $bid;
+        }
+        $this->appendSearch($where, $params, $st['q'], ['n.body']);
+        $order = $st['sort'] === 'title' ? 'n.body ASC, n.save_date DESC' : 'n.save_date DESC';
+        $this->printList(
+            $st,
+            'SELECT COUNT(*) FROM notes n WHERE ' . implode(' AND ', $where),
+            $params,
+            'SELECT n.* FROM notes n WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
+            function (array $rows) {
+                echo '<table class="list lt sans"><tbody><tr><th>When</th><th>Title</th><th>Preview</th><th></th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $n) {
+                    $id = (int) $n['id'];
+                    echo '<tr class="' . $cc . '">';
+                    echo '<td>' . h((string) $n['save_date']) . '</td>';
+                    echo '<td>' . h(note_heading($n['body'] ?? '')) . '</td>';
+                    echo '<td>' . h(substr((string) $n['body'], 0, 80)) . '</td>';
+                    echo '<td>' . button('Open', 'Open', 'note.php?n=' . $id, 'editNoteButton') . '</td>';
+                    echo '</tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
                 }
                 echo '</tbody></table>';
             },
@@ -489,13 +507,239 @@ final class WritList
                 'when' => ['When', 'Sort by when saved'],
                 'title' => ['Title', 'Sort by title'],
             ],
-            'searchformeditormemos',
-            true
+            'searchformwritermemos'
         );
     }
 
     /** @param list<int> $writerIds */
-    private function writTable(string $whereAmI, string $mode, string $status, ?int $writerId, ?int $editorId, array $writerIds = []): void
+    public function renderObserverMemos(string $whereAmI, array $writerIds): void
+    {
+        $writerIds = array_values(array_filter(array_map('intval', $writerIds), static fn (int $id): bool => $id > 0));
+        if ($writerIds === []) {
+            echo empty_list();
+            return;
+        }
+        $st = $this->listState($whereAmI, ['when', 'title', 'writer'], 'when');
+        $in = implode(',', array_fill(0, count($writerIds), '?'));
+        $where = ["n.type = 'memo'", "n.status = 'live'", "(n.editor_set_writer_id IN ({$in}) OR n.writer_id IN ({$in}))"];
+        $params = array_merge($writerIds, $writerIds);
+        $this->appendSearch($where, $params, $st['q'], ['n.body', 'u.name']);
+        $order = match ($st['sort']) {
+            'title' => 'n.body ASC, n.save_date DESC',
+            'writer' => 'u.name ASC, n.save_date DESC',
+            default => 'n.save_date DESC',
+        };
+        $this->printList(
+            $st,
+            'SELECT COUNT(*) FROM notes n
+             LEFT JOIN users u ON u.id = COALESCE(NULLIF(n.editor_set_writer_id, 0), n.writer_id)
+             WHERE ' . implode(' AND ', $where),
+            $params,
+            'SELECT n.*, u.name AS writer_name FROM notes n
+             LEFT JOIN users u ON u.id = COALESCE(NULLIF(n.editor_set_writer_id, 0), n.writer_id)
+             WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
+            function (array $rows) {
+                echo '<table class="list lt sans"><tbody><tr><th>Writer</th><th>When</th><th>Title</th><th>Preview</th><th></th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $n) {
+                    $id = (int) $n['id'];
+                    echo '<tr class="' . $cc . '">';
+                    echo '<td>' . h((string) ($n['writer_name'] ?? '')) . '</td>';
+                    echo '<td>' . h((string) $n['save_date']) . '</td>';
+                    echo '<td>' . h(note_heading($n['body'] ?? '')) . '</td>';
+                    echo '<td>' . h(substr((string) $n['body'], 0, 80)) . '</td>';
+                    echo '<td>' . button('Open', 'Open', 'note.php?n=' . $id, 'editNoteButton') . '</td>';
+                    echo '</tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
+                }
+                echo '</tbody></table>';
+            },
+            [
+                'when' => ['When', 'Sort by when saved'],
+                'title' => ['Title', 'Sort by title'],
+                'writer' => ['Writer', 'Sort by writer'],
+            ],
+            'searchformobservermemos'
+        );
+    }
+
+    public function renderEditorRoll(string $whereAmI): void
+    {
+        $st = $this->listState($whereAmI, ['name', 'username', 'seen'], 'name');
+        $where = ["u.type = 'writer'"];
+        $params = [];
+        if ($this->app->auth->is('editor')) {
+            $where[] = 'u.editor_id = ?';
+            $params[] = $this->app->auth->id();
+        } elseif ($this->app->auth->facilityId()) {
+            $where[] = 'u.facility_id = ?';
+            $params[] = $this->app->auth->facilityId();
+        }
+        $this->appendSearch($where, $params, $st['q'], ['u.name', 'u.username']);
+        $hasSeen = $this->app->db->columnExists('users', 'last_seen');
+        $order = match ($st['sort']) {
+            'username' => 'u.username ASC',
+            'seen' => $hasSeen ? 'u.last_seen IS NULL, u.last_seen DESC, u.name ASC' : 'u.name ASC',
+            default => 'u.name ASC',
+        };
+        $this->printList(
+            $st,
+            'SELECT COUNT(*) FROM users u WHERE ' . implode(' AND ', $where),
+            $params,
+            'SELECT u.* FROM users u WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
+            function (array $rows) {
+                echo '<table class="list roll lt sans"><tbody><tr><th>Name</th><th>Username</th><th>Last seen</th><th></th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $w) {
+                    $seen = writ_when($w['last_seen'] ?? null);
+                    echo '<tr class="' . $cc . '"><td>' . h((string) $w['name']) . '</td>';
+                    echo '<td>' . h((string) $w['username']) . '</td>';
+                    echo '<td><i class="listed_note">' . ($seen !== '' ? h($seen) : '—') . '</i></td>';
+                    echo '<td>' . get_switch('View writs', 'Writs for this writer', 'writs-editor.php', 'u', (string) $w['id'], 'editNoteButton') . '</td></tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
+                }
+                echo '</tbody></table>';
+            },
+            [
+                'name' => ['Name', 'Sort by name'],
+                'username' => ['Username', 'Sort by username'],
+                'seen' => ['Last seen', 'Sort by last seen'],
+            ],
+            'searchformroll'
+        );
+    }
+
+    public function renderEditorAssignments(string $whereAmI): void
+    {
+        $eid = $this->app->auth->is('editor') ? $this->app->auth->id() : null;
+        $this->writTable($whereAmI, 'editor', 'current', null, $eid, [], 'assignment');
+    }
+
+    public function renderEditorTests(string $whereAmI): void
+    {
+        $uid = $this->app->auth->id();
+        $st = $this->listState($whereAmI, ['creation', 'title', 'status'], 'creation');
+        $where = ['t.editor_id = ?', "t.status != 'archived'"];
+        $params = [$uid];
+        $this->appendSearch($where, $params, $st['q'], ['t.title', 't.status']);
+        $order = match ($st['sort']) {
+            'title' => 't.title ASC',
+            'status' => 't.status ASC, t.id DESC',
+            default => 't.id DESC',
+        };
+        $this->printList(
+            $st,
+            'SELECT COUNT(*) FROM tests t WHERE ' . implode(' AND ', $where),
+            $params,
+            'SELECT t.* FROM tests t WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
+            function (array $rows) {
+                echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="test-act.php">';
+                echo $this->app->csrf->field();
+                echo '<span id="bulk_actions_div" class="bulk-opts" hidden>';
+                echo confirm_submit('testsubmit', 'Archive', 'Confirm archive', 'archive', 'act_blue small', 'act_blue small');
+                echo confirm_submit('testsubmit', 'Delete', 'Confirm delete', 'delete', 'act_red small', 'act_red small');
+                echo '<label class="bulk-select-all"><small class="sans lt">Select all</small> <input type="checkbox" onclick="toggle(this)"></label>';
+                echo '</span>';
+                echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Actions &#9660;</button>';
+                echo '</form></div>';
+                echo '<table class="list bulk lt sans"><tbody><tr><th>Title</th><th>Status</th><th></th><th class="bulk_check"></th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $t) {
+                    $id = (int) $t['id'];
+                    echo '<tr class="' . $cc . '">';
+                    echo '<td>' . h((string) ($t['title'] ?? '')) . '</td>';
+                    echo '<td>' . h((string) $t['status']) . '</td>';
+                    echo '<td>' . button('Edit', 'Edit', 'test.php?t=' . $id, 'editNoteButton') . '</td>';
+                    echo '<td class="bulk_check"><input type="checkbox" form="bulk_actions" name="bulk_' . $id . '" value="' . $id . '"></td>';
+                    echo '</tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
+                }
+                echo '</tbody></table>';
+                $this->bulkScript();
+            },
+            [
+                'creation' => ['Creation', 'Sort by order of creation'],
+                'title' => ['Title', 'Sort by title'],
+                'status' => ['Status', 'Sort by status'],
+            ],
+            'searchformtests'
+        );
+    }
+
+    public function renderBlockMemos(string $whereAmI, int $blockId): void
+    {
+        $st = $this->listState($whereAmI, ['when', 'title'], 'when');
+        $where = ["n.type IN ('memo','task')", "n.status = 'live'", 'n.editor_set_block = ?'];
+        $params = [$blockId];
+        $this->appendSearch($where, $params, $st['q'], ['n.body']);
+        $order = $st['sort'] === 'title' ? 'n.body ASC, n.save_date DESC' : 'n.save_date DESC';
+        $this->printList(
+            $st,
+            'SELECT COUNT(*) FROM notes n WHERE ' . implode(' AND ', $where),
+            $params,
+            'SELECT n.* FROM notes n WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order,
+            function (array $rows) {
+                echo '<table class="list lt sans"><tbody><tr><th>When</th><th>Title</th><th>Preview</th><th></th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $n) {
+                    $id = (int) $n['id'];
+                    echo '<tr class="' . $cc . '"><td>' . h((string) $n['save_date']) . '</td>';
+                    echo '<td>' . h(note_heading($n['body'] ?? '')) . '</td>';
+                    echo '<td>' . h(substr((string) $n['body'], 0, 100)) . '</td>';
+                    echo '<td>' . button('Open', 'Open', 'note.php?n=' . $id, 'editNoteButton') . '</td></tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
+                }
+                echo '</tbody></table>';
+            },
+            [
+                'when' => ['When', 'Sort by when saved'],
+                'title' => ['Title', 'Sort by title'],
+            ],
+            'searchformblockmemos'
+        );
+    }
+
+    public function renderBlockWrits(string $whereAmI, int $blockId): void
+    {
+        $st = $this->listState($whereAmI, ['activity', 'creation', 'work', 'title', 'status'], 'activity');
+        $blockCol = $this->writBlockCol();
+        $where = ["w.{$blockCol} = ?", "w.review_status = 'current'"];
+        $params = [$blockId];
+        $this->appendSearch($where, $params, $st['q'], ['w.work', 'w.title', 'u.name']);
+        $order = $this->orderSql($st['sort']);
+        $this->printList(
+            $st,
+            "SELECT COUNT(*) FROM writs w LEFT JOIN users u ON u.id = w.writer_id WHERE " . implode(' AND ', $where),
+            $params,
+            "SELECT w.*, u.name AS writer_name FROM writs w
+             LEFT JOIN users u ON u.id = w.writer_id
+             WHERE " . implode(' AND ', $where) . " ORDER BY {$order}",
+            function (array $rows) {
+                echo '<table class="list writ lt sans"><tbody><tr><th></th><th>Work</th><th>Title</th><th>Status</th><th>Writer</th></tr>';
+                $cc = 'lr';
+                foreach ($rows as $w) {
+                    echo '<tr class="' . $cc . '"><td>' . get_switch('Open', 'Read this writ', 'writ.php', 'w', (string) $w['id'], 'set_writ_blue') . '</td>';
+                    echo '<td>' . h(writ_work($w['work'] ?? '', (int) $w['id'])) . '</td>';
+                    echo '<td>' . h(writ_title($w['title'] ?? '')) . '</td>';
+                    echo '<td>' . h((string) $w['draft_status']) . '</td>';
+                    echo '<td>' . h((string) ($w['writer_name'] ?? '')) . '</td></tr>';
+                    $cc = $cc === 'lr' ? 'dr' : 'lr';
+                }
+                echo '</tbody></table>';
+            },
+            [
+                'activity' => ['Activity', 'Sort by most recent activity'],
+                'creation' => ['Creation', 'Sort by order of creation'],
+                'work' => ['Work', 'Sort by work'],
+                'title' => ['Title', 'Sort by title'],
+                'status' => ['Status', 'Sort by status'],
+            ],
+            'searchformblockwrits'
+        );
+    }
+
+    /** @param list<int> $writerIds */
+    private function writTable(string $whereAmI, string $mode, string $status, ?int $writerId, ?int $editorId, array $writerIds = [], string $kind = ''): void
     {
         $st = $this->listState($whereAmI, ['activity', 'creation', 'work', 'title', 'status'], 'activity');
         $filterWriter = (int) ($_GET['u'] ?? $_GET['o'] ?? 0);
@@ -503,6 +747,10 @@ final class WritList
         $blockCol = $this->writBlockCol();
         $where = [];
         $params = [];
+        if ($kind !== '') {
+            $where[] = 'w.kind = ?';
+            $params[] = $kind;
+        }
         if ($mode === 'writer') {
             $where[] = 'w.writer_id = ?';
             $params[] = $writerId;
@@ -514,7 +762,7 @@ final class WritList
             }
         } elseif ($mode === 'observer') {
             if (!$writerIds) {
-                echo '<p class="lt sans">No writs</p>';
+                echo empty_list();
                 return;
             }
             $in = implode(',', array_fill(0, count($writerIds), '?'));
@@ -566,10 +814,6 @@ final class WritList
                 if ($mode !== 'observer') {
                     $this->bulkBar($mode, $status, $this->app->auth->id(), $whereAmI);
                 }
-                if (!$rows) {
-                    echo '<p class="lt sans">No writs</p>';
-                    return;
-                }
                 echo '<table class="list writ lt sans"><tbody><tr><th></th><th>Work</th><th>Title</th>';
                 if ($mode === 'writer') {
                     echo '<th>Block</th><th>Status</th><th>Edits</th><th>Score</th>';
@@ -610,7 +854,7 @@ final class WritList
                 'title' => ['Title', 'Sort by title'],
                 'status' => ['Status', 'Sort by status'],
             ],
-            $mode === 'editor' ? 'searchformeditorwrits' : ($mode === 'observer' ? 'searchformobserverwrits' : 'searchform')
+            $mode === 'editor' ? ($kind === 'assignment' ? 'searchformassignments' : 'searchformeditorwrits') : ($mode === 'observer' ? 'searchformobserverwrits' : 'searchform')
         );
     }
 
@@ -684,8 +928,11 @@ final class WritList
             echo '<p class="sans noticered">List query failed: ' . h($e->getMessage()) . '</p>';
             return;
         }
-        if ($total === 0 && $st['q'] === '' && !$keepEmpty) {
-            echo '<p class="lt sans"><b>Nothing yet</b></p>';
+        if ($total === 0 && !$keepEmpty) {
+            if ($st['q'] !== '') {
+                $this->toolbar($st['where'], $st['sortGet'], $st['searchSuffix'], $st['classes'], $st['q'], $formId, $sorts);
+            }
+            echo empty_list();
             return;
         }
         $pages = max(1, (int) ceil($total / $st['per']));
@@ -856,7 +1103,9 @@ if (typeof searchClearReset !== "function") {
         }
         echo '<label class="bulk-select-all"><small class="sans lt">Select all</small> <input type="checkbox" onclick="toggle(this)"></label>';
         echo '</span>';
-        echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Archive actions &#9660;</button>';
+        echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">'
+            . (str_contains($whereAmI, 'assignments') ? 'Actions' : 'Archive actions')
+            . ' &#9660;</button>';
         echo '</form></div>';
     }
 

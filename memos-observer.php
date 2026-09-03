@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-$import = ['auth', 'view', 'html', 'note', 'user'];
+$import = ['auth', 'view', 'html', 'note', 'user', 'writlist'];
 require __DIR__ . '/lib/boot.php';
 $app->auth->requireUser();
 if (!$app->auth->is('observer') && !$app->auth->atLeast('editor')) {
@@ -21,27 +21,6 @@ if ($wid > 0 && $ids === [$wid]) {
         echo '<h3 class="lt">' . h($one['name']) . '</h3>';
     }
 }
-foreach ($ids as $oid) {
-    $oid = (int) $oid;
-    if ($oid < 1) {
-        continue;
-    }
-    $w = $app->user->find($oid);
-    if ($wid < 1) {
-        echo '<h3 class="lt">' . h($w['name'] ?? ('#' . $oid)) . '</h3>';
-    }
-    echo '<table class="list lt sans"><tbody>';
-    $cc = 'lr';
-    $memos = $app->note->memosForWriter($oid);
-    if (!$memos) {
-        echo '<tr class="' . $cc . '"><td class="lt sans">No memos</td></tr>';
-    }
-    foreach ($memos as $n) {
-        echo '<tr class="' . $cc . '"><td>' . h((string) $n['save_date']) . '</td>';
-        echo '<td>' . h(substr((string) $n['body'], 0, 100)) . '</td>';
-        echo '<td>' . button('Open', 'Open', 'note.php?n=' . (int) $n['id'], 'editNoteButton') . '</td></tr>';
-        $cc = $cc === 'lr' ? 'dr' : 'lr';
-    }
-    echo '</tbody></table>';
-}
+$where = $wid > 0 ? 'memos-observer.php?w=' . $wid : 'memos-observer.php';
+$app->writlist->renderObserverMemos($where, $ids);
 $app->view->end();

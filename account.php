@@ -137,7 +137,7 @@ if ($app->auth->is('superintendent')) {
     echo '<h3 class="lt">Account log</h3>';
     $log = $app->audit->forUser($id);
     if (!$log) {
-        echo '<p class="sans dk">No events yet.</p>';
+        echo empty_list();
     } else {
         echo '<table class="list sans lt"><tr><th>When</th><th>Who</th><th>Action</th><th>Detail</th><th>IP</th></tr>';
         $cc = 'lr';

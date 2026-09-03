@@ -52,6 +52,24 @@ final class TestRepo
         );
     }
 
+    public function archive(int $id, int $editorId): bool
+    {
+        $st = $this->app->db->run(
+            'UPDATE tests SET status=\'archived\' WHERE id=? AND editor_id=? AND status != \'archived\'',
+            [$id, $editorId]
+        );
+        return $st->rowCount() > 0;
+    }
+
+    public function deleteOwned(int $id, int $editorId): bool
+    {
+        $st = $this->app->db->run(
+            'DELETE FROM tests WHERE id=? AND editor_id=?',
+            [$id, $editorId]
+        );
+        return $st->rowCount() > 0;
+    }
+
     public function assignToWriters(int $testId, array $writerIds, ?int $facilityId, int $blockId): array
     {
         $t = $this->find($testId);

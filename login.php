@@ -81,9 +81,8 @@ if ($needTotp) {
     echo '<form method="post">' . $app->csrf->field();
     echo '<p class="field sans"><label for="totp_code">Code</label>';
     echo '<input name="totp_code" id="totp_code" inputmode="numeric" autocomplete="one-time-code" required></p>';
-    $via = $app->auth->totpVia();
-    if ($via === 'passkey' || $via === 'oauth') {
-        echo '<p class="sans"><label><input type="checkbox" name="remember_machine" value="1"> Remember this machine</label></p>';
+    if ($app->auth->pendingCanRemember()) {
+        echo '<p class="sans"><label><input type="checkbox" name="remember_machine" value="1"> Remember this machine for 30 days</label></p>';
     }
     echo '<p><input type="submit" class="set_gray" value="Verify"></p></form>';
 } else {

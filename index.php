@@ -105,7 +105,7 @@ function observer_my_dash(App $app, array $u, int $uid, string $sort): void
     $ids = $app->user->observeeIds($u);
     $app->writlist->dashSortBar('index.php');
     if (!$ids) {
-        echo '<p class="lt sans">No observees yet. Open Observer Dash to get started.</p>';
+        echo empty_list();
         dash_notices($app, $uid);
         return;
     }
@@ -127,7 +127,7 @@ function observer_my_dash(App $app, array $u, int $uid, string $sort): void
 function dash_notes_table(App $app, array $pins, bool $unpin): void
 {
     if (!$pins) {
-        echo '<p class="sans dk">No pinned notes.</p>';
+        echo empty_list();
         return;
     }
     $cc = 'lr';
@@ -165,7 +165,7 @@ function dash_memo_table(App $app, array $memos): void
 function dash_writ_table(App $app, array $rows, string $mode): void
 {
     if (!$rows) {
-        echo '<p class="lt sans">Nothing waiting.</p>';
+        echo empty_list();
         return;
     }
     echo '<table class="list writ lt sans"><tbody><tr><th></th><th>Work</th><th>Title</th><th>Status</th>';
@@ -200,7 +200,7 @@ function dash_notices(App $app, int $uid): void
     $rows = $app->notify->list($uid);
     echo '<h3 class="lt">Notifications</h3>';
     if (!$rows) {
-        echo '<p class="sans dk">None.</p>';
+        echo empty_list();
         return;
     }
     $i = 0;

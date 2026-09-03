@@ -12,7 +12,7 @@ echo '<h2 class="lt">Notifications</h2>';
 echo '<p class="sans dk">Open the item, then acknowledge — that deletes the notice for good.</p>';
 $rows = $app->notify->list($app->auth->id());
 if (!$rows) {
-    echo '<p class="sans">None.</p>';
+    echo empty_list();
 }
 foreach ($rows as $n) {
     echo '<p class="sans"><b>' . h($n['title']) . '</b> <small class="dk">' . h($n['created_at']) . '</small><br>';
