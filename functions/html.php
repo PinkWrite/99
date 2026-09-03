@@ -13,6 +13,63 @@ function pw99_asset_v(string $abs): string
     return is_string($h) && $h !== '' ? substr($h, 0, 10) : (string) time();
 }
 
+/** Theme id => display name from css/theme-*.css `@theme Name` comments. */
+function pw99_themes(): array
+{
+    $dir = dirname(__DIR__) . '/css';
+    $found = [];
+    foreach (glob($dir . '/theme-*.css') ?: [] as $f) {
+        $id = basename($f, '.css');
+        $name = $id;
+        $raw = (string) file_get_contents($f);
+        if (preg_match('/@theme\s+([^\r\n*]+)/', $raw, $m)) {
+            $name = trim($m[1]);
+        }
+        $found[$id] = $name;
+    }
+    $out = [];
+    foreach (['theme-dusk-desk', 'theme-twilight-write', 'theme-city', 'theme-light-write'] as $id) {
+        if (isset($found[$id])) {
+            $out[$id] = $found[$id];
+            unset($found[$id]);
+        }
+    }
+    foreach ($found as $id => $name) {
+        $out[$id] = $name;
+    }
+    return $out;
+}
+
+function pw99_theme_id(?array $user): string
+{
+    $ids = array_keys(pw99_themes());
+    $want = '';
+    if ($user) {
+        $p = json_arr($user['notify_prefs'] ?? []);
+        $want = (string) ($p['theme'] ?? '');
+    }
+    if ($want === '' && !empty($_COOKIE['pw_theme'])) {
+        $want = preg_replace('/[^a-z0-9\-]/', '', (string) $_COOKIE['pw_theme']) ?? '';
+    }
+    $def = 'theme-dusk-desk';
+    if ($want !== '' && in_array($want, $ids, true)) {
+        return $want;
+    }
+    return in_array($def, $ids, true) ? $def : (string) ($ids[0] ?? $def);
+}
+
+function pw99_set_theme_cookie(string $id): void
+{
+    setcookie('pw_theme', $id, [
+        'expires' => time() + 86400 * 400,
+        'path' => '/',
+        'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        'httponly' => false,
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE['pw_theme'] = $id;
+}
+
 /** Original geometric marks (passkey, G) plus nominative GitHub silhouette for login buttons. */
 function brand_icon(string $which): string
 {

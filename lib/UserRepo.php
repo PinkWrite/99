@@ -101,6 +101,14 @@ final class UserRepo
         $this->app->db->run('UPDATE users SET notify_prefs = ? WHERE id = ?', [json_enc($prefs), $id]);
     }
 
+    public function saveTheme(int $id, string $theme): void
+    {
+        $row = $this->find($id) ?? [];
+        $p = $this->prefs($row);
+        $p['theme'] = $theme;
+        $this->savePrefs($id, $p);
+    }
+
     public function setTotp(int $id, ?string $secret, bool $enabled): void
     {
         $this->app->db->run('UPDATE users SET totp_secret = ?, totp_enabled = ? WHERE id = ?', [
@@ -231,8 +239,12 @@ final class UserRepo
     public function prefs(array $user): array
     {
         $p = json_arr($user['notify_prefs'] ?? []);
+        $theme = (string) ($p['theme'] ?? '');
         if (!isset($p['inapp'])) {
-            $p = $this->app->auth->defaultNotifyPrefs($user['type']);
+            $p = $this->app->auth->defaultNotifyPrefs($user['type'] ?? 'writer');
+        }
+        if ($theme !== '') {
+            $p['theme'] = $theme;
         }
         return $p;
     }

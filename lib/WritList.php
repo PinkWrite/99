@@ -607,13 +607,13 @@ function showBulkActions(){
   if (!bar) return;
   var open = bar.hidden;
   bar.hidden = !open;
-  var tables = document.querySelectorAll("table.list.writ");
+  var tables = document.querySelectorAll("table.list.writ, table.list.bulk");
   for (var i = 0; i < tables.length; i++) {
     tables[i].classList.toggle("bulk-open", open);
   }
 }
 function toggle(source){
-  var cb = document.querySelectorAll("table.list.writ td.bulk_check input[type=checkbox]");
+  var cb = document.querySelectorAll("table.list.writ td.bulk_check input[type=checkbox], table.list.bulk td.bulk_check input[type=checkbox]");
   for (var i = 0; i < cb.length; i++) cb[i].checked = source.checked;
 }
 </script>';

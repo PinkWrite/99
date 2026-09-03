@@ -1,5 +1,20 @@
 /* PinkWrite 99 — save, wordcount, no-paste, passkeys */
 (function () {
+  window.showBulkActions = function () {
+    var bar = document.getElementById('bulk_actions_div');
+    if (!bar) return;
+    var open = bar.hidden;
+    bar.hidden = !open;
+    var tables = document.querySelectorAll('table.list.writ, table.list.bulk');
+    for (var i = 0; i < tables.length; i++) {
+      tables[i].classList.toggle('bulk-open', open);
+    }
+  };
+  window.toggle = function (source) {
+    var cb = document.querySelectorAll('table.list.writ td.bulk_check input[type=checkbox], table.list.bulk td.bulk_check input[type=checkbox]');
+    for (var i = 0; i < cb.length; i++) cb[i].checked = source.checked;
+  };
+
   function wordCount(s) {
     s = (s || '').trim();
     if (!s) return 0;

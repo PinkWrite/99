@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         $in[$k] = !empty($_POST['inapp'][$k]);
         $em[$k] = !empty($_POST['email'][$k]);
     }
-    $app->user->savePrefs($app->auth->id(), ['inapp' => $in, 'email' => $em]);
+    $app->user->savePrefs($app->auth->id(), ['inapp' => $in, 'email' => $em, 'theme' => (string) ($prefs['theme'] ?? '')]);
     $prefs = ['inapp' => $in, 'email' => $em];
     $saved = true;
     $app->audit->record($app->auth->id(), 'notify', 'self');

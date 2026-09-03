@@ -1,0 +1,18 @@
+/* @theme Light Write
+   Paper, not true white. Pink #f71771 only on links and hover, never as a page fill. */
+:root {
+  --pw-frame: #cfc8c0;
+  --pw-page: #f2eee8;
+  --pw-fg: #3a3a3a;
+  --pw-muted: #6a6a6a;
+  --pw-head: #555;
+  --pw-lt: #666;
+  --pw-dk: #555;
+  --pw-row-a: #f7f3ee;
+  --pw-row-b: #ece6df;
+  --pw-row-hover: #f5d5e0;
+  --pw-input: #efeae4;
+  --pw-input-fg: #333;
+  --pw-line: #d5cfc7;
+  --pw-note: #666;
+}

@@ -1,0 +1,18 @@
+/* @theme Twilight Write
+   Cooler dusk: blue-gray charcoal, stronger row contrast. */
+:root {
+  --pw-frame: #26262e;
+  --pw-page: #32323c;
+  --pw-fg: #e2e2ea;
+  --pw-muted: #b0b0bc;
+  --pw-head: #8a8a98;
+  --pw-lt: #9a9aa8;
+  --pw-dk: #6e6e7c;
+  --pw-row-a: #3c3c48;
+  --pw-row-b: #2c2c36;
+  --pw-row-hover: #4a4a58;
+  --pw-input: #3a3a46;
+  --pw-input-fg: #e2e2ea;
+  --pw-line: #4a4a54;
+  --pw-note: #8a8a98;
+}

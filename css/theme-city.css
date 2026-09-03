@@ -1,0 +1,18 @@
+/* @theme City
+   VS Code City Lights: deep blue-black chrome. Accent stays #f71771. */
+:root {
+  --pw-frame: #171d23;
+  --pw-page: #1d252c;
+  --pw-fg: #b7c5d3;
+  --pw-muted: #8a9aa8;
+  --pw-head: #7e8c9a;
+  --pw-lt: #8a9aa8;
+  --pw-dk: #6b7a88;
+  --pw-row-a: #24303a;
+  --pw-row-b: #1a2229;
+  --pw-row-hover: #2c3a46;
+  --pw-input: #24303a;
+  --pw-input-fg: #b7c5d3;
+  --pw-line: #2a3640;
+  --pw-note: #7e8c9a;
+}

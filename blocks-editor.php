@@ -37,5 +37,7 @@ foreach ($editors as $ed) {
 }
 echo '</select></p>';
 echo '<p><input type="submit" name="create" class="lt_button" value="Create block"></p></form>';
+echo '<h3 class="lt" style="display:inline-block;margin-right:0.75em">Open blocks</h3>';
+echo button('View closed blocks', 'Closed blocks', 'blocks-closed.php', 'editNoteButton');
 $app->writlist->renderEditorBlocks('blocks-editor.php', 'admin');
 $app->view->end();

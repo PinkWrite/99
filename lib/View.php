@@ -26,6 +26,11 @@ final class View
         $cssV = pw99_asset_v(__DIR__ . '/../css/styles.css');
         $jsV = pw99_asset_v(__DIR__ . '/../js/pw99.js');
         echo '<link rel="stylesheet" href="css/styles.css?v=' . h($cssV) . '" type="text/css" />';
+        $theme = pw99_theme_id($u);
+        $themeFile = __DIR__ . '/../css/' . $theme . '.css';
+        if (is_file($themeFile)) {
+            echo '<link rel="stylesheet" href="css/' . h($theme) . '.css?v=' . h(pw99_asset_v($themeFile)) . '" type="text/css" />';
+        }
         echo '<script src="js/pw99.js?v=' . h($jsV) . '"></script>';
         echo '<meta http-equiv="Cache-Control" content="no-cache" />';
         echo '<meta http-equiv="Pragma" content="no-cache" />';

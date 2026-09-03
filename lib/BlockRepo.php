@@ -70,4 +70,33 @@ final class BlockRepo
         $c = $block['code'] ?? '';
         return $c !== '' && $c !== null ? $n . ' (' . $c . ')' : $n;
     }
+
+    public function setStatus(int $id, string $status): void
+    {
+        $st = $status === 'closed' ? 'closed' : 'open';
+        $this->app->db->run('UPDATE blocks SET status = ? WHERE id = ?', [$st, $id]);
+    }
+
+    public function delete(int $id): void
+    {
+        if ($this->app->db->columnExists('writs', 'block_id')) {
+            $this->app->db->run('UPDATE writs SET block_id = 0 WHERE block_id = ?', [$id]);
+        }
+        if ($this->app->db->tableExists('tests') && $this->app->db->columnExists('tests', 'block_id')) {
+            $this->app->db->run('UPDATE tests SET block_id = 0 WHERE block_id = ?', [$id]);
+        }
+        if ($this->app->db->tableExists('notes') && $this->app->db->columnExists('notes', 'editor_set_block')) {
+            $this->app->db->run('UPDATE notes SET editor_set_block = 0 WHERE editor_set_block = ?', [$id]);
+        }
+        if ($this->app->db->columnExists('users', 'blocks_json')) {
+            foreach ($this->app->db->all('SELECT id, blocks_json FROM users') as $u) {
+                $have = array_map('intval', json_arr($u['blocks_json'] ?? '[]'));
+                $next = array_values(array_filter($have, static fn ($b) => (int) $b !== $id));
+                if ($next !== $have) {
+                    $this->app->db->run('UPDATE users SET blocks_json = ? WHERE id = ?', [json_enc($next), (int) $u['id']]);
+                }
+            }
+        }
+        $this->app->db->run('DELETE FROM blocks WHERE id = ?', [$id]);
+    }
 }

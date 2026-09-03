@@ -1,0 +1,18 @@
+/* @theme Dusk Desk
+   Default PinkWrite 99 palette: charcoal frame, slightly lighter page. */
+:root {
+  --pw-frame: #333;
+  --pw-page: #3a3a3a;
+  --pw-fg: #ddd;
+  --pw-muted: #aaa;
+  --pw-head: #555;
+  --pw-lt: #777;
+  --pw-dk: #555;
+  --pw-row-a: #383838;
+  --pw-row-b: #313131;
+  --pw-row-hover: #4a4a4a;
+  --pw-input: #555;
+  --pw-input-fg: #ccc;
+  --pw-line: #444;
+  --pw-note: #888;
+}
