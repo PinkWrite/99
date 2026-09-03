@@ -58,6 +58,22 @@ function pw99_theme_id(?array $user): string
     return in_array($def, $ids, true) ? $def : (string) ($ids[0] ?? $def);
 }
 
+/** Open/closed blocks list the editor came from. */
+function pw99_blocks_return(?string $raw = null): string
+{
+    $allow = ['blocks-closed.php', 'blocks-editor.php'];
+    foreach ([$raw, $_POST['return'] ?? '', $_GET['return'] ?? '', $_SERVER['HTTP_REFERER'] ?? ''] as $c) {
+        if (!is_string($c) || $c === '') {
+            continue;
+        }
+        $base = basename((string) (parse_url($c, PHP_URL_PATH) ?: $c));
+        if (in_array($base, $allow, true)) {
+            return $base;
+        }
+    }
+    return 'blocks-editor.php';
+}
+
 function pw99_set_theme_cookie(string $id): void
 {
     setcookie('pw_theme', $id, [

@@ -7,9 +7,10 @@ if (!$app->auth->atLeast('supervisor')) {
     $app->redirect('');
 }
 $bid = (int) ($_GET['b'] ?? $_POST['b'] ?? 0);
+$back = pw99_blocks_return();
 $b = $app->block->find($bid);
 if (!$b) {
-    $app->redirect('blocks-editor.php');
+    $app->redirect($back);
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     $app->block->save($bid, [
@@ -17,11 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         'code' => clean_title($_POST['code'] ?? '', 10),
         'status' => ($_POST['status'] ?? '') === 'closed' ? 'closed' : 'open',
     ]);
-    $b = $app->block->find($bid);
+    $app->view->setFlash('Block saved.');
+    $app->redirect($back);
 }
 $app->view->start('Block', 'blocks', 'admin');
 echo '<form method="post">' . $app->csrf->field();
 echo '<input type="hidden" name="b" value="' . $bid . '">';
+echo '<input type="hidden" name="return" value="' . h($back) . '">';
 echo '<p class="sans">Name <input name="name" value="' . h($b['name']) . '"> Code <input name="code" value="' . h($b['code']) . '"></p>';
 echo '<p class="sans">Status <select class="formselect small" name="status"><option value="open"' . ($b['status'] === 'open' ? ' selected' : '') . '>open</option>';
 echo '<option value="closed"' . ($b['status'] === 'closed' ? ' selected' : '') . '>closed</option></select></p>';

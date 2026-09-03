@@ -7,11 +7,7 @@ if (!$app->auth->atLeast('supervisor')) {
     $app->redirect('editor.php');
 }
 
-$back = 'blocks-closed.php';
-$raw = basename((string) parse_url((string) ($_POST['return'] ?? ''), PHP_URL_PATH));
-if (in_array($raw, ['blocks-closed.php', 'blocks-editor.php'], true)) {
-    $back = $raw;
-}
+$back = pw99_blocks_return();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$app->csrf->check()) {
     $app->view->setFlash('That block action did not go through. Try again.', false);
@@ -43,6 +39,9 @@ foreach ($ids as $id) {
     if ($op === 'open') {
         $app->block->setStatus($id, 'open');
         $ok++;
+    } elseif ($op === 'close') {
+        $app->block->setStatus($id, 'closed');
+        $ok++;
     } elseif ($op === 'delete') {
         $app->block->delete($id);
         $ok++;
@@ -51,6 +50,8 @@ foreach ($ids as $id) {
 
 if ($op === 'open') {
     $app->view->setFlash($ok === 1 ? 'Block opened.' : $ok . ' blocks opened.');
+} elseif ($op === 'close') {
+    $app->view->setFlash($ok === 1 ? 'Block closed.' : $ok . ' blocks closed.');
 } elseif ($op === 'delete') {
     $app->view->setFlash($ok === 1 ? 'Block deleted.' : $ok . ' blocks deleted.', false);
 } else {

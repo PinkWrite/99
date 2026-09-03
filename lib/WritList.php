@@ -181,11 +181,24 @@ final class WritList
             $params,
             "SELECT b.*, u.name AS editor_name FROM blocks b LEFT JOIN users u ON u.id = b.editor_id WHERE " . implode(' AND ', $where) . " ORDER BY {$order}",
             function (array $rows) use ($st, $me, $admin) {
-                echo '<table class="list sans lt"><tbody><tr><th>Name</th><th>Code</th><th>Editor</th>';
+                if ($admin) {
+                    echo '<div class="bulk-bar"><form id="bulk_actions" class="bulk-bar-form" method="post" action="block-act.php">';
+                    echo $this->app->csrf->field();
+                    echo '<input type="hidden" name="return" value="blocks-editor.php">';
+                    echo '<span id="bulk_actions_div" class="bulk-opts" hidden>';
+                    echo confirm_submit('blocksubmit', 'close', 'Confirm close', 'close', 'act_blue small', 'act_blue small');
+                    echo confirm_submit('blocksubmit', 'open', 'Confirm open', 'open', 'act_green small', 'act_green small');
+                    echo '<label class="bulk-select-all"><small class="sans lt">Select all</small> <input type="checkbox" onclick="toggle(this)"></label>';
+                    echo '</span>';
+                    echo '<button type="button" class="act_ltgray small" id="bulk_actions_btn" onclick="showBulkActions()">Actions &#9660;</button>';
+                    echo '</form></div>';
+                }
+                echo '<table class="list' . ($admin ? ' bulk' : '') . ' sans lt"><tbody><tr><th>Name</th><th>Code</th><th>Editor</th>';
                 if ($admin) {
                     echo '<th><div style="display:inline;float:right">Writers</div></th>';
                     echo '<th><div style="display:inline;float:right">Writs</div></th>';
                     echo '<th><div style="display:inline;float:right">Memos</div></th>';
+                    echo '<th class="bulk_check"></th>';
                 } else {
                     echo '<th><div style="display:inline;float:right">Writs</div></th>';
                     echo '<th><div style="display:inline;float:right">Memos</div></th>';
@@ -203,8 +216,9 @@ final class WritList
                     $id = (int) $b['id'];
                     echo '<tr class="' . $cc . '">';
                     if ($admin) {
-                        echo '<td><a class="listed_note" href="block.php?b=' . $id . '"><b>' . h((string) $b['name']) . '</b></a></td>';
-                        echo '<td><a class="listed_note" href="block.php?b=' . $id . '">' . h((string) $b['code']) . '</a></td>';
+                        $href = 'block.php?b=' . $id . '&return=blocks-editor.php';
+                        echo '<td><a class="listed_note" href="' . $href . '"><b>' . h((string) $b['name']) . '</b></a></td>';
+                        echo '<td><a class="listed_note" href="' . $href . '">' . h((string) $b['code']) . '</a></td>';
                     } else {
                         echo '<td><a class="listed_note" href="writs-editor.php?v=' . $id . '"><b>' . h((string) $b['name']) . '</b></a></td>';
                         echo '<td><a class="listed_note" href="writs-editor.php?v=' . $id . '">' . h((string) $b['code']) . '</a></td>';
@@ -214,6 +228,7 @@ final class WritList
                         echo '<td><div style="display:inline;float:right">' . get_switch('Writers', 'List writers in this block', 'enrollment.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
                         echo '<td><div style="display:inline;float:right">' . get_switch('View', 'View writs in this block', 'block-writs.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
                         echo '<td><div style="display:inline;float:right">' . get_switch('View', 'View memos for this block', 'block-memos.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';
+                        echo '<td class="bulk_check"><input type="checkbox" form="bulk_actions" name="bulk_' . $id . '" value="' . $id . '"></td>';
                     } else {
                         echo '<td><div style="display:inline;float:right">' . get_switch('Writs', 'List writs in this Block', 'writs-editor.php', 'v', (string) $id, 'editNoteButton') . '</div></td>';
                         echo '<td><div style="display:inline;float:right">' . get_switch('Block memos', 'List memos for this block', 'memos-editor.php', 'b', (string) $id, 'editNoteButton') . '</div></td>';

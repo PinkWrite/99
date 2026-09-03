@@ -37,7 +37,7 @@ foreach ($rows as $b) {
     $id = (int) $b['id'];
     $eid = (int) ($b['editor_id'] ?? 0);
     echo '<tr class="' . $cc . '">';
-    echo '<td><a class="listed_note" href="block.php?b=' . $id . '"><b>' . h((string) $b['name']) . '</b></a></td>';
+    echo '<td><a class="listed_note" href="block.php?b=' . $id . '&return=blocks-closed.php"><b>' . h((string) $b['name']) . '</b></a></td>';
     echo '<td>' . h((string) ($b['code'] ?? '')) . '</td>';
     echo '<td>' . h((string) ($editors[$eid] ?? '')) . '</td>';
     echo '<td class="bulk_check"><input type="checkbox" form="bulk_actions" name="bulk_' . $id . '" value="' . $id . '"></td>';
