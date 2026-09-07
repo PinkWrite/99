@@ -117,9 +117,9 @@ foreach (['google' => 'Google', 'github' => 'GitHub'] as $p => $lab) {
     $linkRows .= '<tr><td class="id-who">' . brand_icon($p) . '<span class="id-lab">' . h($lab) . '</span></td>';
     $linkRows .= '<td class="id-mark">' . ($on ? brand_icon('check') : '&nbsp;') . '</td><td class="id-act">';
     if ($on) {
-        $linkRows .= post_button('Disconnect', 'Stop using this login', 'security.php', 'unlink_oauth', $p, 'id-disconnect', $app->csrf->token());
+        $linkRows .= post_button('Disconnect', 'Stop using this login', 'security.php', 'unlink_oauth', $p, 'set_gray small', $app->csrf->token());
     } else {
-        $linkRows .= '<a class="id-connect" href="oauth.php?p=' . h($p) . '&link=1">Connect</a>';
+        $linkRows .= button('Connect', 'Link this login', 'oauth.php?p=' . rawurlencode($p) . '&link=1', 'lt_button small');
     }
     $linkRows .= '</td></tr>';
 }

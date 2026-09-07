@@ -1620,35 +1620,14 @@ table.id-link td.id-mark {
   width: 2.2em;
   text-align: center;
 }
+table.id-link td.id-act {
+  white-space: nowrap;
+  width: 1%;
+}
 .id-check-svg {
   color: #6cbb6c;
   width: 1.15em;
   height: 1.15em;
-}
-a.id-connect,
-input.id-disconnect {
-  display: inline-block;
-  width: 9.5em;
-  box-sizing: border-box;
-  text-align: center;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  padding: 0.55em 0.8em;
-  font: 0.95em/1.4em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
-  color: #ccc;
-  text-decoration: none;
-}
-a.id-connect {
-  background-color: #222;
-}
-input.id-disconnect {
-  background-color: #555;
-}
-a.id-connect:hover,
-input.id-disconnect:hover {
-  background-color: #f71771;
-  color: #ccc;
 }
 
 .pw-pass-fields.pw-off input[type="password"],
