@@ -1598,21 +1598,20 @@ table.id-link th,
 table.id-link td {
   text-align: left;
   vertical-align: middle;
-  padding: 0.45em 0.7em 0.45em 0;
+  padding: 0.55em 0.75em 0.55em 0;
   border-bottom: 1px solid #444;
 }
 table.id-link td.id-who {
   white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 0.55em;
 }
 table.id-link td.id-who .id-ico {
-  margin-right: 0;
+  margin-right: 0.55em;
   vertical-align: middle;
+  display: inline-flex;
 }
 table.id-link td.id-who .id-lab {
   display: inline;
+  vertical-align: middle;
   font: 1em/1.4em Arial, Helvetica, sans-serif;
   color: #ccc;
 }
@@ -1623,6 +1622,18 @@ table.id-link td.id-mark {
 table.id-link td.id-act {
   white-space: nowrap;
   width: 1%;
+  padding-right: 0;
+}
+table.id-link td.id-act form,
+table.id-link td.id-act a {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+}
+table.id-link td.id-act input,
+table.id-link td.id-act button {
+  margin: 0;
+  vertical-align: middle;
 }
 .id-check-svg {
   color: #6cbb6c;
