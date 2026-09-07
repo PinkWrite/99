@@ -555,6 +555,18 @@ background:#f71771;
   font:0.8em/1.6em "monospace", "mono", "Andale Mono", "Courier", "Droid Sans Mono", "Courier New";
 }
 
+/* Stacked New note / New writ rows. Inline forms have no vertical
+   margin, so a bare <br> collapses when the memos table is absent. */
+p.dash-actions {
+  display: block;
+  margin: 0.9em 0;
+  line-height: 1.6;
+}
+p.dash-actions form {
+  display: inline;
+  margin: 0;
+}
+
 .editNoteButton {
   cursor: pointer;
   background-color: #2a2a2a;

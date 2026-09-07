@@ -15,8 +15,7 @@ $app->view->start('Writer Dash for ' . $u['name'], 'writs', 'writer');
 echo '<p class="sans dk">Typing and Editing for Learners and Teachers.</p>';
 
 try {
-echo post_button('New note +', 'Start a new note', 'note.php', 'new_note', (string) $uid, 'newNoteButton', $app->csrf->token());
-echo '<br>';
+echo '<p class="dash-actions">' . post_button('New note +', 'Start a new note', 'note.php', 'new_note', (string) $uid, 'newNoteButton', $app->csrf->token()) . '</p>';
 $pins = $app->note->pinnedFor($uid, 10);
 if ($pins) {
     $cc = 'lr';
@@ -59,11 +58,8 @@ if ($memos) {
     }
     echo '</tbody></table>';
 }
-echo '<br>';
-echo button('All memos', 'View all notes from your editor and blocks', 'memos.php', 'editNoteButton');
-echo '<br><br>';
-
-echo post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'set_gray', $app->csrf->token());
+echo '<p class="dash-actions">' . button('All memos', 'View all notes from your editor and blocks', 'memos.php', 'editNoteButton') . '</p>';
+echo '<p class="dash-actions">' . post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'set_gray', $app->csrf->token()) . '</p>';
 $app->writlist->renderWriter('writer-dash.php');
 } catch (Throwable $e) {
     echo '<p class="sans noticered">Dashboard list failed: ' . h($e->getMessage()) . '</p>';

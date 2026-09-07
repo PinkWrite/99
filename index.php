@@ -33,13 +33,11 @@ try {
 
     $isEditor = $app->auth->atLeast('editor');
     if ($isEditor) {
-        echo post_button('New memo +', 'Write a memo', 'note.php', 'new_note', '1', 'newNoteButton', $app->csrf->token());
-        echo '<br>';
-        echo post_button('New test +', 'Compose a test', 'test.php', 'new_test', '1', 'newNoteButton', $app->csrf->token());
+        echo '<p class="dash-actions">' . post_button('New memo +', 'Write a memo', 'note.php', 'new_note', '1', 'newNoteButton', $app->csrf->token()) . '</p>';
+        echo '<p class="dash-actions">' . post_button('New test +', 'Compose a test', 'test.php', 'new_test', '1', 'newNoteButton', $app->csrf->token()) . '</p>';
     } else {
-        echo post_button('New note +', 'Start a new note', 'note.php', 'new_note', (string) $uid, 'newNoteButton', $app->csrf->token());
-        echo '<br>';
-        echo post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'set_gray', $app->csrf->token());
+        echo '<p class="dash-actions">' . post_button('New note +', 'Start a new note', 'note.php', 'new_note', (string) $uid, 'newNoteButton', $app->csrf->token()) . '</p>';
+        echo '<p class="dash-actions">' . post_button('New writ +', 'Start writing something new', 'writ.php', 'new_writ', (string) $uid, 'set_gray', $app->csrf->token()) . '</p>';
     }
 
     $app->writlist->dashSortBar('index.php');
