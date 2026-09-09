@@ -103,7 +103,18 @@ if (!empty($config['db']['name'])) {
             $app->load($import);
             return;
         }
+        $ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+                && strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+            || (isset($_POST['ajax']) && (string) $_POST['ajax'] === '1');
         http_response_code(500);
+        if ($ajax) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'ok' => false,
+                'error' => 'Database connection failed. The SysAdmin needs to check MariaDB and config.php.',
+            ]);
+            exit;
+        }
         header('Content-Type: text/plain; charset=utf-8');
         echo "Database connection failed. The SysAdmin needs to check config.php.\n";
         echo "Use 127.0.0.1 (TCP), not localhost (Unix socket).\n";
