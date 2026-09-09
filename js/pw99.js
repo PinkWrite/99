@@ -45,40 +45,75 @@
     });
   };
 
+  var pwSaveRetry = {};
+  var pwWaitMarkup = '<span class="pw-wait sans">'
+    + '<svg class="pw-spin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">'
+    + '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="40 16"/>'
+    + '</svg> Waiting for the database…</span>';
+
+  function pwRetryable(x, j, raw) {
+    if (j && j.retry) return true;
+    var st = x ? x.status : 0;
+    if (st === 0 || st === 502 || st === 503 || st === 504) return true;
+    var s = ((j && j.error) ? j.error : '') + ' ' + (raw || '');
+    return /database connection failed|connection refused|SQLSTATE\[HY000\] \[2002\]|Waiting for the database/i.test(s);
+  }
+
   window.pwAjaxForm = function (formId, postTo, updateId, extra) {
     var form = document.getElementById(formId);
     var box = document.getElementById(updateId);
     if (!form) return;
-    var fd = new FormData(form);
-    fd.append('ajax', '1');
-    if (extra) Object.keys(extra).forEach(function (k) { fd.append(k, extra[k]); });
-    var x = new XMLHttpRequest();
-    x.open('POST', postTo);
-    x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    x.onload = function () {
-      if (!box) return;
-      var t = x.responseText;
-      try {
-        var j = JSON.parse(t);
-        if (j.ok) {
-          box.innerHTML = '<span class="noticegreen noticehide sans">' + (j.msg || 'Saved') + '</span>';
+    if (pwSaveRetry[formId]) {
+      clearTimeout(pwSaveRetry[formId]);
+      pwSaveRetry[formId] = null;
+    }
+    function send() {
+      var fd = new FormData(form);
+      fd.append('ajax', '1');
+      if (extra) Object.keys(extra).forEach(function (k) { fd.append(k, extra[k]); });
+      var x = new XMLHttpRequest();
+      x.open('POST', postTo);
+      x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      x.onload = function () {
+        var t = x.responseText || '';
+        var j = null;
+        try { j = JSON.parse(t); } catch (e) { j = null; }
+        if (j && j.ok) {
+          if (pwSaveRetry[formId]) {
+            clearTimeout(pwSaveRetry[formId]);
+            pwSaveRetry[formId] = null;
+          }
+          if (box) {
+            box.innerHTML = '<span class="noticegreen noticehide sans">' + (j.msg || 'Saved') + '</span>';
+          }
           if (j.source && form.source) form.source.value = j.source;
           if (j.id && form.test_id) form.test_id.value = j.id;
           if (j.work != null && form.work && !String(form.work.value || '').trim()) {
             form.work.value = j.work;
           }
-        } else {
-          box.innerHTML = '<span class="noticered sans">' + (j.error || 'Save failed') + '</span>';
+          window.onbeforeunload = null;
+          return;
         }
-      } catch (e) {
-        box.innerHTML = t || '<span class="noticered sans">Save failed</span>';
-      }
-    };
-    x.onerror = function () {
-      if (box) box.innerHTML = '<span class="noticered sans">Network error</span>';
-    };
-    x.send(fd);
-    window.onbeforeunload = null;
+        if (pwRetryable(x, j, t)) {
+          if (box) box.innerHTML = pwWaitMarkup;
+          window.onbeforeunload = function () { return ''; };
+          pwSaveRetry[formId] = setTimeout(send, 10000);
+          return;
+        }
+        if (box) {
+          box.innerHTML = (j && j.error)
+            ? '<span class="noticered sans">' + j.error + '</span>'
+            : (t || '<span class="noticered sans">Save failed</span>');
+        }
+      };
+      x.onerror = function () {
+        if (box) box.innerHTML = pwWaitMarkup;
+        window.onbeforeunload = function () { return ''; };
+        pwSaveRetry[formId] = setTimeout(send, 10000);
+      };
+      x.send(fd);
+    }
+    send();
   };
 
   window.pwBindSave = function (formId, postTo, updateId, extra) {

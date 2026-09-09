@@ -67,5 +67,5 @@ if ($tid) {
     echo form_select('block', $blockOpts, (int) ($t['block_id'] ?? 0), 'All my writers', 'formselect') . '</p>';
     echo '<p><input type="submit" name="publish" class="lt_button" value="Publish to writers"></p></form>';
 }
-echo '<script src="js/pw99.js"></script><script>pwBindSave("testform","ajax/save-test.php","ajax_changes");</script>';
+echo '<script>pwBindSave("testform","ajax/save-test.php","ajax_changes");</script>';
 $app->view->end();

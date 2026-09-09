@@ -161,6 +161,6 @@ if ($canEdit) {
 echo '<p><textarea name="body" id="writingArea" class="writingBox" rows="16" cols="82" onchange="onNavWarn()"' . ($canEdit ? '' : ' readonly') . '>' . h($n['body']) . '</textarea></p>';
 echo '</form>';
 if ($canEdit) {
-    echo '<script src="js/pw99.js"></script><script>pwBindSave("editform","ajax/save-note.php","ajax_changes");</script>';
+    echo '<script>pwBindSave("editform","ajax/save-note.php","ajax_changes");</script>';
 }
 $app->view->end();

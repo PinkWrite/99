@@ -191,5 +191,5 @@ if ($reviewed) {
 echo '<p class="sans">Notes<br><textarea name="notes" rows="4" cols="82" onchange="onNavWarn()">' . h($w['notes']) . '</textarea></p>';
 echo '</form>';
 echo comments_markup($app->writ->comments($wid), $wid, false, $uid, $app->csrf->token());
-echo '<script src="js/pw99.js"></script><script>pwWord("writingArea","wordCount","wordCountInput");pwNoPaste("writingArea");pwBindSave("editform","ajax/save-writ.php","ajax_changes");</script>';
+echo '<script>pwWord("writingArea","wordCount","wordCountInput");pwNoPaste("writingArea");pwBindSave("editform","ajax/save-writ.php","ajax_changes");</script>';
 $app->view->end();

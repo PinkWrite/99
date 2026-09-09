@@ -76,5 +76,5 @@ echo '<p class="sans">Notes<br><textarea name="notes" rows="3" cols="82">' . h($
 echo '<input type="hidden" name="save_edit" value="1">';
 echo '</form>';
 echo comments_markup($app->writ->comments($wid), $wid, false, $app->auth->id(), $app->csrf->token());
-echo '<script src="js/pw99.js"></script><script>pwBindSave("editsform","ajax/save-review.php","ajax_changes");</script>';
+echo '<script>pwBindSave("editsform","ajax/save-review.php","ajax_changes");</script>';
 $app->view->end();

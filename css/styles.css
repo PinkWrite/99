@@ -1451,6 +1451,20 @@ input.act_disabled:disabled {
 }
 span.noticehide { font-weight: bold; }
 
+@keyframes pw-spin {
+  to { transform: rotate(360deg); }
+}
+.pw-spin {
+  display: inline-block;
+  vertical-align: -0.2em;
+  margin-right: 0.35em;
+  animation: pw-spin 0.8s linear infinite;
+}
+.pw-wait {
+  color: var(--pw-muted);
+  font-weight: normal;
+}
+
 /* Save row sits above the writing body with a normal paragraph gap. */
 p.save-row {
   margin: 0.4em 0 1em;

@@ -106,12 +106,14 @@ if (!empty($config['db']['name'])) {
         $ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
                 && strtolower((string) $_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
             || (isset($_POST['ajax']) && (string) $_POST['ajax'] === '1');
-        http_response_code(500);
+        error_log('PinkWrite 99: database connection failed: ' . $e->getMessage());
+        http_response_code(503);
         if ($ajax) {
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'ok' => false,
-                'error' => 'Database connection failed. The SysAdmin needs to check MariaDB and config.php.',
+                'retry' => true,
+                'error' => 'Waiting for the database…',
             ]);
             exit;
         }
