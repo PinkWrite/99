@@ -55,6 +55,7 @@ final class Audit
             'login_fail' => 'Failed login',
             'password' => 'Password',
             'password_off' => 'Password login off',
+            'password_on' => 'Password login on',
             'totp_on' => 'Authenticator on',
             'totp_off' => 'Authenticator removed',
             'contact' => 'Name or email',

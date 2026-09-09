@@ -122,6 +122,17 @@ function pw99_migrate(App $app): string
         }
         $db->run('INSERT INTO schema_version (version, note) VALUES (6, ?)', ['users last_seen']);
         $notes[] = 'schema_version=6 last_seen';
+        $ver = 6;
+    }
+    if ($ver < 7) {
+        if ($db->tableExists('users') && !$db->columnExists('users', 'pass_login')) {
+            $db->pdo()->exec('ALTER TABLE users ADD COLUMN pass_login TINYINT(1) NOT NULL DEFAULT 1');
+        }
+        if ($db->columnExists('users', 'pass_login')) {
+            $db->pdo()->exec("UPDATE users SET pass_login = 0 WHERE pass IS NULL OR pass = ''");
+        }
+        $db->run('INSERT INTO schema_version (version, note) VALUES (7, ?)', ['password login toggle']);
+        $notes[] = 'schema_version=7 pass_login';
     }
     return $notes ? implode('; ', $notes) : 'schema current';
 }

@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS users (
   editor_id BIGINT UNSIGNED DEFAULT NULL,
   status ENUM('signup','active','dormant','grad') NOT NULL DEFAULT 'active',
   pass VARCHAR(255) DEFAULT NULL,
+  pass_login TINYINT(1) NOT NULL DEFAULT 1,
   totp_secret VARCHAR(64) DEFAULT NULL,
   totp_enabled TINYINT(1) NOT NULL DEFAULT 0,
   notify_prefs JSON NOT NULL,

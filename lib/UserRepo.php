@@ -65,10 +65,32 @@ final class UserRepo
 
     public function setPassword(int $id, string $plain): void
     {
-        $this->app->db->run('UPDATE users SET pass = ? WHERE id = ?', [
-            password_hash($plain, PASSWORD_DEFAULT),
-            $id,
-        ]);
+        $hash = password_hash($plain, PASSWORD_DEFAULT);
+        if ($this->app->db->columnExists('users', 'pass_login')) {
+            $this->app->db->run('UPDATE users SET pass = ?, pass_login = 1 WHERE id = ?', [$hash, $id]);
+        } else {
+            $this->app->db->run('UPDATE users SET pass = ? WHERE id = ?', [$hash, $id]);
+        }
+    }
+
+    public function setPassLogin(int $id, bool $on): void
+    {
+        if ($this->app->db->columnExists('users', 'pass_login')) {
+            $this->app->db->run('UPDATE users SET pass_login = ? WHERE id = ?', [$on ? 1 : 0, $id]);
+        } elseif (!$on) {
+            $this->clearPassword($id);
+        }
+    }
+
+    public function passwordLoginOn(array $u): bool
+    {
+        if (empty($u['pass'])) {
+            return false;
+        }
+        if (array_key_exists('pass_login', $u) && (int) $u['pass_login'] === 0) {
+            return false;
+        }
+        return true;
     }
 
     public function clearPassword(int $id): void

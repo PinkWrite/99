@@ -8,11 +8,25 @@ $uid = $app->auth->id();
 $pks = $app->passkey->list($uid);
 $oauths = $app->oauth->list($uid);
 $canDisable = $pks !== [] && $oauths !== [];
-$noPass = empty($u['pass']);
+$noPass = !$app->user->passwordLoginOn($u);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
-    if (isset($_POST['disable_password']) && $canDisable) {
-        $app->user->clearPassword($uid);
+    if (isset($_POST['pw_login_toggle']) && $canDisable) {
+        if (isset($_POST['disable_password'])) {
+            $app->user->setPassLogin($uid, false);
+            $u = $app->user->find($uid) ?? $u;
+            $noPass = true;
+            $msg = 'Password login is off.';
+            $app->audit->record($uid, 'password_off', 'self');
+        } elseif (!empty($u['pass'])) {
+            $app->user->setPassLogin($uid, true);
+            $u = $app->user->find($uid) ?? $u;
+            $noPass = false;
+            $msg = 'Password login is on.';
+            $app->audit->record($uid, 'password_on', 'self');
+        }
+    } elseif (isset($_POST['disable_password']) && $canDisable) {
+        $app->user->setPassLogin($uid, false);
         $u = $app->user->find($uid) ?? $u;
         $noPass = true;
         $msg = 'Password login is off.';
@@ -50,6 +64,7 @@ if ($msg) {
 }
 if ($canDisable) {
     echo '<form method="post" id="nopwform" class="sans">' . $app->csrf->field();
+    echo '<input type="hidden" name="pw_login_toggle" value="1">';
     echo '<p><label><input type="checkbox" name="disable_password" id="disable_password" value="1"'
         . ($noPass ? ' checked' : '') . '> Disable password login</label></p>';
     echo '</form>';
@@ -79,7 +94,7 @@ echo '<script>
   apply();
   cb.addEventListener("change", function () {
     apply();
-    if (cb.checked && cut) cut.submit();
+    if (cut) cut.submit();
   });
 })();
 </script>';

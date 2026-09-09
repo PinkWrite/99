@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
         $pkId = (int) $_POST['del_pk'];
         $pks = $app->passkey->list($app->auth->id());
         $oauths = $app->oauth->list($app->auth->id());
-        if (empty($u['pass']) && count($pks) < 2 && $oauths === []) {
+        if (!$app->user->passwordLoginOn($u) && count($pks) < 2 && $oauths === []) {
             // keep at least one way in
         } else {
             $app->passkey->delete($pkId, $app->auth->id());
@@ -35,17 +35,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $app->csrf->check()) {
     } elseif (isset($_POST['unlink_oauth'])) {
         $pks = $app->passkey->list($app->auth->id());
         $oauths = $app->oauth->list($app->auth->id());
-        if (empty($u['pass']) && $pks === [] && count($oauths) < 2) {
+        if (!$app->user->passwordLoginOn($u) && $pks === [] && count($oauths) < 2) {
             // keep at least one way in
         } else {
             $app->oauth->unlink($app->auth->id(), (string) $_POST['unlink_oauth']);
+        }
+    } elseif (isset($_POST['pw_login_toggle'])) {
+        $pks = $app->passkey->list($app->auth->id());
+        $oauths = $app->oauth->list($app->auth->id());
+        if ($pks !== [] && $oauths !== []) {
+            $id = $app->auth->id();
+            if (isset($_POST['disable_password'])) {
+                $app->user->setPassLogin($id, false);
+                $app->audit->record($id, 'password_off', 'self');
+            } elseif (!empty($u['pass'])) {
+                $app->user->setPassLogin($id, true);
+                $app->audit->record($id, 'password_on', 'self');
+            }
+            $u = $app->user->find($id) ?? $u;
         }
     } elseif (isset($_POST['disable_password'])) {
         $pks = $app->passkey->list($app->auth->id());
         $oauths = $app->oauth->list($app->auth->id());
         if ($pks !== [] && $oauths !== []) {
-            $app->user->clearPassword($app->auth->id());
+            $app->user->setPassLogin($app->auth->id(), false);
             $u = $app->user->find($app->auth->id()) ?? $u;
+            $app->audit->record($app->auth->id(), 'password_off', 'self');
         }
     }
 }
@@ -125,24 +140,16 @@ foreach (['google' => 'Google', 'github' => 'GitHub'] as $p => $lab) {
 }
 if ($linkRows !== '') {
     echo '<h2 class="lt">Linked logins</h2>';
-    echo '<table class="id-link"><tbody>' . $linkRows . '</tbody></table>';
+    echo '<table class="id-link oauth-list"><colgroup><col class="oauth-col-who"><col class="oauth-col-mark"><col class="oauth-col-act"></colgroup><tbody>' . $linkRows . '</tbody></table>';
 }
 $pksNow = $app->passkey->list($app->auth->id());
 $oauthNow = $app->oauth->list($app->auth->id());
 if ($pksNow !== [] && $oauthNow !== []) {
+    $pwOff = !$app->user->passwordLoginOn($u);
     echo '<form method="post" id="nopwform" class="sans">' . $app->csrf->field();
+    echo '<input type="hidden" name="pw_login_toggle" value="1">';
     echo '<p><label><input type="checkbox" name="disable_password" id="disable_password" value="1"'
-        . (empty($u['pass']) ? ' checked' : '') . '> Disable password login</label></p>';
+        . ($pwOff ? ' checked' : '') . ' onchange="this.form.submit()"> Disable password login</label></p>';
     echo '</form>';
-    echo '<script>
-(function(){
-  var cb = document.getElementById("disable_password");
-  if (!cb) return;
-  cb.addEventListener("change", function () {
-    if (cb.checked) cb.form.submit();
-    else window.location = "password.php";
-  });
-})();
-</script>';
 }
 $app->view->end();

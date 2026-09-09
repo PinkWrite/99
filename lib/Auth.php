@@ -128,7 +128,7 @@ final class Auth
             return 'bad';
         }
         $u = $this->app->user->findByUsername($username);
-        if (!$u || empty($u['pass']) || !password_verify($pass, $u['pass'])) {
+        if (!$u || !$this->app->user->passwordLoginOn($u) || !password_verify($pass, (string) $u['pass'])) {
             $this->app->clickathon->fail($ip, $username);
             if ($u) {
                 $this->logAccount((int) $u['id'], 'login_fail', 'password', 0);
