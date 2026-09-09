@@ -23,7 +23,12 @@ if ($off) {
     $app->json(['ok' => true, 'msg' => 'Saved', 'off' => true]);
 }
 if (empty($u['pass'])) {
-    $app->json(['ok' => false, 'error' => 'Set a password first.', 'off' => true], 400);
+    $app->json([
+        'ok' => false,
+        'error' => 'Set a password first.',
+        'error_html' => 'Set a <a href="password.php">password</a> first.',
+        'off' => true,
+    ], 400);
 }
 $app->user->setPassLogin($id, true);
 $app->audit->record($id, 'password_on', 'self');

@@ -150,7 +150,10 @@
         }
         cb.checked = !cb.checked;
         if (typeof j.off === 'boolean') cb.checked = j.off;
-        if (box) box.innerHTML = '<span class="noticered sans">' + ((j && j.error) || 'Save failed') + '</span>';
+        if (box) {
+          var err = (j && j.error_html) ? j.error_html : ((j && j.error) || 'Save failed');
+          box.innerHTML = '<span class="noticered sans">' + err + '</span>';
+        }
       };
       x.onerror = function () {
         cb.checked = !cb.checked;
