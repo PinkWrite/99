@@ -20,21 +20,33 @@ Walk-in Superintendent recovery: set `allow_create_super` to `true` in config, o
 - CLI: `php bin/update.php` or `bash bin/pw99-update`
 - Admin / Superintendent locker: **Update app**
 - Pulls the GitHub branch named in `config.php` as `stream` (never overwrites `config.php`), then runs SQL migrations.
-- If `stream` is missing, older `github_branch` still works. If `stream` is `main` and that branch is not on origin, the updater uses `master`.
+- If `stream` is missing, older `github_branch` still works. The name `main` is treated as `master`.
 
 ## Streams
-`stream` is SysAdmin-only. Edit `config.php`. There is no in-app control.
+Two branches. `stream` is SysAdmin-only. Edit `config.php`. There is no in-app control.
 
 | stream | What it is |
 |---|---|
-| `main` | Default for new installs. Published line. |
+| `master` | Published line. Default. |
 | `developer` | In-progress work. Point a box here to follow that branch. |
-| `master` | Older published name. Existing boxes keep working on it until the SysAdmin changes `stream`. |
 
-This classroom box can stay on `master` through the next update, then set `'stream' => 'developer'` in `config.php` to follow the developer branch from then on.
+## Google and GitHub login
+Empty `id` or `secret` in `config.php` hides that button. Callback for both providers is `https://{host}/oauth.php` (the same `host` value as in config, with `https://` in front).
+
+| Provider | Where to get the keys | What to paste |
+|---|---|---|
+| Google | [Google Cloud credentials](https://console.cloud.google.com/apis/credentials) — create an **OAuth client ID**, application type **Web application**. Authorized redirect URI: `https://{host}/oauth.php` | `oauth.google.id` and `oauth.google.secret` |
+| GitHub | [GitHub Developer settings](https://github.com/settings/developers) — **OAuth Apps** → New OAuth App. Authorization callback URL: `https://{host}/oauth.php` | `oauth.github.id` and `oauth.github.secret` |
+
+```php
+'oauth' => [
+    'google' => ['id' => '….apps.googleusercontent.com', 'secret' => '…'],
+    'github' => ['id' => 'Ov…', 'secret' => '…'],
+],
+```
 
 ## Migrating an old dump
-The mysqli-era tree and `sql/legacy-lift.sql` live on the [legacy](https://github.com/PinkWrite/99/tree/legacy) branch. Read that README. Import the dump into an empty database, then `php bin/update.php` on master (same lift in PHP).
+The mysqli-era tree and `sql/legacy-lift.sql` live on the [legacy](https://github.com/PinkWrite/99/tree/legacy) history. Read that README. Import the dump into an empty database, then `php bin/update.php` on `master` (same lift in PHP).
 
 ## Roles
 | Role | Seat |
