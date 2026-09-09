@@ -125,6 +125,41 @@
     });
   };
 
+  window.pwBindPassLogin = function (cbId, msgId, postTo) {
+    var cb = document.getElementById(cbId);
+    var box = document.getElementById(msgId);
+    if (!cb || !cb.form) return;
+    cb.addEventListener('change', function () {
+      var fd = new FormData(cb.form);
+      fd.append('ajax', '1');
+      fd.set('disable_password', cb.checked ? '1' : '0');
+      var x = new XMLHttpRequest();
+      x.open('POST', postTo);
+      x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      x.onload = function () {
+        var j = null;
+        try { j = JSON.parse(x.responseText || ''); } catch (e) { j = null; }
+        if (j && j.ok) {
+          if (typeof j.off === 'boolean') cb.checked = j.off;
+          if (box) {
+            box.innerHTML = '';
+            void box.offsetWidth;
+            box.innerHTML = '<span class="noticegreen noticehide sans">' + (j.msg || 'Saved') + '</span>';
+          }
+          return;
+        }
+        cb.checked = !cb.checked;
+        if (typeof j.off === 'boolean') cb.checked = j.off;
+        if (box) box.innerHTML = '<span class="noticered sans">' + ((j && j.error) || 'Save failed') + '</span>';
+      };
+      x.onerror = function () {
+        cb.checked = !cb.checked;
+        if (box) box.innerHTML = '<span class="noticered sans">Save failed</span>';
+      };
+      x.send(fd);
+    });
+  };
+
   window.onNavWarn = function () {
     window.onbeforeunload = function () { return ''; };
   };

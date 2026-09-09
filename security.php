@@ -146,10 +146,10 @@ $pksNow = $app->passkey->list($app->auth->id());
 $oauthNow = $app->oauth->list($app->auth->id());
 if ($pksNow !== [] && $oauthNow !== []) {
     $pwOff = !$app->user->passwordLoginOn($u);
-    echo '<form method="post" id="nopwform" class="sans">' . $app->csrf->field();
-    echo '<input type="hidden" name="pw_login_toggle" value="1">';
-    echo '<p><label><input type="checkbox" name="disable_password" id="disable_password" value="1"'
-        . ($pwOff ? ' checked' : '') . ' onchange="this.form.submit()"> Disable password login</label></p>';
-    echo '</form>';
+    echo '<form method="post" id="nopwform" class="sans pw-login-toggle" action="ajax/save-pass-login.php" onsubmit="return false;">' . $app->csrf->field();
+    echo '<label><input type="checkbox" name="disable_password" id="disable_password" value="1"'
+        . ($pwOff ? ' checked' : '') . '> Disable password login</label>';
+    echo '<span id="pw_login_saved"></span></form>';
+    echo '<script>pwBindPassLogin("disable_password","pw_login_saved","ajax/save-pass-login.php");</script>';
 }
 $app->view->end();

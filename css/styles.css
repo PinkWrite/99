@@ -1603,9 +1603,8 @@ button.id-btn:hover {
 }
 
 table.id-link {
-  width: 36em;
+  width: auto;
   max-width: 100%;
-  table-layout: fixed;
   border-collapse: collapse;
   margin: 0.6em 0 1.4em;
 }
@@ -1686,18 +1685,36 @@ table.pk-list {
   width: 36em;
   max-width: 100%;
 }
+table.oauth-list {
+  table-layout: fixed;
+  width: 23.6em;
+  max-width: 100%;
+}
 table.oauth-list col.oauth-col-who {
-  width: 29em;
+  width: 11em;
 }
 table.oauth-list col.oauth-col-mark {
-  width: 2.2em;
+  width: 4.6em;
 }
 table.oauth-list col.oauth-col-act {
-  width: 4.8em;
+  width: 8em;
 }
-table.oauth-list td.id-mark,
-table.oauth-list td.id-act {
+table.oauth-list td.id-mark {
+  width: 4.6em;
   text-align: center;
+}
+table.oauth-list td.id-act {
+  width: 8em;
+  text-align: center;
+}
+.pw-login-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  flex-wrap: wrap;
+}
+.pw-login-toggle label {
+  margin: 0;
 }
 table.pk-list col.pk-col-name {
   width: 17.5em;
