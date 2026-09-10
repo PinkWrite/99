@@ -1727,9 +1727,12 @@ table.pk-list col.pk-col-rm {
 }
 table.pk-list td {
   vertical-align: middle;
+  height: 3.1em;
+  box-sizing: border-box;
 }
 table.pk-list td.pk-name {
   width: 17.5em;
+  overflow: hidden;
 }
 table.pk-list td.pk-when {
   width: 11.5em;
@@ -1746,12 +1749,14 @@ table.pk-list form.pk-row {
   align-items: center;
   column-gap: 0.45em;
   margin: 0;
+  height: 2em;
 }
 table.pk-list .pk-who,
 table.pk-list .pk-act {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: 2em;
+  height: 2em;
   min-width: 0;
 }
 table.pk-list .pk-who .pk-label,
@@ -1761,6 +1766,8 @@ table.pk-list .pk-who .pk-input {
   max-width: 100%;
   box-sizing: border-box;
   min-width: 0;
+  height: 2em;
+  max-height: 2em;
 }
 table.pk-list .pk-who .pk-label {
   overflow: hidden;
@@ -1770,7 +1777,11 @@ table.pk-list .pk-who .pk-label {
   line-height: 2em;
 }
 table.pk-list .pk-who .pk-input {
-  font: 1em/1.4em Verdana, Arial, Helvetica, sans-serif;
+  font: 1em/2em Verdana, Arial, Helvetica, sans-serif;
+  padding: 0 0.45em;
+  margin: 0;
+  border: 1px solid #666;
+  border-radius: 4px;
 }
 table.pk-list .pk-act .pk-edit,
 table.pk-list .pk-act .pk-save {

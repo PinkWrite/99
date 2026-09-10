@@ -132,15 +132,16 @@ foreach (['google' => 'Google', 'github' => 'GitHub'] as $p => $lab) {
     $linkRows .= '<tr><td class="id-who">' . brand_icon($p) . '<span class="id-lab">' . h($lab) . '</span></td>';
     $linkRows .= '<td class="id-mark">' . ($on ? brand_icon('check') : '&nbsp;') . '</td><td class="id-act">';
     if ($on) {
-        $linkRows .= post_button('Disconnect', 'Stop using this login', 'security.php', 'unlink_oauth', $p, 'set_gray small', $app->csrf->token());
+        $linkRows .= '<button type="button" class="set_gray small" data-oauth="' . h($p) . '" data-act="disconnect" title="Stop using this login">Disconnect</button>';
     } else {
-        $linkRows .= button('Connect', 'Link this login', 'oauth.php?p=' . rawurlencode($p) . '&link=1', 'lt_button small');
+        $linkRows .= '<button type="button" class="lt_button small" data-oauth="' . h($p) . '" data-act="connect" title="Link this login">Connect</button>';
     }
     $linkRows .= '</td></tr>';
 }
 if ($linkRows !== '') {
     echo '<h2 class="lt">Linked logins</h2>';
-    echo '<table class="id-link oauth-list"><colgroup><col class="oauth-col-who"><col class="oauth-col-mark"><col class="oauth-col-act"></colgroup><tbody>' . $linkRows . '</tbody></table>';
+    echo '<table class="id-link oauth-list" id="oauth-list" data-csrf="' . h($app->csrf->token()) . '"><colgroup><col class="oauth-col-who"><col class="oauth-col-mark"><col class="oauth-col-act"></colgroup><tbody>' . $linkRows . '</tbody></table>';
+    echo '<script>pwBindOauthLinks("#oauth-list");</script>';
 }
 $pksNow = $app->passkey->list($app->auth->id());
 $oauthNow = $app->oauth->list($app->auth->id());

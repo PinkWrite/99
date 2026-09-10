@@ -163,6 +163,71 @@
     });
   };
 
+  var pwOauthCheck = '<span class="id-ico"><svg class="id-svg id-check-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5 10 17.5 19 6.5"/></svg></span>';
+
+  function pwOauthSetRow(table, provider, linked) {
+    var btn = table.querySelector('[data-oauth="' + provider + '"]');
+    if (!btn) return;
+    var row = btn.closest('tr');
+    if (!row) return;
+    var mark = row.querySelector('.id-mark');
+    var act = row.querySelector('.id-act');
+    if (mark) mark.innerHTML = linked ? pwOauthCheck : '&nbsp;';
+    if (act) {
+      if (linked) {
+        act.innerHTML = '<button type="button" class="set_gray small" data-oauth="' + provider + '" data-act="disconnect" title="Stop using this login">Disconnect</button>';
+      } else {
+        act.innerHTML = '<button type="button" class="lt_button small" data-oauth="' + provider + '" data-act="connect" title="Link this login">Connect</button>';
+      }
+    }
+  }
+
+  window.pwBindOauthLinks = function (tableSel) {
+    var table = document.querySelector(tableSel);
+    if (!table || table.getAttribute('data-oauth-bound')) return;
+    table.setAttribute('data-oauth-bound', '1');
+    window.addEventListener('message', function (ev) {
+      if (ev.origin !== window.location.origin) return;
+      var d = ev.data;
+      if (!d || !d.pw99oauth) return;
+      if (d.ok) pwOauthSetRow(table, d.provider, true);
+    });
+    table.addEventListener('click', function (ev) {
+      var btn = ev.target.closest ? ev.target.closest('[data-oauth]') : null;
+      if (!btn || !table.contains(btn)) return;
+      ev.preventDefault();
+      var p = btn.getAttribute('data-oauth');
+      var act = btn.getAttribute('data-act');
+      if (act === 'connect') {
+        var w = 520;
+        var h = 640;
+        var left = window.screenX + Math.max(0, (window.outerWidth - w) / 2);
+        var top = window.screenY + Math.max(0, (window.outerHeight - h) / 2);
+        window.open(
+          'oauth.php?p=' + encodeURIComponent(p) + '&link=1&popup=1',
+          'pw99oauth',
+          'popup=yes,width=' + w + ',height=' + h + ',left=' + left + ',top=' + top
+        );
+        return;
+      }
+      if (act === 'disconnect') {
+        var fd = new FormData();
+        fd.append('_csrf', table.getAttribute('data-csrf') || '');
+        fd.append('ajax', '1');
+        fd.append('unlink_oauth', p);
+        var x = new XMLHttpRequest();
+        x.open('POST', 'ajax/save-oauth.php');
+        x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        x.onload = function () {
+          var j = null;
+          try { j = JSON.parse(x.responseText || ''); } catch (e) { j = null; }
+          if (j && j.ok) pwOauthSetRow(table, p, false);
+        };
+        x.send(fd);
+      }
+    });
+  };
+
   window.onNavWarn = function () {
     window.onbeforeunload = function () { return ''; };
   };
